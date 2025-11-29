@@ -2,10 +2,13 @@
 <html lang="en">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes">
     <title>Enhanced Social Media Analytics Dashboard</title>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link rel="icon" href="data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 100 100%22><text y=%22.9em%22 font-size=%2290%22>📊</text></svg>">
+
     <style>
+       
         :root {
             --primary: #4361ee;
             --secondary: #3f37c9;
@@ -485,6 +488,9 @@
             background-color: var(--light-gray);
             color: var(--dark);
             font-weight: 600;
+
+            white-space: nowrap; 
+            display: inline-block;
         }
 
         .performance-indicator {
@@ -795,7 +801,180 @@
                 align-items: flex-start;
             }
         }
+
+        .posts-scroll-container {
+            max-height: 800px; 
+            overflow-y: auto;  
+            padding-right: 10px; 
+        }
+
+        .posts-scroll-container::-webkit-scrollbar {
+            width: 8px;
+        }
+        .posts-scroll-container::-webkit-scrollbar-track {
+            background: #f1f1f1;
+            border-radius: 4px;
+        }
+        .posts-scroll-container::-webkit-scrollbar-thumb {
+            background: #ccc;
+            border-radius: 4px;
+        }
+        .posts-scroll-container::-webkit-scrollbar-thumb:hover {
+            background: #aaa;
+        }
+
+        .platform-tab {
+            cursor: pointer;
+            user-select: none;
+        }
+
+        /* ===================================== */
+        /* TABLET (iPad 1024px)                  */
+        /* ===================================== */
+        @media (max-width: 1024px) {
+            .container { padding: 15px; }
+            header { padding: 15px 20px; }
+
+            .stat-card,
+            .region-card,
+            .comparison-card,
+            .post-card,
+            .content-section {
+                padding: 15px !important;
+            }
+
+            .summary-stats { grid-template-columns: repeat(3, 1fr); }
+            .posts-grid { grid-template-columns: repeat(2, 1fr); }
+            .comparison-grid { grid-template-columns: repeat(2, 1fr); }
+
+            .pages-table {
+            display: block;
+            overflow-x: auto;
+            width: 100%;
+        }
+        }
+
+        /* ===================================== */
+        /* LARGE PHONES / SMALL TABLETS (768px)  */
+        /* ===================================== */
+        @media (max-width: 768px) {
+            .header-top {
+                flex-direction: column;
+                align-items: flex-start;
+                gap: 15px;
+            }
+
+            .filters-section {
+                grid-template-columns: 1fr !important;
+            }
+
+            .summary-stats { grid-template-columns: repeat(2, 1fr); }
+            .region-breakdown { grid-template-columns: 1fr; }
+            .posts-grid { grid-template-columns: 1fr; }
+            .comparison-grid { grid-template-columns: 1fr; }
+
+            .section-header {
+                flex-direction: column;
+                align-items: flex-start;
+            }
+
+            .post-image { height: 180px; }
+            .content-section { padding: 15px; }
+        }
+
+        /* ===================================== */
+        /* MOBILE FIX (580px)  */
+        /* ===================================== */
+        @media (max-width: 580px) {
+
+        
+            .pages-table tbody tr td:first-child,
+            .pages-table thead tr th:first-child {
+                position: sticky;
+                left: 0;
+                background: #ffffff;
+                z-index: 10;
+                min-width: 160px !important; 
+                max-width: 160px;
+                border-right: 2px solid #f0f0f0; 
+                box-shadow: 2px 0 5px rgba(0,0,0,0.05);
+            }
+
+            .page-avatar {
+                width: 32px !important;
+                height: 32px !important;
+                font-size: 12px !important;
+                flex-shrink: 0; 
+                margin-right: 8px;
+            }
+
+            .page-name {
+                display: flex;
+                align-items: center;
+                gap: 0; 
+            }
+            
+            .page-name > div {
+                overflow: hidden; 
+                display: flex;
+                flex-direction: column;
+                justify-content: center;
+            }
+
+            .page-name > div > div:first-child {
+                font-size: 11px !important;
+                font-weight: 700;
+                line-height: 1.3;
+                white-space: normal; 
+                margin-bottom: 2px;
+            }
+
+            .page-name > div > div:last-child {
+                font-size: 9px !important;
+                color: #888;
+                white-space: nowrap;
+                overflow: hidden;
+                text-overflow: ellipsis; 
+            }
+
+            
+            .pages-table th,
+            .pages-table td {
+                padding: 10px 8px !important; 
+                font-size: 11px !important;
+                vertical-align: middle; 
+                white-space: nowrap; 
+            }
+
+            .platform-badge {
+                padding: 3px 8px !important;
+            }
+            
+        
+            .pages-table {
+                margin-top: 0;
+                border-radius: 0;
+            }
+        }
+
+        /* SMALL MOBILE (480px) */ 
+        /* ===================================== */
+        @media (max-width: 480px) {
+            .summary-stats { grid-template-columns: 1fr; }
+            .container { padding: 10px; }
+
+            .btn { padding: 8px 14px; font-size: 12px; }
+            .section-title { font-size: 18px; }
+            .post-image { height: 150px; }
+
+            .stat-card,
+            .region-card,
+            .comparison-card {
+                padding: 12px !important;
+            }
+        }
     </style>
+
 </head>
 <body>
     <div class="container">
@@ -818,7 +997,7 @@
             <div class="filters-section">
                 <div class="filter-group">
                     <label class="filter-label">Time Range</label>
-                    <select id="time-range" class="filter-select">
+                    <select id="time-range" class="filter-select" onchange="updateDashboard()">
                         <option value="7">Last 7 days</option>
                         <option value="30" selected>Last 30 days</option>
                         <option value="90">Last 90 days</option>
@@ -829,7 +1008,7 @@
 
                 <div class="filter-group">
                     <label class="filter-label">Region</label>
-                    <select id="region-filter" class="filter-select">
+                    <select id="region-filter" class="filter-select" onchange="updateDashboard()">
                         <option value="all">All Regions</option>
                         <option value="north-america">North America</option>
                         <option value="europe">Europe</option>
@@ -841,20 +1020,17 @@
 
                 <div class="filter-group">
                     <label class="filter-label">Platform</label>
-                    <select id="platform-filter" class="filter-select">
+                    <select id="platform-filter" class="filter-select" onchange="updateDashboard()">
                         <option value="all">All Platforms</option>
-                        <option value="instagram">Instagram</option>
                         <option value="facebook">Facebook</option>
-                        <option value="twitter">Twitter</option>
-                        <option value="linkedin">LinkedIn</option>
+                        <option value="instagram">Instagram</option>
                         <option value="tiktok">TikTok</option>
-                        <option value="youtube">YouTube</option>
                     </select>
                 </div>
 
                 <div class="filter-group">
                     <label class="filter-label">Page/Account</label>
-                    <select id="page-filter" class="filter-select">
+                    <select id="page-filter" class="filter-select" onchange="updateDashboard()">
                         <option value="all">All Pages</option>
                         <option value="main">Main Brand Account</option>
                         <option value="usa">USA Regional</option>
@@ -864,27 +1040,6 @@
                     </select>
                 </div>
 
-                <div class="filter-group">
-                    <label class="filter-label">Content Type</label>
-                    <select id="content-filter" class="filter-select">
-                        <option value="all">All Content</option>
-                        <option value="image">Images</option>
-                        <option value="video">Videos</option>
-                        <option value="carousel">Carousels</option>
-                        <option value="story">Stories</option>
-                        <option value="reel">Reels/Shorts</option>
-                    </select>
-                </div>
-
-                <div class="filter-group">
-                    <label class="filter-label">Sort By</label>
-                    <select id="sort-filter" class="filter-select">
-                        <option value="engagement">Highest Engagement</option>
-                        <option value="impressions">Most Impressions</option>
-                        <option value="reach">Highest Reach</option>
-                        <option value="date">Most Recent</option>
-                    </select>
-                </div>
             </div>
 
             <div class="active-filters" id="active-filters">
@@ -892,96 +1047,75 @@
             </div>
         </header>
 
-        <div class="summary-stats" id="summary-stats">
+        <div class="summary-stats" id="summary-stats" style="margin-bottom: 5px;">
             <div class="stat-card impressions">
                 <div class="stat-header">
-                    <div class="stat-icon">
-                        <i class="fas fa-eye"></i>
-                    </div>
+                    <div class="stat-icon"><i class="fas fa-eye"></i></div>
                 </div>
                 <div class="stat-title">Total Impressions</div>
-                <div class="stat-value">3.8M</div>
-                <div class="stat-change positive">
-                    <i class="fas fa-arrow-up"></i>
-                    <span>18.5%</span>
+                <div class="stat-value" id="total-impressions">0</div> <div class="stat-change positive">
+                    <i class="fas fa-arrow-up"></i> <span>18.5%</span>
                 </div>
                 <div class="comparison-text">vs previous period</div>
             </div>
 
             <div class="stat-card reach">
                 <div class="stat-header">
-                    <div class="stat-icon">
-                        <i class="fas fa-users"></i>
-                    </div>
+                    <div class="stat-icon"><i class="fas fa-users"></i></div>
                 </div>
-                <div class="stat-title">Total Reach</div>
-                <div class="stat-value">2.9M</div>
-                <div class="stat-change positive">
-                    <i class="fas fa-arrow-up"></i>
-                    <span>12.3%</span>
+                <div class="stat-title">Total Followers</div> <div class="stat-value" id="total-followers">0</div> <div class="stat-change positive">
+                    <i class="fas fa-arrow-up"></i> <span>12.3%</span>
                 </div>
-                <div class="comparison-text">vs previous period</div>
+                <div class="comparison-text">Across all platforms</div>
             </div>
 
             <div class="stat-card engagement">
                 <div class="stat-header">
-                    <div class="stat-icon">
-                        <i class="fas fa-heart"></i>
-                    </div>
+                    <div class="stat-icon"><i class="fas fa-heart"></i></div>
                 </div>
                 <div class="stat-title">Total Engagements</div>
-                <div class="stat-value">387K</div>
-                <div class="stat-change positive">
-                    <i class="fas fa-arrow-up"></i>
-                    <span>24.7%</span>
+                <div class="stat-value" id="total-engagement">0</div> <div class="stat-change positive">
+                    <i class="fas fa-arrow-up"></i> <span>24.7%</span>
                 </div>
                 <div class="comparison-text">vs previous period</div>
             </div>
 
             <div class="stat-card rate">
                 <div class="stat-header">
-                    <div class="stat-icon">
-                        <i class="fas fa-percentage"></i>
-                    </div>
+                    <div class="stat-icon"><i class="fas fa-percentage"></i></div>
                 </div>
-                <div class="stat-title">Engagement Rate</div>
-                <div class="stat-value">5.2%</div>
-                <div class="stat-change positive">
-                    <i class="fas fa-arrow-up"></i>
-                    <span>3.1%</span>
+                <div class="stat-title">Avg. Engagement Rate</div>
+                <div class="stat-value" id="avg-engagement-rate">0%</div> <div class="stat-change positive">
+                    <i class="fas fa-arrow-up"></i> <span>3.1%</span>
                 </div>
-                <div class="comparison-text">vs previous period</div>
+                <div class="comparison-text">Average per account</div>
             </div>
 
             <div class="stat-card clicks">
                 <div class="stat-header">
-                    <div class="stat-icon">
-                        <i class="fas fa-mouse-pointer"></i>
-                    </div>
+                    <div class="stat-icon"><i class="fas fa-mouse-pointer"></i></div>
                 </div>
                 <div class="stat-title">Total Clicks</div>
-                <div class="stat-value">124K</div>
-                <div class="stat-change positive">
-                    <i class="fas fa-arrow-up"></i>
-                    <span>15.8%</span>
+                <div class="stat-value">0</div> <div class="stat-change positive">
+                    <i class="fas fa-arrow-up"></i> <span>15.8%</span>
                 </div>
                 <div class="comparison-text">vs previous period</div>
             </div>
 
             <div class="stat-card followers">
                 <div class="stat-header">
-                    <div class="stat-icon">
-                        <i class="fas fa-user-plus"></i>
-                    </div>
+                    <div class="stat-icon"><i class="fas fa-user-plus"></i></div>
                 </div>
                 <div class="stat-title">New Followers</div>
-                <div class="stat-value">45.2K</div>
-                <div class="stat-change negative">
-                    <i class="fas fa-arrow-down"></i>
-                    <span>2.4%</span>
+                <div class="stat-value">0</div> <div class="stat-change negative">
+                    <i class="fas fa-arrow-down"></i> <span>2.4%</span>
                 </div>
                 <div class="comparison-text">vs previous period</div>
             </div>
+        </div>
+
+        <div id="data-period-label" style="text-align: right; font-size: 11px; color: #8898aa; margin-top: 5px; margin-bottom: 20px; font-style: italic;">
+            <i class="fas fa-spinner fa-spin"></i> กำลังโหลดช่วงเวลาข้อมูล...
         </div>
 
         <div class="content-section">
@@ -992,130 +1126,9 @@
                 </h2>
             </div>
 
-            <div class="region-breakdown">
-                <div class="region-card">
-                    <div class="region-header">
-                        <div class="region-name">
-                            <i class="fas fa-flag-usa" style="color: var(--primary);"></i>
-                            North America
-                        </div>
-                        <div class="performance-indicator high">
-                            <i class="fas fa-circle"></i>
-                            High
-                        </div>
-                    </div>
-                    <div class="region-metrics">
-                        <div class="region-metric">
-                            <span class="region-metric-label">Impressions</span>
-                            <span class="region-metric-value">1.5M</span>
-                        </div>
-                        <div class="region-metric">
-                            <span class="region-metric-label">Engagement</span>
-                            <span class="region-metric-value">185K</span>
-                        </div>
-                        <div class="region-metric">
-                            <span class="region-metric-label">Posts</span>
-                            <span class="region-metric-value">142</span>
-                        </div>
-                        <div class="region-metric">
-                            <span class="region-metric-label">Eng. Rate</span>
-                            <span class="region-metric-value">6.8%</span>
-</div>
-</div>
-</div>
-            <div class="region-card">
-                <div class="region-header">
-                    <div class="region-name">
-                        <i class="fas fa-flag" style="color: var(--info);"></i>
-                        Europe
-                    </div>
-                    <div class="performance-indicator high">
-                        <i class="fas fa-circle"></i>
-                        High
-                    </div>
-                </div>
-                <div class="region-metrics">
-                    <div class="region-metric">
-                        <span class="region-metric-label">Impressions</span>
-                        <span class="region-metric-value">1.2M</span>
-                    </div>
-                    <div class="region-metric">
-                        <span class="region-metric-label">Engagement</span>
-                        <span class="region-metric-value">142K</span>
-                    </div>
-                    <div class="region-metric">
-                        <span class="region-metric-label">Posts</span>
-                        <span class="region-metric-value">128</span>
-                    </div>
-                    <div class="region-metric">
-                        <span class="region-metric-label">Eng. Rate</span>
-                        <span class="region-metric-value">5.9%</span>
-                    </div>
-                </div>
+            <div class="region-breakdown" id="region-container">
             </div>
-
-            <div class="region-card">
-                <div class="region-header">
-                    <div class="region-name">
-                        <i class="fas fa-globe-asia" style="color: var(--danger);"></i>
-                        Asia Pacific
-                    </div>
-                    <div class="performance-indicator medium">
-                        <i class="fas fa-circle"></i>
-                        Medium
-                    </div>
-                </div>
-                <div class="region-metrics">
-                    <div class="region-metric">
-                        <span class="region-metric-label">Impressions</span>
-                        <span class="region-metric-value">842K</span>
-                    </div>
-                    <div class="region-metric">
-                        <span class="region-metric-label">Engagement</span>
-                        <span class="region-metric-value">98K</span>
-                    </div>
-                    <div class="region-metric">
-                        <span class="region-metric-label">Posts</span>
-                        <span class="region-metric-value">95</span>
-                    </div>
-                    <div class="region-metric">
-                        <span class="region-metric-label">Eng. Rate</span>
-                        <span class="region-metric-value">4.7%</span>
-                    </div>
-                </div>
-            </div>
-
-            <div class="region-card">
-                <div class="region-header">
-                    <div class="region-name">
-                        <i class="fas fa-map-marked-alt" style="color: var(--warning);"></i>
-                        Latin America
-                    </div>
-                    <div class="performance-indicator medium">
-                        <i class="fas fa-circle"></i>
-                        Medium
-                    </div>
-                </div>
-                <div class="region-metrics">
-                    <div class="region-metric">
-                        <span class="region-metric-label">Impressions</span>
-                        <span class="region-metric-value">567K</span>
-                    </div>
-                    <div class="region-metric">
-                        <span class="region-metric-label">Engagement</span>
-                        <span class="region-metric-value">67K</span>
-                    </div>
-                    <div class="region-metric">
-                        <span class="region-metric-label">Posts</span>
-                        <span class="region-metric-value">78</span>
-                    </div>
-                    <div class="region-metric">
-                        <span class="region-metric-label">Eng. Rate</span>
-                        <span class="region-metric-value">5.1%</span>
-                    </div>
-                </div>
-            </div>
-        </div>
+                
     </div>
 
     <div class="content-section">
@@ -1125,138 +1138,140 @@
                 All Pages & Accounts
             </h2>
             <div class="section-controls">
-                <select class="filter-select">
-                    <option>Show: All</option>
-                    <option>Show: Top 10</option>
-                    <option>Show: Bottom 10</option>
+                <select class="filter-select" id="account-filter" onchange="filterAccountTable()">
+                    <option value="all">Show: All</option>
+                    <option value="top10">Show: Top 10</option>
+                    <option value="bottom10">Show: Bottom 10</option>
                 </select>
             </div>
         </div>
-
-        <table class="pages-table">
-            <thead>
-                <tr>
-                    <th>Page/Account</th>
-                    <th>Platform</th>
-                    <th>Region</th>
-                    <th>Followers</th>
-                    <th>Impressions</th>
-                    <th>Engagement</th>
-                    <th>Eng. Rate</th>
-                    <th>Performance</th>
-                </tr>
-            </thead>
-            <tbody>
-                <tr>
-                    <td>
-                        <div class="page-name">
-                            <div class="page-avatar">MB</div>
-                            <div>
-                                <div style="font-weight: 600;">Main Brand Account</div>
-                                <div style="font-size: 12px; color: var(--gray);">@mainbrand</div>
+        
+            <table class="pages-table">
+                <thead>
+                    <tr>
+                        <th>Page/Account</th>
+                        <th>Platform</th>
+                        <th>Region</th>
+                        <th>Followers</th>
+                        <th>Impressions</th>
+                        <th>Engagement</th>
+                        <th>Eng. Rate</th>
+                        <th>Performance</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr>
+                        <td>
+                            <div class="page-name">
+                                <div class="page-avatar">MB</div>
+                                <div>
+                                    <div style="font-weight: 600;">Main Brand Account</div>
+                                    <div style="font-size: 12px; color: var(--gray);">@mainbrand</div>
+                                </div>
                             </div>
-                        </div>
-                    </td>
-                    <td><span class="platform-badge instagram"><i class="fab fa-instagram"></i> Instagram</span></td>
-                    <td><span class="region-badge">Global</span></td>
-                    <td>1.2M</td>
-                    <td>945K</td>
-                    <td>124K</td>
-                    <td>6.8%</td>
-                    <td><span class="performance-indicator high"><i class="fas fa-arrow-up"></i> High</span></td>
-                </tr>
-                <tr>
-                    <td>
-                        <div class="page-name">
-                            <div class="page-avatar">US</div>
-                            <div>
-                                <div style="font-weight: 600;">USA Regional Page</div>
-                                <div style="font-size: 12px; color: var(--gray);">@brandusa</div>
+                        </td>
+                        <td><span class="platform-badge instagram"><i class="fab fa-instagram"></i> Instagram</span></td>
+                        <td><span class="region-badge">Global</span></td>
+                        <td>1.2M</td>
+                        <td>945K</td>
+                        <td>124K</td>
+                        <td>6.8%</td>
+                        <td><span class="performance-indicator high"><i class="fas fa-arrow-up"></i> High</span></td>
+                    </tr>
+                    <tr>
+                        <td>
+                            <div class="page-name">
+                                <div class="page-avatar">US</div>
+                                <div>
+                                    <div style="font-weight: 600;">USA Regional Page</div>
+                                    <div style="font-size: 12px; color: var(--gray);">@brandusa</div>
+                                </div>
                             </div>
-                        </div>
-                    </td>
-                    <td><span class="platform-badge facebook"><i class="fab fa-facebook"></i> Facebook</span></td>
-                    <td><span class="region-badge">North America</span></td>
-                    <td>875K</td>
-                    <td>786K</td>
-                    <td>98K</td>
-                    <td>6.2%</td>
-                    <td><span class="performance-indicator high"><i class="fas fa-arrow-up"></i> High</span></td>
-                </tr>
-                <tr>
-                    <td>
-                        <div class="page-name">
-                            <div class="page-avatar">EU</div>
-                            <div>
-                                <div style="font-weight: 600;">Europe Regional</div>
-                                <div style="font-size: 12px; color: var(--gray);">@brandeu</div>
+                        </td>
+                        <td><span class="platform-badge facebook"><i class="fab fa-facebook"></i> Facebook</span></td>
+                        <td><span class="region-badge">North America</span></td>
+                        <td>875K</td>
+                        <td>786K</td>
+                        <td>98K</td>
+                        <td>6.2%</td>
+                        <td><span class="performance-indicator high"><i class="fas fa-arrow-up"></i> High</span></td>
+                    </tr>
+                    <tr>
+                        <td>
+                            <div class="page-name">
+                                <div class="page-avatar">EU</div>
+                                <div>
+                                    <div style="font-weight: 600;">Europe Regional</div>
+                                    <div style="font-size: 12px; color: var(--gray);">@brandeu</div>
+                                </div>
                             </div>
-                        </div>
-                    </td>
-                    <td><span class="platform-badge instagram"><i class="fab fa-instagram"></i> Instagram</span></td>
-                    <td><span class="region-badge">Europe</span></td>
-                    <td>654K</td>
-                    <td>589K</td>
-                    <td>72K</td>
-                    <td>5.9%</td>
-                    <td><span class="performance-indicator high"><i class="fas fa-arrow-up"></i> High</span></td>
-                </tr>
-                <tr>
-                    <td>
-                        <div class="page-name">
-                            <div class="page-avatar">AP</div>
-                            <div>
-                                <div style="font-weight: 600;">Asia Pacific Account</div>
-                                <div style="font-size: 12px; color: var(--gray);">@brandasia</div>
+                        </td>
+                        <td><span class="platform-badge instagram"><i class="fab fa-instagram"></i> Instagram</span></td>
+                        <td><span class="region-badge">Europe</span></td>
+                        <td>654K</td>
+                        <td>589K</td>
+                        <td>72K</td>
+                        <td>5.9%</td>
+                        <td><span class="performance-indicator high"><i class="fas fa-arrow-up"></i> High</span></td>
+                    </tr>
+                    <tr>
+                        <td>
+                            <div class="page-name">
+                                <div class="page-avatar">AP</div>
+                                <div>
+                                    <div style="font-weight: 600;">Asia Pacific Account</div>
+                                    <div style="font-size: 12px; color: var(--gray);">@brandasia</div>
+                                </div>
                             </div>
-                        </div>
-                    </td>
-                    <td><span class="platform-badge tiktok"><i class="fab fa-tiktok"></i> TikTok</span></td>
-                    <td><span class="region-badge">Asia Pacific</span></td>
-                    <td>432K</td>
-                    <td>412K</td>
-                    <td>54K</td>
-                    <td>5.4%</td>
-                    <td><span class="performance-indicator medium"><i class="fas fa-minus"></i> Medium</span></td>
-                </tr>
-                <tr>
-                    <td>
-                        <div class="page-name">
-                            <div class="page-avatar">CS</div>
-                            <div>
-                                <div style="font-weight: 600;">Customer Support</div>
-                                <div style="font-size: 12px; color: var(--gray);">@brandsupport</div>
+                        </td>
+                        <td><span class="platform-badge tiktok"><i class="fab fa-tiktok"></i> TikTok</span></td>
+                        <td><span class="region-badge">Asia Pacific</span></td>
+                        <td>432K</td>
+                        <td>412K</td>
+                        <td>54K</td>
+                        <td>5.4%</td>
+                        <td><span class="performance-indicator medium"><i class="fas fa-minus"></i> Medium</span></td>
+                    </tr>
+                    <tr>
+                        <td>
+                            <div class="page-name">
+                                <div class="page-avatar">CS</div>
+                                <div>
+                                    <div style="font-weight: 600;">Customer Support</div>
+                                    <div style="font-size: 12px; color: var(--gray);">@brandsupport</div>
+                                </div>
                             </div>
-                        </div>
-                    </td>
-                    <td><span class="platform-badge twitter"><i class="fab fa-twitter"></i> Twitter</span></td>
-                    <td><span class="region-badge">Global</span></td>
-                    <td>298K</td>
-                    <td>245K</td>
-                    <td>32K</td>
-                    <td>4.8%</td>
-                    <td><span class="performance-indicator medium"><i class="fas fa-minus"></i> Medium</span></td>
-                </tr>
-                <tr>
-                    <td>
-                        <div class="page-name">
-                            <div class="page-avatar">LA</div>
-                            <div>
-                                <div style="font-weight: 600;">Latin America Page</div>
-                                <div style="font-size: 12px; color: var(--gray);">@brandlatam</div>
+                        </td>
+                        <td><span class="platform-badge twitter"><i class="fab fa-twitter"></i> Twitter</span></td>
+                        <td><span class="region-badge">Global</span></td>
+                        <td>298K</td>
+                        <td>245K</td>
+                        <td>32K</td>
+                        <td>4.8%</td>
+                        <td><span class="performance-indicator medium"><i class="fas fa-minus"></i> Medium</span></td>
+                    </tr>
+                    <tr>
+                        <td>
+                            <div class="page-name">
+                                <div class="page-avatar">LA</div>
+                                <div>
+                                    <div style="font-weight: 600;">Latin America Page</div>
+                                    <div style="font-size: 12px; color: var(--gray);">@brandlatam</div>
+                                </div>
                             </div>
-                        </div>
-                    </td>
-                    <td><span class="platform-badge facebook"><i class="fab fa-facebook"></i> Facebook</span></td>
-                    <td><span class="region-badge">Latin America</span></td>
-                    <td>187K</td>
-                    <td>198K</td>
-                    <td>28K</td>
-                    <td>5.1%</td>
-                    <td><span class="performance-indicator medium"><i class="fas fa-minus"></i> Medium</span></td>
-                </tr>
-            </tbody>
-        </table>
+                        </td>
+                        <td><span class="platform-badge facebook"><i class="fab fa-facebook"></i> Facebook</span></td>
+                        <td><span class="region-badge">Latin America</span></td>
+                        <td>187K</td>
+                        <td>198K</td>
+                        <td>28K</td>
+                        <td>5.1%</td>
+                        <td><span class="performance-indicator medium"><i class="fas fa-minus"></i> Medium</span></td>
+                    </tr>
+                </tbody>
+            </table>
+        
+            
     </div>
 
     <div class="content-section">
@@ -1273,338 +1288,23 @@
         </div>
 
         <div class="platform-tabs">
-            <div class="platform-tab active" data-platform="all">
-                <i class="fas fa-globe"></i>
-                <span>All Platforms</span>
+            <div class="platform-tab active" onclick="filterPostsByTab('all', this)">
+                <i class="fas fa-globe"></i> <span>All Platforms</span>
             </div>
-            <div class="platform-tab" data-platform="instagram">
-                <i class="fab fa-instagram"></i>
-                <span>Instagram</span>
+            <div class="platform-tab" onclick="filterPostsByTab('instagram', this)">
+                <i class="fab fa-instagram"></i> <span>Instagram</span>
             </div>
-            <div class="platform-tab" data-platform="facebook">
-                <i class="fab fa-facebook"></i>
-                <span>Facebook</span>
+            <div class="platform-tab" onclick="filterPostsByTab('facebook', this)">
+                <i class="fab fa-facebook"></i> <span>Facebook</span>
             </div>
-            <div class="platform-tab" data-platform="twitter">
-                <i class="fab fa-twitter"></i>
-                <span>Twitter</span>
-            </div>
-            <div class="platform-tab" data-platform="linkedin">
-                <i class="fab fa-linkedin"></i>
-                <span>LinkedIn</span>
-            </div>
-            <div class="platform-tab" data-platform="tiktok">
-                <i class="fab fa-tiktok"></i>
-                <span>TikTok</span>
+            <div class="platform-tab" onclick="filterPostsByTab('tiktok', this)">
+                <i class="fab fa-tiktok"></i> <span>TikTok</span>
             </div>
         </div>
 
-        <div class="posts-grid" id="posts-grid">
-            <!-- Post 1 -->
-            <div class="post-card" data-platform="instagram" data-region="north-america">
-                <div class="post-image" style="background-image: url('https://images.unsplash.com/photo-1611162617474-5b21e879e113?w=400');">
-                    <span class="post-platform-overlay instagram">
-                        <i class="fab fa-instagram"></i> Instagram
-                    </span>
-                    <span class="post-region-overlay">
-                        <i class="fas fa-map-marker-alt"></i> North America
-                    </span>
+        <div class="posts-scroll-container">
+            <div class="posts-grid" id="posts-grid">
                 </div>
-                <div class="post-content">
-                    <h4 class="post-title">Behind the scenes of our new product launch - see how we create magic!</h4>
-                    <div class="post-info">
-                        <span class="post-date">May 15, 2024</span>
-                        <span class="post-page">Main Brand</span>
-                    </div>
-                    <div class="post-metrics">
-                        <div class="metric">
-                            <span class="metric-label">Impressions</span>
-                            <span class="metric-value">
-                                <i class="fas fa-eye"></i>
-                                124.5K
-                            </span>
-                        </div>
-                        <div class="metric">
-                            <span class="metric-label">Reach</span>
-                            <span class="metric-value">
-                                <i class="fas fa-users"></i>
-                                98.3K
-                            </span>
-                        </div>
-                        <div class="metric">
-                            <span class="metric-label">Engagement</span>
-                            <span class="metric-value">
-                                <i class="fas fa-heart"></i>
-                                17.1K
-                            </span>
-                        </div>
-                    </div>
-                    <div class="engagement-rate-bar">
-                        <div class="engagement-rate-label">
-                            <span>Engagement Rate</span>
-                            <span class="engagement-rate-value">13.7%</span>
-                        </div>
-                        <div class="progress-bar">
-                            <div class="progress-fill" style="width: 85%;"></div>
-                        </div>
-                    </div>
-                </div>
-            </div>
-
-            <!-- Post 2 -->
-            <div class="post-card" data-platform="facebook" data-region="europe">
-                <div class="post-image" style="background-image: url('https://images.unsplash.com/photo-1563986768609-322da13575f3?w=400');">
-                    <span class="post-platform-overlay facebook">
-                        <i class="fab fa-facebook"></i> Facebook
-                    </span>
-                    <span class="post-region-overlay">
-                        <i class="fas fa-map-marker-alt"></i> Europe
-                    </span>
-                </div>
-                <div class="post-content">
-                    <h4 class="post-title">Announcing our partnership with leading charity - making a difference together</h4>
-                    <div class="post-info">
-                        <span class="post-date">May 18, 2024</span>
-                        <span class="post-page">Europe Regional</span>
-                    </div>
-                    <div class="post-metrics">
-                        <div class="metric">
-                            <span class="metric-label">Impressions</span>
-                            <span class="metric-value">
-                                <i class="fas fa-eye"></i>
-                                215.3K
-                            </span>
-                        </div>
-                        <div class="metric">
-                            <span class="metric-label">Reach</span>
-                            <span class="metric-value">
-                                <i class="fas fa-users"></i>
-                                182.7K
-                            </span>
-                        </div>
-                        <div class="metric">
-                            <span class="metric-label">Engagement</span>
-                            <span class="metric-value">
-                                <i class="fas fa-heart"></i>
-                                25.5K
-                            </span>
-                        </div>
-                    </div>
-                    <div class="engagement-rate-bar">
-                        <div class="engagement-rate-label">
-                            <span>Engagement Rate</span>
-                            <span class="engagement-rate-value">11.8%</span>
-                        </div>
-                        <div class="progress-bar">
-                            <div class="progress-fill" style="width: 75%;"></div>
-                        </div>
-                    </div>
-                </div>
-            </div>
-
-            <!-- Post 3 -->
-            <div class="post-card" data-platform="instagram" data-region="asia-pacific">
-                <div class="post-image" style="background-image: url('https://images.unsplash.com/photo-1611162616305-c69b3fa7fbe0?w=400');">
-                    <span class="post-platform-overlay instagram">
-                        <i class="fab fa-instagram"></i> Instagram
-                    </span>
-                    <span class="post-region-overlay">
-                        <i class="fas fa-map-marker-alt"></i> Asia Pacific
-                    </span>
-                </div>
-                <div class="post-content">
-                    <h4 class="post-title">Team spotlight: Meet our creative director and learn about her inspiring journey</h4>
-                    <div class="post-info">
-                        <span class="post-date">May 10, 2024</span>
-                        <span class="post-page">Asia Pacific</span>
-                    </div>
-                    <div class="post-metrics">
-                        <div class="metric">
-                            <span class="metric-label">Impressions</span>
-                            <span class="metric-value">
-                                <i class="fas fa-eye"></i>
-                                98.7K
-                            </span>
-                        </div>
-                        <div class="metric">
-                            <span class="metric-label">Reach</span>
-                            <span class="metric-value">
-                                <i class="fas fa-users"></i>
-                                76.2K
-                            </span>
-                        </div>
-                        <div class="metric">
-                            <span class="metric-label">Engagement</span>
-                            <span class="metric-value">
-                                <i class="fas fa-heart"></i>
-                                14.0K
-                            </span>
-                        </div>
-                    </div>
-                    <div class="engagement-rate-bar">
-                        <div class="engagement-rate-label">
-                            <span>Engagement Rate</span>
-                            <span class="engagement-rate-value">12.8%</span>
-                        </div>
-                        <div class="progress-bar">
-                            <div class="progress-fill" style="width: 80%;"></div>
-                        </div>
-                    </div>
-                </div>
-            </div>
-
-            <!-- Post 4 -->
-            <div class="post-card" data-platform="tiktok" data-region="latin-america">
-                <div class="post-image" style="background-image: url('https://images.unsplash.com/photo-1552664730-d307ca884978?w=400');">
-                    <span class="post-platform-overlay tiktok">
-                        <i class="fab fa-tiktok"></i> TikTok
-                    </span>
-                    <span class="post-region-overlay">
-                        <i class="fas fa-map-marker-alt"></i> Latin America
-                    </span>
-                </div>
-                <div class="post-content">
-                    <h4 class="post-title">Viral dance challenge with our latest product - join the movement!</h4>
-                    <div class="post-info">
-                        <span class="post-date">May 20, 2024</span>
-                        <span class="post-page">Latin America</span>
-                    </div>
-                    <div class="post-metrics">
-                        <div class="metric">
-                            <span class="metric-label">Views</span>
-                            <span class="metric-value">
-                                <i class="fas fa-eye"></i>
-                                456.8K
-                            </span>
-                        </div>
-                        <div class="metric">
-                            <span class="metric-label">Likes</span>
-                            <span class="metric-value">
-                                <i class="fas fa-heart"></i>
-                                89.2K
-                            </span>
-                        </div>
-                        <div class="metric">
-                            <span class="metric-label">Shares</span>
-                            <span class="metric-value">
-                                <i class="fas fa-share"></i>
-                                12.4K
-                            </span>
-                        </div>
-                    </div>
-                    <div class="engagement-rate-bar">
-                        <div class="engagement-rate-label">
-                            <span>Engagement Rate</span>
-                            <span class="engagement-rate-value">19.5%</span>
-                        </div>
-                        <div class="progress-bar">
-                            <div class="progress-fill" style="width: 95%;"></div>
-                        </div>
-                    </div>
-                </div>
-            </div>
-
-            <!-- Post 5 -->
-            <div class="post-card" data-platform="linkedin" data-region="north-america">
-                <div class="post-image" style="background-image: url('https://images.unsplash.com/photo-1542744173-8e7e53415bb0?w=400');">
-                    <span class="post-platform-overlay linkedin">
-                        <i class="fab fa-linkedin"></i> LinkedIn
-                    </span>
-                    <span class="post-region-overlay">
-                        <i class="fas fa-map-marker-alt"></i> North America
-                    </span>
-                </div>
-                <div class="post-content">
-                    <h4 class="post-title">Industry insights: 5 trends shaping the future of digital marketing in 2024</h4>
-                    <div class="post-info">
-                        <span class="post-date">May 12, 2024</span>
-                        <span class="post-page">Main Brand</span>
-                    </div>
-                    <div class="post-metrics">
-                        <div class="metric">
-                            <span class="metric-label">Impressions</span>
-                            <span class="metric-value">
-                                <i class="fas fa-eye"></i>
-                                67.4K
-                            </span>
-                        </div>
-                        <div class="metric">
-                            <span class="metric-label">Engagement</span>
-                            <span class="metric-value">
-                                <i class="fas fa-heart"></i>
-                                8.9K
-                            </span>
-                        </div>
-                        <div class="metric">
-                            <span class="metric-label">Clicks</span>
-                            <span class="metric-value">
-                                <i class="fas fa-mouse-pointer"></i>
-                                4.2K
-                            </span>
-                        </div>
-                    </div>
-                    <div class="engagement-rate-bar">
-                        <div class="engagement-rate-label">
-                            <span>Engagement Rate</span>
-                            <span class="engagement-rate-value">13.2%</span>
-                        </div>
-                        <div class="progress-bar">
-                            <div class="progress-fill" style="width: 82%;"></div>
-                        </div>
-                    </div>
-                </div>
-            </div>
-
-            <!-- Post 6 -->
-            <div class="post-card" data-platform="twitter" data-region="europe">
-                <div class="post-image" style="background-image: url('https://images.unsplash.com/photo-1557804506-669a67965ba0?w=400');">
-                    <span class="post-platform-overlay twitter">
-                        <i class="fab fa-twitter"></i> Twitter
-                    </span>
-                    <span class="post-region-overlay">
-                        <i class="fas fa-map-marker-alt"></i> Europe
-                    </span>
-                </div>
-                <div class="post-content">
-                    <h4 class="post-title">Breaking: We're launching in 5 new European markets this quarter! 🚀</h4>
-                    <div class="post-info">
-                        <span class="post-date">May 22, 2024</span>
-                        <span class="post-page">Europe Regional</span>
-                    </div>
-                    <div class="post-metrics">
-                        <div class="metric">
-                            <span class="metric-label">Impressions</span>
-                            <span class="metric-value">
-                                <i class="fas fa-eye"></i>
-                                89.3K
-                            </span>
-                        </div>
-                        <div class="metric">
-                            <span class="metric-label">Engagement</span>
-                            <span class="metric-value">
-                                <i class="fas fa-heart"></i>
-                                11.2K
-                            </span>
-                        </div>
-                        <div class="metric">
-                            <span class="metric-label">Retweets</span>
-                            <span class="metric-value">
-                                <i class="fas fa-retweet"></i>
-                                3.4K
-                            </span>
-                        </div>
-                    </div>
-                    <div class="engagement-rate-bar">
-                        <div class="engagement-rate-label">
-                            <span>Engagement Rate</span>
-                            <span class="engagement-rate-value">12.5%</span>
-                        </div>
-                        <div class="progress-bar">
-                            <div class="progress-fill" style="width: 78%;"></div>
-                        </div>
-                    </div>
-                </div>
-            </div>
         </div>
     </div>
 
@@ -1616,7 +1316,7 @@
             </h2>
         </div>
 
-        <div class="comparison-grid">
+        <div class="comparison-grid" id="platform-comparison-grid">
             <div class="comparison-card">
                 <div class="comparison-header">
                     <div class="comparison-title">
@@ -1735,133 +1435,490 @@
     </div>
 </div>
 
+
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+
 <script>
-    // Filter management
-    const filters = {
-        timeRange: '30',
-        region: 'all',
-        platform: 'all',
-        page: 'all',
-        contentType: 'all',
-        sortBy: 'engagement'
-    };
 
-    // Initialize filter handlers
-    document.getElementById('time-range').addEventListener('change', function() {
-        filters.timeRange = this.value;
-        updateFilters();
-        applyFilters();
-    });
+    const SUPABASE_URL = 'https://merpsvkfmjbugrgnwwlq.supabase.co'; 
+    const SUPABASE_KEY = 'sb_publishable_HTUvRzrVGDFbqLxrUCCMZQ_tY_oW4zJ';
+    
+   let supabase;
+    try {
+        if (window.supabase) supabase = window.supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
+    } catch(e) { console.error('Supabase Init Error:', e); }
 
-    document.getElementById('region-filter').addEventListener('change', function() {
-        filters.region = this.value;
-        updateFilters();
-        applyFilters();
-    });
+    let rawData = { accounts: [], posts: [], snapshots: [] };
+    let currentFilteredPosts = []; 
 
-    document.getElementById('platform-filter').addEventListener('change', function() {
-        filters.platform = this.value;
-        updateFilters();
-        applyFilters();
-    });
+    // ==========================================
+    // 2. INITIALIZATION
+    // ==========================================
+    async function initDashboard() {
+        if (!supabase) return alert('Supabase Client Error');
+        await fetchAllData();
+        populatePageFilter(); 
+        updateDashboard(); 
+    }
 
-    document.getElementById('page-filter').addEventListener('change', function() {
-        filters.page = this.value;
-        updateFilters();
-        applyFilters();
-    });
+    // ==========================================
+    // 3. DATA FETCHING
+    // ==========================================
+    async function fetchAllData() {
+        try {
+            const { data: acc } = await supabase.from('social_accounts').select('*').not('external_id', 'is', null);
+            rawData.accounts = acc || [];
 
-    document.getElementById('content-filter').addEventListener('change', function() {
-        filters.contentType = this.value;
-        updateFilters();
-        applyFilters();
-    });
+            const { data: posts } = await supabase.from('posts').select(`*, social_accounts(region, platform, name)`).order('posted_at', { ascending: false }).limit(500);
+            rawData.posts = posts || [];
 
-    document.getElementById('sort-filter').addEventListener('change', function() {
-        filters.sortBy = this.value;
-        applyFilters();
-    });
+            const { data: snaps } = await supabase.from('daily_snapshots').select('*').order('recorded_at', { ascending: true });
+            rawData.snapshots = snaps || [];
 
-    // Platform tabs
-    document.querySelectorAll('.platform-tab').forEach(tab => {
-        tab.addEventListener('click', function() {
-            document.querySelectorAll('.platform-tab').forEach(t => {
-                t.classList.remove('active');
-            });
-            this.classList.add('active');
-            
-            const platform = this.getAttribute('data-platform');
-            filters.platform = platform;
-            document.getElementById('platform-filter').value = platform;
-            updateFilters();
-            applyFilters();
-        });
-    });
+            renderDataPeriod(rawData.snapshots);
+        } catch (err) { console.error('Fetch Error:', err); }
+    }
 
-    // Update active filters display
-    function updateFilters() {
-        const activeFiltersContainer = document.getElementById('active-filters');
-        activeFiltersContainer.innerHTML = '';
-
-        const filterLabels = {
-            region: 'Region',
-            platform: 'Platform',
-            page: 'Page',
-            contentType: 'Content Type'
+    // ==========================================
+    // 4. MASTER FILTER LOGIC
+    // ==========================================
+    function updateDashboard() {
+        const filter = {
+            time: parseInt(document.getElementById('time-range').value) || 30,
+            region: document.getElementById('region-filter').value,
+            platform: document.getElementById('platform-filter').value,
+            pageId: document.getElementById('page-filter').value,
+            contentType: 'all', 
+            sort: 'engagement'
         };
 
-        Object.keys(filters).forEach(key => {
-            if (filters[key] !== 'all' && key !== 'timeRange' && key !== 'sortBy') {
-                const tag = document.createElement('div');
-                tag.className = 'filter-tag';
-                tag.innerHTML = `
-                    <span>${filterLabels[key]}: ${filters[key].replace('-', ' ')}</span>
-                    <i class="fas fa-times" onclick="removeFilter('${key}')"></i>
-                `;
-                activeFiltersContainer.appendChild(tag);
+        let filteredAccounts = rawData.accounts.filter(acc => {
+            if (filter.region !== 'all' && acc.region !== filter.region) return false;
+            if (filter.platform !== 'all' && acc.platform !== filter.platform) return false;
+            if (filter.pageId !== 'all' && String(acc.id) !== String(filter.pageId)) return false;
+            return true;
+        });
+
+        const allowedAccountIds = new Set(filteredAccounts.map(acc => acc.id));
+        let filteredPosts = rawData.posts.filter(post => {
+            if (!allowedAccountIds.has(post.account_id)) return false;
+            
+            const type = (post.media_type || 'IMAGE').toUpperCase();
+            if (filter.contentType === 'VIDEO' && !['VIDEO', 'REELS'].includes(type)) return false;
+            if (filter.contentType === 'IMAGE' && !['IMAGE', 'PHOTO', 'CAROUSEL_ALBUM'].includes(type)) return false;
+            
+            return true;
+        });
+
+        const pastDate = new Date();
+        pastDate.setDate(pastDate.getDate() - filter.time);
+        const pastDateStr = pastDate.toISOString().split('T')[0];
+        let historyMap = {};
+        rawData.snapshots.forEach(snap => {
+            if (allowedAccountIds.has(snap.account_id)) {
+                const snapDate = snap.recorded_at.split('T')[0];
+                if (snapDate <= pastDateStr) historyMap[snap.account_id] = snap; 
             }
         });
-    }
 
-    // Remove filter
-    function removeFilter(filterKey) {
-        filters[filterKey] = 'all';
-        document.getElementById(filterKey + '-filter').value = 'all';
-        updateFilters();
-        applyFilters();
-    }
+        currentFilteredPosts = filteredPosts;
 
-    // Apply filters to posts
-    function applyFilters() {
-        const posts = document.querySelectorAll('.post-card');
+        renderSummaryCards(filteredAccounts, historyMap, filter.time);
+        filterAccountTable(); 
         
-        posts.forEach(post => {
-            let show = true;
+        const activeTab = document.querySelector('.platform-tab.active');
+        const activePlatform = activeTab ? activeTab.innerText.trim().toLowerCase().replace('all platforms', 'all') : 'all';
+        filterPostsByTab(activePlatform, null); 
 
-            // Platform filter
-            if (filters.platform !== 'all') {
-                const postPlatform = post.getAttribute('data-platform');
-                if (postPlatform !== filters.platform) {
-                    show = false;
-                }
-            }
-
-            // Region filter
-            if (filters.region !== 'all') {
-                const postRegion = post.getAttribute('data-region');
-                if (postRegion !== filters.region) {
-                    show = false;
-                }
-            }
-
-            post.style.display = show ? 'block' : 'none';
-        });
-
-        console.log('Filters applied:', filters);
+        renderRegionStats(filteredAccounts);
+        renderPlatformComparison(filteredAccounts, filteredPosts); 
     }
 
-    // Initial load
-    updateFilters();
+    // ==========================================
+    // 5. TOP POSTS & TABS LOGIC
+    // ==========================================
+    window.filterPostsByTab = function(platform, element) {
+        if(element) {
+            document.querySelectorAll('.platform-tab').forEach(el => el.classList.remove('active'));
+            element.classList.add('active');
+        }
+
+        const source = currentFilteredPosts || [];
+        let postsToShow = [];
+
+        if (platform === 'all') {
+
+            const fb = source.filter(p => p.platform === 'facebook').sort((a,b) => b.likes - a.likes).slice(0, 10);
+            const ig = source.filter(p => p.platform === 'instagram').sort((a,b) => b.likes - a.likes).slice(0, 10);
+            const tt = source.filter(p => p.platform === 'tiktok').sort((a,b) => b.likes - a.likes).slice(0, 10);
+            
+            postsToShow = [...fb, ...ig, ...tt];
+
+            postsToShow.sort((a,b) => b.likes - a.likes);
+        } else {
+
+            postsToShow = source
+                .filter(p => p.platform === platform)
+                .sort((a,b) => b.likes - a.likes)
+                .slice(0, 10);
+        }
+
+        renderPostGrid(postsToShow);
+    }
+
+    function renderPostGrid(posts) {
+        const grid = document.getElementById('posts-grid');
+        if(!grid) return;
+        grid.innerHTML = '';
+        
+        if (posts.length === 0) {
+            grid.innerHTML = '<div style="grid-column:1/-1;text-align:center;padding:40px;color:#999"><i class="fas fa-search" style="font-size:24px;margin-bottom:10px"></i><br>No posts found matching criteria</div>';
+            return;
+        }
+
+        posts.forEach(post => {
+            const acc = post.social_accounts;
+            const date = new Date(post.posted_at).toLocaleDateString('en-US', { day: 'numeric', month: 'short' });
+   
+            let bgImage = 'linear-gradient(45deg, #f3f4f6, #e5e7eb)';
+            let playIcon = '';
+            
+            if (post.image_url && post.image_url.startsWith('http')) {
+                bgImage = `url('${post.image_url}')`;
+            } 
+            
+            const type = (post.media_type || '').toUpperCase();
+            if (['VIDEO', 'REELS'].includes(type) || post.platform === 'tiktok') {
+                playIcon = '<div style="position:absolute;top:50%;left:50%;transform:translate(-50%,-50%);font-size:40px;color:white;opacity:0.8;text-shadow:0 2px 4px rgba(0,0,0,0.5);"><i class="fas fa-play-circle"></i></div>';
+            }
+
+            const card = `
+                <div class="post-card">
+                    <div class="post-image" style="background-image: ${bgImage};">
+                        <span class="post-platform-overlay" style="background:${getPlatformColor(acc.platform).text}; color:white"><i class="${getPlatformIcon(acc.platform)}"></i> ${capitalize(acc.platform)}</span>
+                        ${playIcon}
+                    </div>
+                    <div class="post-content">
+                        <h4 class="post-title" title="${post.caption}">${post.caption ? post.caption.substring(0, 60)+(post.caption.length>60?'...':'') : 'No Caption'}</h4>
+                        <div class="post-info"><span class="post-date">${date}</span><span class="post-page" style="color:${getPlatformColor(acc.platform).text}">${acc.name}</span></div>
+                        <div class="post-metrics">
+                            <div class="metric"><span class="metric-label">Likes</span><span class="metric-value"><i class="fas fa-heart"></i> ${formatNumber(post.likes)}</span></div>
+                            <div class="metric"><span class="metric-label">Comments</span><span class="metric-value"><i class="fas fa-comment"></i> ${formatNumber(post.comments)}</span></div>
+                            <div class="metric"><span class="metric-label">Shares</span><span class="metric-value"><i class="fas fa-share"></i> ${formatNumber(post.shares)}</span></div>
+                        </div>
+                        <div class="engagement-rate-bar"><a href="${post.post_url}" target="_blank" style="text-decoration:none;font-size:12px;color:var(--primary);font-weight:600;">View Post <i class="fas fa-external-link-alt"></i></a></div>
+                    </div>
+                </div>
+            `;
+            grid.innerHTML += card;
+        });
+    }
+
+    // ==========================================
+    // 6. ACCOUNT TABLE FILTER
+    // ==========================================
+    window.filterAccountTable = function() {
+        const filterType = document.getElementById('account-filter').value;
+        let dataToShow = typeof currentFilteredAccounts !== 'undefined' ? [...currentFilteredAccounts] : []; 
+        if(dataToShow.length === 0 && rawData.accounts.length > 0) dataToShow = [...rawData.accounts]; // Fallback
+
+        if (filterType === 'top10') {
+            dataToShow.sort((a, b) => (b.followers_count||0) - (a.followers_count||0));
+            dataToShow = dataToShow.slice(0, 10);
+        } else if (filterType === 'bottom10') {
+            dataToShow.sort((a, b) => (a.followers_count||0) - (b.followers_count||0));
+            dataToShow = dataToShow.slice(0, 10);
+        } else {
+            dataToShow.sort((a, b) => (b.followers_count||0) - (a.followers_count||0));
+        }
+        renderAccountTable(dataToShow, window.currentHistoryMap);
+    }
+
+    // ==========================================
+    // 7. RENDER OTHER SECTIONS
+    // ==========================================
+    function renderSummaryCards(accounts, historyMap, days) {
+        let curr = { fol: 0, imp: 0, eng: 0, click: 0, new: 0 };
+        let prev = { fol: 0, imp: 0, eng: 0, click: 0 };
+
+        accounts.forEach(acc => {
+            const fol = acc.followers_count||0;
+            curr.fol += fol;
+            curr.imp += (acc.impressions||0);
+            curr.eng += (acc.engagement||0);
+            curr.click += (acc.clicks||0);
+
+            const old = historyMap[acc.id] || {};
+            const oldFol = old.followers_count || fol;
+            prev.fol += oldFol;
+            prev.imp += (old.impressions || acc.impressions);
+            prev.eng += (old.engagement || acc.engagement);
+            prev.click += (old.clicks || acc.clicks);
+            curr.new += (fol - oldFol);
+        });
+
+        const calcGrowth = (c, p) => p > 0 ? ((c - p) / p) * 100 : 0;
+
+        updateCardUI('total-impressions', curr.imp, calcGrowth(curr.imp, prev.imp));
+        updateCardUI('total-followers', curr.fol, calcGrowth(curr.fol, prev.fol));
+        updateCardUI('total-engagement', curr.eng, calcGrowth(curr.eng, prev.eng));
+        updateCardBySelector('.stat-card.clicks', curr.click, calcGrowth(curr.click, prev.click));
+        updateCardBySelector('.stat-card.followers', curr.new, 0); 
+
+        const currRate = curr.fol > 0 ? ((curr.eng/curr.fol)*100) : 0;
+        const prevRate = prev.fol > 0 ? ((prev.eng/prev.fol)*100) : 0;
+        document.getElementById('avg-engagement-rate').innerText = currRate.toFixed(2) + '%';
+        updatePercentUI(document.querySelector('.stat-card.rate'), calcGrowth(currRate, prevRate));
+        document.querySelectorAll('.comparison-text').forEach(el => el.innerText = `vs ${days} days ago`);
+
+        window.currentFilteredAccounts = accounts;
+        window.currentHistoryMap = historyMap;
+    }
+
+    function renderAccountTable(accounts, historyMap) {
+        const tbody = document.querySelector('.pages-table tbody');
+        if(!tbody) return;
+        tbody.innerHTML = '';
+        accounts.sort((a,b) => (b.followers_count||0) - (a.followers_count||0));
+
+        accounts.forEach(acc => {
+            const old = historyMap && historyMap[acc.id] ? historyMap[acc.id] : {};
+            const growth = (acc.followers_count||0) - (old.followers_count || acc.followers_count||0);
+            const engRate = (acc.followers_count||0) > 0 ? ((acc.engagement/acc.followers_count)*100).toFixed(2) : '0.00';
+            
+            const initial = getCountryCode(acc); 
+
+            let growthHtml = '';
+            if(growth > 0) growthHtml = `<span style="color:#28a745; font-size:11px"><i class="fas fa-arrow-up"></i> ${formatNumber(growth)}</span>`;
+            else if(growth < 0) growthHtml = `<span style="color:#dc3545; font-size:11px"><i class="fas fa-arrow-down"></i> ${formatNumber(Math.abs(growth))}</span>`;
+
+            let statusHtml = '<span class="performance-indicator low"><i class="fas fa-minus"></i> No Data</span>';
+            if ((acc.followers_count || 0) > 0) {
+                statusHtml = '<span class="performance-indicator high"><i class="fas fa-check"></i> Active</span>';
+            }
+
+            const row = `<tr>
+                <td>
+                    <div class="page-name">
+                        <div class="page-avatar" style="background:${getPlatformColor(acc.platform).bg}; color:${getPlatformColor(acc.platform).text}">${initial}</div>
+                        <div><div style="font-weight:600">${acc.name}</div><div style="font-size:12px;color:gray">${acc.handle||''} ${growthHtml}</div></div>
+                    </div>
+                </td>
+                <td><span class="platform-badge" style="background:${getPlatformColor(acc.platform).bg}; color:${getPlatformColor(acc.platform).text}"><i class="${getPlatformIcon(acc.platform)}"></i> ${capitalize(acc.platform)}</span></td>
+                <td><span class="region-badge">${formatRegion(acc.region)}</span></td>
+                <td>${formatNumber(acc.followers_count)}</td>
+                <td>${formatNumber(acc.impressions)}</td>
+                <td>${formatNumber(acc.engagement)}</td>
+                <td>${engRate}%</td>
+                <td>${statusHtml}</td> </tr>`;
+            tbody.innerHTML += row;
+        });
+    }
+
+    function renderRegionStats(accounts) {
+        const container = document.getElementById('region-container');
+        if(!container) return;
+        container.innerHTML = '';
+        const regions = {};
+        accounts.forEach(acc => {
+            const r = acc.region || 'global';
+            if (!regions[r]) regions[r] = { name: r, imp: 0, eng: 0, fol: 0, count: 0 };
+            regions[r].imp += (acc.impressions||0);
+            regions[r].eng += (acc.engagement||0);
+            regions[r].fol += (acc.followers_count||0);
+            regions[r].count++;
+        });
+        Object.values(regions).forEach(stat => {
+            const rate = stat.fol > 0 ? (stat.eng / stat.fol) * 100 : 0;
+            let level = rate > 1.5 ? (rate > 3.0 ? 'High' : 'Medium') : 'Low';
+            let iconClass = stat.name.includes('asia') ? 'fas fa-globe-asia' : (stat.name.includes('europe') ? 'fas fa-globe-europe' : 'fas fa-globe-americas');
+            container.innerHTML += `
+                <div class="region-card">
+                    <div class="region-header">
+                        <div class="region-name"><i class="${iconClass}" style="color:var(--primary)"></i> ${formatRegion(stat.name)}</div>
+                        <div class="performance-indicator ${level.toLowerCase()}"><i class="fas fa-circle"></i> ${level}</div>
+                    </div>
+                    <div class="region-metrics">
+                        <div class="region-metric"><span class="region-metric-label">Impressions</span><span class="region-metric-value">${formatNumber(stat.imp)}</span></div>
+                        <div class="region-metric"><span class="region-metric-label">Engagement</span><span class="region-metric-value">${formatNumber(stat.eng)}</span></div>
+                        <div class="region-metric"><span class="region-metric-label">Active Pages</span><span class="region-metric-value">${stat.count}</span></div>
+                        <div class="region-metric"><span class="region-metric-label">Eng. Rate</span><span class="region-metric-value">${rate.toFixed(2)}%</span></div>
+                    </div>
+                </div>
+            `;
+        });
+        if (Object.keys(regions).length === 0) container.innerHTML = '<div style="padding:20px; color:#999;">No data for this region.</div>';
+    }
+
+    function renderPlatformComparison(accounts, posts) {
+        const container = document.getElementById('platform-comparison-grid');
+        if(!container) return;
+        container.innerHTML = '';
+
+        const selectedPlatform = document.getElementById('platform-filter').value;
+
+        let targetPlatforms = ['facebook', 'instagram', 'tiktok'];
+       
+        if (selectedPlatform !== 'all') {
+            targetPlatforms = [selectedPlatform];
+        }
+
+        const stats = {};
+        targetPlatforms.forEach(p => { stats[p] = { count: 0, totalEng: 0, followers: 0, bestTimeMap: {} }; });
+
+        accounts.forEach(acc => {
+            const p = acc.platform.toLowerCase();
+            if (stats[p]) stats[p].followers += (acc.followers_count || 0);
+        });
+
+        posts.forEach(post => {
+            const p = post.platform.toLowerCase();
+            if (stats[p]) {
+                stats[p].count += 1;
+                const eng = (post.likes||0) + (post.comments||0) + (post.shares||0);
+                stats[p].totalEng += eng;
+               
+                if (post.posted_at) {
+                    const hour = new Date(post.posted_at).getHours();
+                    const timeSlot = Math.floor(hour / 2) * 2;
+                    stats[p].bestTimeMap[timeSlot] = (stats[p].bestTimeMap[timeSlot] || 0) + eng;
+                }
+            }
+        });
+
+        targetPlatforms.forEach(platform => {
+            const s = stats[platform];
+
+            const avgEng = s.count > 0 ? Math.round(s.totalEng / s.count) : 0;
+            const engRate = s.followers > 0 ? ((s.totalEng / s.followers) * 100).toFixed(2) : '0.00';
+           
+            let bestTimeStr = 'N/A';
+            let maxEng = -1, bestSlot = -1;
+            for (const [slot, eng] of Object.entries(s.bestTimeMap)) { if (eng > maxEng) { maxEng = eng; bestSlot = parseInt(slot); } }
+            if (bestSlot !== -1) {
+                const formatAMPM = (h) => { const s = h >= 12 ? 'PM' : 'AM'; const h12 = h % 12 || 12; return `${h12} ${s}`; };
+                bestTimeStr = `${formatAMPM(bestSlot)} - ${formatAMPM((bestSlot + 2) % 24)}`;
+            }
+
+            const style = getPlatformColor(platform);
+            const icon = getPlatformIcon(platform);
+            
+            let iconColor = style.text;
+            if (platform === 'tiktok') iconColor = '#000000';
+
+            const card = `
+                <div class="comparison-card">
+                    <div class="comparison-header">
+                        <div class="comparison-title">
+                            <i class="${icon}" style="color: ${iconColor};"></i> ${capitalize(platform)}
+                        </div>
+                        <span class="performance-indicator high"><i class="fas fa-chart-line"></i> ${engRate}% ER</span>
+                    </div>
+                    <div class="comparison-metrics">
+                        <div class="comparison-metric-row">
+                            <span class="comparison-metric-name">Total Posts</span>
+                            <span class="comparison-metric-value">${formatNumber(s.count)}</span>
+                        </div>
+                        <div class="comparison-metric-row">
+                            <span class="comparison-metric-name">Avg Engagement</span>
+                            <span class="comparison-metric-value">${formatNumber(avgEng)}</span>
+                        </div>
+                        <div class="comparison-metric-row">
+                            <span class="comparison-metric-name">Total Followers</span>
+                            <span class="comparison-metric-value">${formatNumber(s.followers)}</span>
+                        </div>
+                        <div class="comparison-metric-row">
+                            <span class="comparison-metric-name">Best Time</span>
+                            <span class="comparison-metric-value" style="font-size:14px">${bestTimeStr}</span>
+                        </div>
+                    </div>
+                </div>
+            `;
+            container.innerHTML += card;
+        });
+    }
+
+    function renderDataPeriod(snapshots) {
+        if (!snapshots || snapshots.length === 0) return;
+        const start = new Date(snapshots[0].recorded_at);
+        const end = new Date();
+        const opts = { day: 'numeric', month: 'short', year: 'numeric' };
+        const el = document.getElementById('data-period-label');
+        if(el) el.innerHTML = `<i class="fas fa-history"></i> Data collected from: <b>${start.toLocaleDateString('en-US', opts)}</b> — <b>${end.toLocaleDateString('en-US', opts)}</b>`;
+    }
+
+    // ==========================================
+    // 8. HELPERS
+    // ==========================================
+    function populatePageFilter() {
+        const select = document.getElementById('page-filter');
+        if(!select) return;
+        select.innerHTML = '<option value="all">All Pages</option>';
+        const sortedAcc = [...rawData.accounts].sort((a,b) => a.name.localeCompare(b.name));
+        sortedAcc.forEach(acc => {
+            const opt = document.createElement('option');
+            opt.value = acc.id;
+            opt.innerText = `${acc.name} (${capitalize(acc.platform)})`;
+            select.appendChild(opt);
+        });
+    }
+    function updateCardUI(id, val, growth) {
+        const el = document.getElementById(id);
+        if(!el) return;
+        el.innerText = formatNumber(val);
+        updatePercentUI(el.closest('.stat-card'), growth);
+    }
+    function updateCardBySelector(selector, val, growth) {
+        const card = document.querySelector(selector);
+        if(!card) return;
+        card.querySelector('.stat-value').innerText = formatNumber(val);
+        updatePercentUI(card, growth);
+    }
+    function updatePercentUI(card, percentage) {
+        const changeEl = card?.querySelector('.stat-change');
+        if (!changeEl) return;
+        if (percentage === 0 || isNaN(percentage)) {
+            changeEl.className = 'stat-change';
+            changeEl.style.color = '#999';
+            changeEl.innerHTML = `<i class="fas fa-minus"></i> <span>0%</span>`;
+            return;
+        }
+        const isPositive = percentage > 0;
+        changeEl.className = `stat-change ${isPositive ? 'positive' : 'negative'}`;
+        changeEl.innerHTML = `<i class="fas fa-arrow-${isPositive ? 'up' : 'down'}"></i> <span>${Math.abs(percentage).toFixed(1)}%</span>`;
+    }
+    function formatNumber(num) { if(isNaN(num)) return '0'; if(num>=1000000)return(num/1000000).toFixed(1)+'M'; if(num>=1000)return(num/1000).toFixed(1)+'K'; return num.toLocaleString(); }
+    function getPlatformIcon(p) { if(p==='facebook')return'fab fa-facebook-f'; if(p==='instagram')return'fab fa-instagram'; if(p==='tiktok')return'fab fa-tiktok'; return 'fas fa-share-alt'; }
+    function getPlatformColor(p) {
+        switch(p)
+        { 
+            case 'facebook':return{bg:'#e3f2fd',text:'#1877F2'}; 
+            case 'instagram':return{bg:'#fce4ec',text:'#E1306C'}; 
+            case 'tiktok': return { bg: '#000000', text: '#ffffff' };
+            default:return{bg:'#eee',text:'#333'}; } }
+    function formatRegion(r) { if(!r)return'Global'; return r.split('-').map(w=>w.charAt(0).toUpperCase()+w.slice(1)).join(' '); }
+    function capitalize(s) { return s?s.charAt(0).toUpperCase()+s.slice(1):''; }
+
+    
+    function getCountryCode(account) {
+
+        const text = (account.name + ' ' + (account.handle || '')).toUpperCase();
+
+        if (text.includes('DEFAULT') || text.includes('THAILAND') || text.includes('.TH')) return 'TH';
+        if (text.includes(' US ') || text.includes(' USA ') || text.includes('.US')) return 'US';
+        if (text.includes(' JP ') || text.includes(' JAPAN ') || text.includes('.JP')) return 'JP';
+        if (text.includes(' KR ') || text.includes(' KOREA ') || text.includes('.KR')) return 'KR';
+        if (text.includes(' FR ') || text.includes(' FRANCE ') || text.includes('.FR')) return 'FR';
+        if (text.includes(' DE ') || text.includes(' GERMANY ') || text.includes('.DE')) return 'DE';
+        if (text.includes(' UK ') || text.includes(' UNITED KINGDOM ') || text.includes('.UK')) return 'UK';
+        if (text.includes(' IN ') || text.includes(' INDIA ') || text.includes('.IN')) return 'IN';
+        if (text.includes(' UAE ') || text.includes('.UAE') || text.includes('ARAB')) return 'AE';
+        if (text.includes(' IL ') || text.includes(' ISRAEL ') || text.includes('.IL')) return 'IL';
+        
+        return 'GL'; 
+    }
+
+    document.addEventListener('DOMContentLoaded', initDashboard);
 </script>
 </body>
 </html>
