@@ -529,8 +529,38 @@
         </div>
 
         <div class="form-group">
-          <label for="content-theme">Content Theme/Concept</label>
-          <input type="text" class="form-control" id="content-theme" placeholder="Enter theme or concept"/>
+          <label><i class="fas fa-clock"></i> Scheduled Time (24H)</label>
+        <div style="display: flex; align-items: center; gap: 8px;">
+          
+          <select id="post-time-hour" class="form-control" style="text-align:center; font-weight:bold; cursor:pointer; width: 75px;">
+            <option value="00">00</option><option value="01">01</option><option value="02">02</option>
+            <option value="03">03</option><option value="04">04</option><option value="05">05</option>
+            <option value="06">06</option><option value="07">07</option><option value="08">08</option>
+            <option value="09">09</option><option value="10" selected>10</option><option value="11">11</option>
+            <option value="12">12</option><option value="13">13</option><option value="14">14</option>
+            <option value="15">15</option><option value="16">16</option><option value="17">17</option>
+            <option value="18">18</option><option value="19">19</option><option value="20">20</option>
+            <option value="21">21</option><option value="22">22</option><option value="23">23</option>
+          </select>
+          
+          <span style="font-weight:bold; font-size:1.2rem;">:</span>
+          
+          <select id="post-time-minute" class="form-control" style="text-align:center; font-weight:bold; cursor:pointer; width: 75px;">
+            <option value="00">00</option><option value="01">01</option><option value="02">02</option><option value="03">03</option><option value="04">04</option>
+            <option value="05">05</option><option value="06">06</option><option value="07">07</option><option value="08">08</option><option value="09">09</option>
+            <option value="10">10</option><option value="11">11</option><option value="12">12</option><option value="13">13</option><option value="14">14</option>
+            <option value="15">15</option><option value="16">16</option><option value="17">17</option><option value="18">18</option><option value="19">19</option>
+            <option value="20">20</option><option value="21">21</option><option value="22">22</option><option value="23">23</option><option value="24">24</option>
+            <option value="25">25</option><option value="26">26</option><option value="27">27</option><option value="28">28</option><option value="29">29</option>
+            <option value="30">30</option><option value="31">31</option><option value="32">32</option><option value="33">33</option><option value="34">34</option>
+            <option value="35">35</option><option value="36">36</option><option value="37">37</option><option value="38">38</option><option value="39">39</option>
+            <option value="40">40</option><option value="41">41</option><option value="42">42</option><option value="43">43</option><option value="44">44</option>
+            <option value="45">45</option><option value="46">46</option><option value="47">47</option><option value="48">48</option><option value="49">49</option>
+            <option value="50">50</option><option value="51">51</option><option value="52">52</option><option value="53">53</option><option value="54">54</option>
+            <option value="55">55</option><option value="56">56</option><option value="57">57</option><option value="58">58</option><option value="59">59</option>
+          </select>
+
+        </div>
         </div>
 
         <div class="form-group" id="manual-video-section" style="display:none; margin-top:15px; background:#f8f9fa; padding:15px; border-radius:8px; border:1px dashed #ccc;">
@@ -552,26 +582,37 @@
         </div>
 
         <!-- Carousel Video Section -->
-        <div class="carousel-video-section" id="carousel-video-section" style="display:none;">
+        <div class="carousel-video-section" id="carousel-video-section" style="display:none; margin-top: 15px; background: #f8f9fa; padding: 15px; border-radius: 8px; border: 1px dashed #ccc;">
           <label style="color:var(--primary);"><i class="fas fa-film"></i> Carousel Video</label>
           <p style="font-size:0.85rem; color:var(--gray); margin-bottom:10px;">Add a video to your carousel (optional)</p>
           
-          <div id="carousel-video-preview" class="carousel-video-preview" style="display:none;">
-            <div class="carousel-video-item">
-              <video id="carousel-video-player" style="width:80px; height:80px; object-fit:cover; border-radius:4px;"></video>
-              <div class="carousel-video-info">
-                <div id="carousel-video-filename" style="font-weight:600;"></div>
-                <div style="font-size:0.8rem; color:var(--gray);">Carousel video</div>
+          <div id="carousel-video-preview" style="display:none; margin-top:10px;">
+            <div style="display:flex; flex-direction:column; gap:0; background:#fff; border-radius:8px; overflow:hidden; border: 1px solid #e0e0e0; box-shadow: 0 2px 8px rgba(0,0,0,0.05);">
+              
+              <div style="width:100%; background:#000; position:relative; text-align:center;">
+                  <video id="carousel-video-player" controls preload="metadata" style="width:100%; height:auto; max-height: 400px; display:block; margin: 0 auto;"></video>
               </div>
-              <div class="carousel-video-actions">
-                <button type="button" class="btn btn-danger" id="clear-carousel-video-btn" title="Remove video">
-                  <i class="fas fa-trash"></i>
-                </button>
+          
+              <div style="display:flex; justify-content: space-between; align-items:center; gap:10px; padding: 12px 15px; background: #fff; border-top: 1px solid #eee;">
+                  <div style="flex:1; overflow:hidden; display:flex; align-items:center; gap:10px; color: #333;">
+                       <div style="width:36px; height:36px; background:#f0f2f5; border-radius:50%; display:flex; align-items:center; justify-content:center; color:#555; flex-shrink:0;">
+                          <i class="fas fa-video"></i>
+                       </div>
+                       <div style="overflow:hidden; display:flex; flex-direction:column;">
+                          <div id="carousel-video-filename" style="font-size:14px; font-weight:600; white-space:nowrap; overflow:hidden; text-overflow:ellipsis;">Filename.mp4</div>
+                          <span style="font-size:11px; color:#888;">Carousel Video Asset</span>
+                       </div>
+                  </div>
+                  
+                  <button type="button" id="clear-carousel-video-btn" style="border:1px solid #dc3545; background:#fff; color:#dc3545; cursor:pointer; padding:8px 12px; border-radius:6px; font-size:13px; font-weight:600; transition:all 0.2s;" onmouseover="this.style.background='#dc3545'; this.style.color='white';" onmouseout="this.style.background='white'; this.style.color='#dc3545';">
+                    <i class="fas fa-trash-alt" style="margin-right:4px;"></i> Remove
+                  </button>
               </div>
+          
             </div>
           </div>
 
-          <button type="button" class="btn btn-primary" id="open-carousel-video-picker">
+          <button type="button" class="btn btn-primary" id="open-carousel-video-picker" style="margin-top: 10px;">
             <i class="fas fa-plus"></i> Add Video to Carousel
           </button>
         </div>
@@ -596,8 +637,12 @@
           <div class="platform-selector">
             <input type="checkbox" id="platform-fb" value="facebook">
             <label for="platform-fb"><i class="fa-brands fa-facebook"></i> Facebook</label>
+            
             <input type="checkbox" id="platform-ig" value="instagram">
             <label for="platform-ig"><i class="fa-brands fa-instagram"></i> Instagram</label>
+            
+            <input type="checkbox" id="platform-tt" value="tiktok">
+            <label for="platform-tt"><i class="fa-brands fa-tiktok"></i> TikTok</label>
           </div>
         </div>
 
@@ -1130,6 +1175,7 @@
         const platformIcons = platforms.map(p => {
             if (p.toLowerCase() === 'facebook') return `<i class="fa-brands fa-facebook" style="color:#1877F2;"></i>`;
             if (p.toLowerCase() === 'instagram') return `<i class="fa-brands fa-instagram" style="color:#E4405F;"></i>`;
+            if (p.toLowerCase() === 'tiktok') return `<i class="fa-brands fa-tiktok" style="color:#000000;"></i>`;
             return `<span>${p}</span>`;
         }).join(' ');
 
@@ -1242,6 +1288,19 @@
              <div class="preview-meta-pill"><i class="fa-solid fa-share-nodes"></i> <strong>Platforms:</strong> ${platformIcons || '-'}</div>
           </div>
         `;
+          
+        const timeDisplay = content.postTime ? `<span class="preview-meta-pill"><i class="far fa-clock"></i> <strong>Time:</strong> ${content.postTime}</span>` : '';
+
+        body.innerHTML += `
+          <div class="form-group"><label>Theme</label><div class="form-control preview-theme">${content.theme || '-'}</div></div>
+          ${aiBlock}
+          <div class="preview-meta-row">
+             <div class="preview-meta-pill"><i class="fa-solid fa-globe"></i> <strong>Markets:</strong> ${markets}</div>
+             <div class="preview-meta-pill"><i class="fa-solid fa-share-nodes"></i> <strong>Platforms:</strong> ${platformIcons || '-'}</div>
+             ${timeDisplay} </div>
+        `;
+      
+      
       });
     }
 
@@ -1435,127 +1494,163 @@
     const year = currentDate.getFullYear();
 
     const rawDayData = (monthDataCache && monthDataCache[day]) || null;
-    let dayDataArray;
-    if (Array.isArray(rawDayData)) {
-      dayDataArray = rawDayData;
-    } else if (rawDayData) {
-      dayDataArray = [rawDayData];
-    } else {
-      dayDataArray = [];
-    }
+    let dayDataArray = Array.isArray(rawDayData) ? rawDayData : (rawDayData ? [rawDayData] : []);
 
+    // Fix legacy ID
     dayDataArray.forEach((item, index) => {
-      if (!item.id) {
-        item.id = `legacy_${index}`;
-      }
+      if (!item.id) item.id = `legacy_${index}`;
     });
 
     const content = activityId ? dayDataArray.find(item => item.id === activityId) : null;
 
-    document.getElementById('modal-title').textContent = content
-      ? `Edit Content - ${day}/${month+1}/${year}`
-      : `Add Content - ${day}/${month+1}/${year}`;
-    document.getElementById('edit-date').value = `${year}-${month}-${day}`;
-    document.getElementById('edit-activity-id').value = content ? content.id : '';
+    // --- Safety Helper: ฟังก์ชันช่วยใส่ค่าแบบปลอดภัย (กัน Error) ---
+    const setVal = (id, val) => { const el = document.getElementById(id); if(el) el.value = val; };
+    const setCheck = (id, val) => { const el = document.getElementById(id); if(el) el.checked = val; };
+    const setText = (id, val) => { const el = document.getElementById(id); if(el) el.textContent = val; };
+    // -----------------------------------------------------------
 
+    // Set Hidden Fields & Title
+    if(document.getElementById('modal-title')) {
+        document.getElementById('modal-title').textContent = content
+        ? `Edit Content - ${day}/${month+1}/${year}`
+        : `Add Content - ${day}/${month+1}/${year}`;
+    }
+    setVal('edit-date', `${year}-${month}-${day}`);
+    setVal('edit-activity-id', content ? content.id : '');
+
+    // Reset Market Checkboxes
     const selected = new Set((content?.markets || []).map(norm));
     document.querySelectorAll('#market-checkboxes input[type="checkbox"]').forEach(cb => {
-      const isChecked = selected.size ? selected.has(norm(cb.value)) : true;
-      cb.checked = isChecked;
+      cb.checked = selected.size ? selected.has(norm(cb.value)) : true;
     });
 
     if (content) {
-      document.getElementById('content-type').value = content.type || '';
-      document.getElementById('content-theme').value = content.theme || '';
-      document.getElementById('ai-prompt').value = content.aiPrompt || '';
-      document.getElementById('ai-prompt-section').style.display = (content.type === 'ai-carousel') ? 'block' : 'none';
-      document.getElementById('delete-content').style.display = 'inline-block';
+      
+      setVal('content-type', content.type || '');
+      setVal('content-theme', content.theme || '');
+      setVal('ai-prompt', content.aiPrompt || '');
 
-      // Handle carousel video
-      if ((content.type === 'ai-carousel' || content.type === 'real-carousel') && content.carouselVideo) {
-        document.getElementById('carousel-video-preview').style.display = 'block';
-        document.getElementById('carousel-video-filename').textContent = content.carouselVideo;
-        const videoPlayer = document.getElementById('carousel-video-player');
-        videoPlayer.src = getFileUrl(content.carouselVideo, content.type);
+      if (content.postTime) {
+          const parts = content.postTime.split(':');
+          if (parts.length === 2) {
+             setVal('post-time-hour', parts[0]);
+             setVal('post-time-minute', parts[1]);
+          }
       } else {
-        document.getElementById('carousel-video-preview').style.display = 'none';
+          setVal('post-time-hour', '10');
+          setVal('post-time-minute', '00');
       }
 
-      // Handle carousel images - FIXED: Always show images if they exist
+      // Show/Hide Delete Button
+      const delBtn = document.getElementById('delete-content');
+      if(delBtn) delBtn.style.display = 'inline-block';
+
+      // Load Platforms
+      let platforms = Array.isArray(content.platform) ? content.platform : (content.platform ? [content.platform] : []);
+      const platformSet = new Set(platforms);
+      setCheck('platform-fb', platformSet.has('facebook'));
+      setCheck('platform-ig', platformSet.has('instagram'));
+      setCheck('platform-tt', platformSet.has('tiktok'));
+
+      // --- Carousel Video ---
+      if ((content.type === 'ai-carousel' || content.type === 'real-carousel') && content.carouselVideo) {
+        const preview = document.getElementById('carousel-video-preview');
+        const player = document.getElementById('carousel-video-player');
+        if(preview) preview.style.display = 'block';
+        setText('carousel-video-filename', content.carouselVideo);
+        if(player) {
+            const bucket = "ShortVideo";
+            player.src = `${STORAGE_BASE_URL}/${bucket}/${encodeURIComponent(content.carouselVideo)}`;
+        }
+      } else {
+        const preview = document.getElementById('carousel-video-preview');
+        if(preview) preview.style.display = 'none';
+      }
+
+      // --- Carousel Images ---
       if ((content.type === 'ai-carousel' || content.type === 'real-carousel') && content.images && content.images.length > 0) {
         const imagesContainer = document.getElementById('carousel-images-preview');
-        imagesContainer.innerHTML = '';
-        
-        const imagesGrid = document.createElement('div');
-        imagesGrid.className = 'carousel-images-grid';
-        
-        content.images.forEach(filename => {
-          const cleanName = filename.replace('carousel-image/', '').replace('carousel-image\\', '');
-          const url = `${STORAGE_BASE_URL}/${BUCKET_CAROUSEL}/${encodeURIComponent(cleanName)}`;
-          
-          const imageItem = document.createElement('div');
-          imageItem.className = 'carousel-image-item';
-          imageItem.innerHTML = `
-            <img src="${url}" alt="Carousel image" 
-              onerror="this.src='https://placehold.co/100x100?text=Error';">
-          `;
-          imagesGrid.appendChild(imageItem);
-        });
-        
-        imagesContainer.appendChild(imagesGrid);
-        document.getElementById('carousel-images-section').style.display = 'block';
+        if (imagesContainer) {
+            imagesContainer.innerHTML = '';
+            const imagesGrid = document.createElement('div');
+            imagesGrid.className = 'carousel-images-grid';
+            
+            content.images.forEach(filename => {
+              const cleanName = filename.replace('carousel-image/', '').replace('carousel-image\\', '');
+              const url = `${STORAGE_BASE_URL}/${BUCKET_CAROUSEL}/${encodeURIComponent(cleanName)}`;
+              const imageItem = document.createElement('div');
+              imageItem.className = 'carousel-image-item';
+              imageItem.innerHTML = `<img src="${url}" alt="Carousel image" onerror="this.src='https://placehold.co/100x100?text=Error';">`;
+              imagesGrid.appendChild(imageItem);
+            });
+            imagesContainer.appendChild(imagesGrid);
+        }
+        const imgSec = document.getElementById('carousel-images-section');
+        if(imgSec) imgSec.style.display = 'block';
       } else {
-        document.getElementById('carousel-images-section').style.display = 'block';
-        document.getElementById('carousel-images-preview').innerHTML = '<p style="color:var(--gray); font-style:italic;">No images generated yet</p>';
+        // Reset Images if none
+        const imgSec = document.getElementById('carousel-images-section');
+        if(imgSec) imgSec.style.display = 'block';
+        const imgPrev = document.getElementById('carousel-images-preview');
+        if(imgPrev) imgPrev.innerHTML = '<p style="color:var(--gray); font-style:italic;">No images generated yet</p>';
       }
 
-      let platforms = [];
-      if (Array.isArray(content.platform)) {
-        platforms = content.platform;
-      } else if (content.platform) {
-        platforms = [content.platform];
-      }
-      const platformSet = new Set(platforms);
-      document.getElementById('platform-fb').checked = platformSet.has('facebook');
-      document.getElementById('platform-ig').checked = platformSet.has('instagram');
     } else {
-      document.getElementById('content-type').value = '';
-      document.getElementById('content-theme').value = '';
-      document.getElementById('platform-fb').checked = false;
-      document.getElementById('platform-ig').checked = false;
-      document.getElementById('ai-prompt').value = '';
-      document.getElementById('ai-prompt-section').style.display = 'none';
-      document.getElementById('delete-content').style.display = 'none';
-      document.getElementById('carousel-video-preview').style.display = 'none';
-      document.getElementById('carousel-images-section').style.display = 'block';
-      document.getElementById('carousel-images-preview').innerHTML = '<p style="color:var(--gray); font-style:italic;">No images generated yet</p>';
+      
+      setVal('content-type', '');
+      setVal('content-theme', '');
+      setVal('ai-prompt', '');
+      setVal('post-time-hour', '10');
+      setVal('post-time-minute', '00');
+
+      setCheck('platform-fb', false);
+      setCheck('platform-ig', false);
+      setCheck('platform-tt', false);
+
+      const delBtn = document.getElementById('delete-content');
+      if(delBtn) delBtn.style.display = 'none';
+      
+      const vidPrev = document.getElementById('carousel-video-preview');
+      if(vidPrev) vidPrev.style.display = 'none';
+      
+      const imgSec = document.getElementById('carousel-images-section');
+      if(imgSec) imgSec.style.display = 'block'; // Show section but empty
+      const imgPrev = document.getElementById('carousel-images-preview');
+      if(imgPrev) imgPrev.innerHTML = '<p style="color:var(--gray); font-style:italic;">No images generated yet</p>';
     }
 
-    // Show/hide sections based on content type
-    const type = document.getElementById('content-type').value;
-    document.getElementById('manual-video-section').style.display = 
-      (type.includes('shortform') || type === 'longform') ? 'block' : 'none';
-    document.getElementById('carousel-video-section').style.display = 
-      (type === 'ai-carousel' || type === 'real-carousel') ? 'block' : 'none';
-    document.getElementById('carousel-images-section').style.display = 
-      (type === 'ai-carousel' || type === 'real-carousel') ? 'block' : 'none';
+    // Toggle Sections Visibility
+    const type = document.getElementById('content-type') ? document.getElementById('content-type').value : '';
+    const aiPromptSec = document.getElementById('ai-prompt-section');
+    const manualVidSec = document.getElementById('manual-video-section');
+    const carVidSec = document.getElementById('carousel-video-section');
+    const carImgSec = document.getElementById('carousel-images-section');
+
+    if(aiPromptSec) aiPromptSec.style.display = (type === 'ai-carousel') ? 'block' : 'none';
+    if(manualVidSec) manualVidSec.style.display = (type.includes('shortform') || type === 'longform') ? 'block' : 'none';
+    if(carVidSec) carVidSec.style.display = (type === 'ai-carousel' || type === 'real-carousel') ? 'block' : 'none';
+    if(carImgSec) carImgSec.style.display = (type === 'ai-carousel' || type === 'real-carousel') ? 'block' : 'none';
 
     document.getElementById('edit-modal').style.display = 'flex';
 
-    const videoSection = document.getElementById('manual-video-section');
-    if (content && content.type && (content.type.includes('shortform') || content.type === 'longform')) {
-        videoSection.style.display = 'block';
+    // Handle Manual Video (Non-Carousel)
+    if (manualVidSec && content && content.type && (content.type.includes('shortform') || content.type === 'longform')) {
         const fName = content.fileName || '';
-        document.getElementById('selected-filename').value = fName;
+        setVal('selected-filename', fName);
         
-        if(fName) {
-            document.getElementById('preview-container').style.display = 'block';
-            document.getElementById('video-player-preview').src = getFileUrl(fName, content.type);
-        } else {
-             document.getElementById('preview-container').style.display = 'none';
+        const preview = document.getElementById('preview-container');
+        const player = document.getElementById('video-player-preview');
+        
+        if(fName && preview && player) {
+            preview.style.display = 'block';
+            player.src = getFileUrl(fName, content.type);
+        } else if (preview) {
+             preview.style.display = 'none';
         }
     } else {
-        videoSection.style.display = 'none';
+        setVal('selected-filename', '');
+        const preview = document.getElementById('preview-container');
+        if(preview) preview.style.display = 'none';
     }
   }
 
@@ -1567,28 +1662,34 @@
   async function openCarouselVideoPicker() {
     const modal = document.getElementById('carousel-video-picker-modal');
     const container = document.getElementById('carousel-video-list-container');
+    const searchInput = document.getElementById('carousel-video-search');
+
+    searchInput.value = ''; 
     modal.style.display = 'flex';
-    
     container.innerHTML = '<div style="text-align:center; margin-top:20px;"><i class="fas fa-spinner fa-spin"></i> Loading Library...</div>';
 
     try {
       const type = document.getElementById('content-type').value;
+      const currentActivityId = document.getElementById('edit-activity-id').value;
+
       let bucket = "ShortForm"; 
-      
       if (type === 'ai-carousel' || type === 'real-carousel') {
         bucket = "ShortVideo"; 
       }
-
+     
       const res = await fetch(`${LIST_VIDEOS_WEBHOOK_URL}?bucket=${bucket}`);
-      
       if (!res.ok) throw new Error(`API Error: ${res.status}`);
 
-      const files = await res.json();
-      renderCarouselVideoList(files);
+      const allFiles = await res.json();
 
-      document.getElementById('carousel-video-search').onkeyup = (e) => {
+      const usedFilenames = getUsedFilenames(currentActivityId);
+      const availableFiles = allFiles.filter(file => !usedFilenames.has(file.name));
+    
+      renderCarouselVideoList(availableFiles);
+
+      searchInput.onkeyup = (e) => {
         const term = e.target.value.toLowerCase();
-        const filtered = files.filter(f => f.name.toLowerCase().includes(term));
+        const filtered = availableFiles.filter(f => f.name.toLowerCase().includes(term));
         renderCarouselVideoList(filtered);
       };
 
@@ -1640,7 +1741,10 @@
     const videoPlayer = document.getElementById('carousel-video-player');
     const type = document.getElementById('content-type').value;
     videoPlayer.src = getFileUrl(filename, type);
-    
+
+    const bucket = "ShortVideo";
+    videoPlayer.src = `${STORAGE_BASE_URL}/${bucket}/${encodeURIComponent(filename)}`;
+
     document.getElementById('carousel-video-picker-modal').style.display = 'none';
   }
 
@@ -1654,16 +1758,33 @@
     e.preventDefault();
     const ok = await ensureAuthenticated(); if (!ok) return;
 
-    const day = currentlyEditingDay;
-    const activityId = document.getElementById('edit-activity-id').value;
-    const type = document.getElementById('content-type').value;
-    const theme = document.getElementById('content-theme').value;
-    const aiPrompt = document.getElementById('ai-prompt').value;
-    const manualFileName = document.getElementById('selected-filename').value;
+    const getVal = (id) => { const el = document.getElementById(id); return el ? el.value : ''; };
+    const getCheck = (id) => { const el = document.getElementById(id); return el ? el.checked : false; };
 
-    // Get carousel video filename
-    const carouselVideo = document.getElementById('carousel-video-preview').style.display !== 'none' 
-      ? document.getElementById('carousel-video-filename').textContent 
+    const day = currentlyEditingDay;
+    const activityId = getVal('edit-activity-id');
+    const type = getVal('content-type');
+    const theme = getVal('content-theme');
+    const aiPrompt = getVal('ai-prompt');
+    const manualFileName = getVal('selected-filename');
+
+    let postTime = '10:00';
+    const hhEl = document.getElementById('post-time-hour');
+    const mmEl = document.getElementById('post-time-minute');
+    const singleTimeEl = document.getElementById('post-time');
+
+    if (hhEl && mmEl) {
+       
+        postTime = `${hhEl.value}:${mmEl.value}`;
+    } else if (singleTimeEl) {
+       
+        postTime = singleTimeEl.value;
+    }
+    
+    const carouselVideoEl = document.getElementById('carousel-video-filename');
+    const carouselPreviewEl = document.getElementById('carousel-video-preview');
+    const carouselVideo = (carouselPreviewEl && carouselPreviewEl.style.display !== 'none' && carouselVideoEl) 
+      ? carouselVideoEl.textContent 
       : null;
 
     let selectedMarketsList = [];
@@ -1676,7 +1797,7 @@
       return;
     }
 
-    // Inventory check: 1 AI-shortform per day vs available videos
+    // Inventory check
     if (type === 'ai-shortform') {
       const availableCount = await getRealtimeVideoCount();
       let otherScheduledActivities = 0;
@@ -1691,14 +1812,14 @@
       const newPostActivity = (selectedMarketsList.length > 0) ? 1 : 0;
       const totalFutureActivities = otherScheduledActivities + newPostActivity;
       if (totalFutureActivities > availableCount) {
-        const errorMessage = `❌ Error: Not enough videos (Available: ${availableCount}, Scheduled: ${totalFutureActivities})`;
-        showNotification(errorMessage, 'error');
+        showNotification(`❌ Error: Not enough videos (Available: ${availableCount})`, 'error');
         return;
       }
     }
 
-    // Longform: only 1 per month
+    // Longform check
     if (type === 'longform') {
+        
       let existingLongform = false;
       Object.values(monthDataCache || {}).forEach(rawDayData => {
         const dayArray = Array.isArray(rawDayData) ? rawDayData : (rawDayData ? [rawDayData] : []);
@@ -1715,8 +1836,9 @@
     }
 
     const selectedPlatforms = [];
-    if (document.getElementById('platform-fb').checked) selectedPlatforms.push('facebook');
-    if (document.getElementById('platform-ig').checked) selectedPlatforms.push('instagram');
+    if (getCheck('platform-fb')) selectedPlatforms.push('facebook');
+    if (getCheck('platform-ig')) selectedPlatforms.push('instagram');
+    if (getCheck('platform-tt')) selectedPlatforms.push('tiktok');
 
     const payload = {
       id: (activityId && !activityId.startsWith('legacy_')) ? activityId : newActivityId(),
@@ -1724,22 +1846,20 @@
       theme,
       platform: selectedPlatforms,
       fileName: manualFileName,
-      markets: selectedMarketsList
+      markets: selectedMarketsList,
+      postTime: postTime 
     };
 
-    // Add carousel video if selected - FIXED: Don't overwrite images when adding video
     if ((type === 'ai-carousel' || type === 'real-carousel') && carouselVideo) {
       payload.carouselVideo = carouselVideo;
     }
 
-    // FIXED: Preserve existing images when saving
     const rawDayData = monthDataCache[day] || null;
     const currentDayArray = (Array.isArray(rawDayData) ? rawDayData : (rawDayData ? [rawDayData] : [])).slice();
     const existingContent = activityId ? currentDayArray.find(item => item.id === activityId) : null;
     
     if (type === 'ai-carousel') {
       payload.aiPrompt = aiPrompt;
-      // Preserve existing images if they exist
       if (existingContent && existingContent.images) {
         payload.images = existingContent.images;
       } else {
@@ -1759,6 +1879,7 @@
     showNotification('Content saved successfully!');
     closeModal();
 
+    // Trigger AI Generation (if needed)
     try {
       if (type === 'ai-carousel') {
         const y = currentDate.getFullYear();
@@ -1796,13 +1917,11 @@
             } else {
                  waitForAIImages(schedule_id, day, payload.id);
             }
-        } else {
-            showNotification('AI Trigger failed: n8n returned error.', 'error');
         }
       }
     } catch (err) {
       console.error(err);
-      showNotification('Saved, but AI generation failed.', 'error');
+      showNotification('Saved, but AI generation check failed.', 'error');
     }
   }
 
@@ -1849,6 +1968,7 @@
     const isMobile = window.matchMedia && window.matchMedia('(max-width: 600px)').matches;
 
     function createActivityHtml(dayData, index = 0) {
+     
       if (currentView === 'individual' && selectedMarkets.length > 0) {
         const marketsOnThisActivity = new Set(
           (dayData.markets || []).map(toCanonicalMarket)
@@ -1883,13 +2003,23 @@
       const iconStyle = "font-size: 0.9rem; vertical-align: middle; margin-left: 5px;";
       if (platformSet.has('facebook')) platformIcons += `<i class="fa-brands fa-facebook" style="color:#1877F2; ${iconStyle}"></i>`;
       if (platformSet.has('instagram')) platformIcons += `<i class="fa-brands fa-instagram" style="color:#E4405F; ${iconStyle}"></i>`;
+      if (platformSet.has('tiktok')) platformIcons += `<i class="fa-brands fa-tiktok" style="color:#000000; ${iconStyle}"></i>`;
 
-      // Add video indicator for carousels with video
       const videoIndicator = (dayData.carouselVideo) ? ' <i class="fas fa-film" style="font-size:0.7rem; margin-left:3px;"></i>' : '';
+
+      let timeHtml = '';
+      if (dayData.postTime) {
+        timeHtml = `<span style="font-size:0.75rem; color:#666; background:#eee; padding:1px 4px; border-radius:3px; margin-left:5px;">
+                      <i class="far fa-clock"></i> ${dayData.postTime}
+                    </span>`;
+      }
 
       return `
         <div class="activity-block" data-activity-id="${activityId}">
-          <div class="content-type ${dayData.type}">${getContentTypeName(dayData.type)}${platformIcons}${videoIndicator}</div>
+          <div class="content-type ${dayData.type}">
+             ${getContentTypeName(dayData.type)}${platformIcons}${videoIndicator}
+          </div>
+          <div style="margin-top:2px;">${timeHtml}</div>
           ${viewSpecificHtml}
           <div class="content-theme">${dayData.theme || ''}</div>
         </div>
@@ -1897,6 +2027,7 @@
     }
 
     if (isMobile) {
+      // --- MOBILE VIEW ---
       const daysInMonth = new Date(date.getFullYear(), date.getMonth() + 1, 0).getDate();
       const list = document.createElement('div');
       list.className = 'mobile-list';
@@ -1931,6 +2062,7 @@
         list.appendChild(day);
       }
     } else {
+      // --- DESKTOP VIEW ---
       const header = document.createElement('div');
       header.className = 'calendar-header';
       header.innerHTML = `
@@ -1970,6 +2102,7 @@
 
             let activitiesHtml = '';
             dayDataArray.forEach(activityData => {
+            
               activitiesHtml += createActivityHtml(activityData);
             });
 
@@ -1996,7 +2129,7 @@
     }
 
     updateContentSummary(date);
-    updateShortformPerMarketCounts();
+    updateShortformPerMarketCounts(); 
   }
 
   function updateContentSummary(date) {
@@ -2130,29 +2263,60 @@
     }
   }
 
+  function getUsedFilenames(currentActivityId) {
+    const used = new Set();
+    
+    Object.values(monthDataCache || {}).forEach(dayData => {
+        const activities = Array.isArray(dayData) ? dayData : (dayData ? [dayData] : []);
+        
+        activities.forEach(act => {
+           
+            if (act.id === currentActivityId) return;
+
+            if (act.fileName) {
+                used.add(act.fileName);
+            }
+
+            if (act.carouselVideo) {
+                used.add(act.carouselVideo);
+            }
+        });
+    });
+    
+    return used;
+  }
+
   async function openVideoPicker() {
     const modal = document.getElementById('video-picker-modal');
     const container = document.getElementById('video-list-container');
-    modal.style.display = 'flex';
+    const searchInput = document.getElementById('video-search');
     
+    searchInput.value = ''; 
+    modal.style.display = 'flex';
     container.innerHTML = '<div style="text-align:center; margin-top:20px;"><i class="fas fa-spinner fa-spin"></i> Loading Library...</div>';
 
     try {
       const type = document.getElementById('content-type').value;
+      const currentActivityId = document.getElementById('edit-activity-id').value;
+     
       let bucket = "ShortForm"; 
-      
-      if (type === 'ai-shortform') bucket = "ShortVideo"; 
-
+      if (type === 'ai-shortform') {
+          bucket = "ShortVideo"; 
+      }
+   
       const res = await fetch(`${LIST_VIDEOS_WEBHOOK_URL}?bucket=${bucket}`);
-      
       if (!res.ok) throw new Error(`API Error: ${res.status}`);
+      
+      const allFiles = await res.json();
 
-      const files = await res.json();
-      renderVideoList(files);
+      const usedFilenames = getUsedFilenames(currentActivityId);
+      const availableFiles = allFiles.filter(file => !usedFilenames.has(file.name));
 
-      document.getElementById('video-search').onkeyup = (e) => {
+      renderVideoList(availableFiles);
+      
+      searchInput.onkeyup = (e) => {
         const term = e.target.value.toLowerCase();
-        const filtered = files.filter(f => f.name.toLowerCase().includes(term));
+        const filtered = availableFiles.filter(f => f.name.toLowerCase().includes(term));
         renderVideoList(filtered);
       };
 
