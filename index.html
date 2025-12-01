@@ -3746,35 +3746,54 @@ window.switchView = function(view) {
     }
   }
 
+  function getUsedFilenames(currentActivityId) {
+    const used = new Set();
+ 
+    Object.values(monthDataCache || {}).forEach(dayData => {
+        const activities = Array.isArray(dayData) ? dayData : (dayData ? [dayData] : []);
+        
+        activities.forEach(act => {
+        
+            if (act && act.fileName && act.id !== currentActivityId) {
+                used.add(act.fileName);
+            }
+        });
+    });
+    
+    return used;
+  }
+
   async function openVideoPicker() {
     const modal = document.getElementById('video-picker-modal');
     const container = document.getElementById('video-list-container');
-    modal.style.display = 'flex';
+    const searchInput = document.getElementById('video-search');
+  
+    searchInput.value = '';
     
+    modal.style.display = 'flex';
     container.innerHTML = '<div style="text-align:center; margin-top:20px;"><i class="fas fa-spinner fa-spin"></i> Loading Library...</div>';
 
     try {
-     
       const type = document.getElementById('content-type').value;
+      const currentActivityId = document.getElementById('edit-activity-id').value; 
+      
       let bucket = "ShortForm"; 
-      
-      
       if (type === 'ai-shortform') bucket = "ShortVideo"; 
 
-    
       const res = await fetch(`${LIST_VIDEOS_WEBHOOK_URL}?bucket=${bucket}`);
-      
       if (!res.ok) throw new Error(`API Error: ${res.status}`);
-
-
-      const files = await res.json();
       
-      renderVideoList(files);
-      
+      const allFiles = await res.json();
 
-      document.getElementById('video-search').onkeyup = (e) => {
+      const usedFilenames = getUsedFilenames(currentActivityId);
+      
+      const availableFiles = allFiles.filter(file => !usedFilenames.has(file.name));
+     
+      renderVideoList(availableFiles);
+      
+      searchInput.onkeyup = (e) => {
         const term = e.target.value.toLowerCase();
-        const filtered = files.filter(f => f.name.toLowerCase().includes(term));
+        const filtered = availableFiles.filter(f => f.name.toLowerCase().includes(term));
         renderVideoList(filtered);
       };
 
