@@ -382,15 +382,6 @@
     </div>
   </header>
 
-  <div class="main-navigation" style="margin-bottom:20px;">
-    <button class="nav-tab active" onclick="switchView('calendar')">
-      <i class="fas fa-calendar-alt"></i> Calendar
-    </button>
-    <button class="nav-tab" onclick="switchView('analytics')">
-      <i class="fas fa-chart-line"></i> Analytics
-    </button>
-  </div>
-
   <div id="calendar-view" style="display:block;">
     <div class="controls">
       <div class="month-navigation">
@@ -1180,31 +1171,31 @@
         }).join(' ');
 
         let mediaHtml = '';
-        
-        // Handle carousel with both video and images
+     
         if ((content.type === 'ai-carousel' || content.type === 'real-carousel')) {
           let videoHtml = '';
           let imagesHtml = '';
+        
+        if (content.carouselVideo) {
           
-          // Add video if exists
-          if (content.carouselVideo) {
-            const videoUrl = getFileUrl(content.carouselVideo, content.type);
-            videoHtml = `
-              <div class="preview-block">
-                <div class="media-preview">
-                  <div class="media-frame media-square" style="background:black;">
-                    <video controls style="width:100%; height:100%; object-fit:contain;">
-                      <source src="${videoUrl}" type="video/mp4">
-                      Your browser does not support the video tag.
-                    </video>
-                  </div>
-                  <div class="media-label">
-                    <i class="fa-solid fa-file-video"></i> <span>Carousel Video: ${content.carouselVideo}</span>
-                  </div>
+          const videoUrl = `${STORAGE_BASE_URL}/ShortVideo/${encodeURIComponent(content.carouselVideo)}`;
+          
+          videoHtml = `
+            <div class="preview-block">
+              <div class="media-preview">
+                <div class="media-frame media-square" style="background:black;">
+                  <video controls style="width:100%; height:100%; object-fit:contain;">
+                    <source src="${videoUrl}" type="video/mp4">
+                    Your browser does not support the video tag.
+                  </video>
+                </div>
+                <div class="media-label">
+                  <i class="fa-solid fa-file-video"></i> <span>Carousel Video: ${content.carouselVideo}</span>
                 </div>
               </div>
-            `;
-          }
+            </div>
+          `;
+        }
           
           // Add images if exist
           if (content.images && content.images.length > 0) {
