@@ -1811,6 +1811,35 @@
                 </div>
             </div>
 
+            <!-- Peak Posting Times -->
+            <div class="content-section">
+                <div class="section-header">
+                    <h2 class="section-title">
+                        <i class="fas fa-clock"></i>
+                        Peak Posting Times
+                    </h2>
+                    <div class="section-controls">
+                        <button class="btn btn-secondary">
+                            <i class="fas fa-info-circle"></i> Learn More
+                        </button>
+                    </div>
+                </div>
+                <table class="pages-table">
+                    <thead>
+                        <tr>
+                            <th>Page/Account</th>
+                            <th>Platform</th>
+                            <th>Best Day</th>
+                            <th>Best Time Slot</th>
+                            <th>Avg. Engagement at Peak</th>
+                        </tr>
+                    </thead>
+                    <tbody id="peak-times-table-body">
+                        <!-- Peak times data will be populated here -->
+                    </tbody>
+                </table>
+            </div>
+
             <!-- Recent Posts Performance Table -->
             <div class="content-section">
                 <div class="section-header">
@@ -2181,22 +2210,29 @@
             let growthNewFollowers = 0;
             if (filteredSnapshots.length > 0) {
                 const dateGroups = {};
+                const accountFollowers = {}; // To track latest follower count per account
+
+                // Sort snapshots by date to process them chronologically
+                filteredSnapshots.sort((a, b) => new Date(a.recorded_at) - new Date(b.recorded_at));
+
                 filteredSnapshots.forEach(snap => {
                     const date = snap.recorded_at.split('T')[0];
-                    if (!dateGroups[date]) dateGroups[date] = { fol: 0 };
-                    dateGroups[date].fol += (snap.followers_count || 0);
+                    accountFollowers[snap.account_id] = snap.followers_count || 0;
+                    
+                    // Sum of latest values for all accounts on this date
+                    dateGroups[date] = Object.values(accountFollowers).reduce((a, b) => a + b, 0);
                 });
 
                 const sortedDates = Object.keys(dateGroups).sort();
                 if (sortedDates.length >= 2) {
                     const latestDate = sortedDates[sortedDates.length - 1];
                     const prevDate = sortedDates[sortedDates.length - 2];
-                    newFollowers = dateGroups[latestDate].fol - dateGroups[prevDate].fol;
+                    newFollowers = dateGroups[latestDate] - dateGroups[prevDate];
 
                     if (sortedDates.length >= 3) {
                         const prevPrevDate = sortedDates[sortedDates.length - 3];
-                        const newFollowersPrev = dateGroups[prevDate].fol - dateGroups[prevPrevDate].fol;
-                        growthNewFollowers = newFollowersPrev > 0 ? ((newFollowers - newFollowersPrev) / newFollowersPrev) * 100 : 0;
+                        const newFollowersPrev = dateGroups[prevDate] - dateGroups[prevPrevDate];
+                        growthNewFollowers = newFollowersPrev !== 0 ? ((newFollowers - newFollowersPrev) / Math.abs(newFollowersPrev)) * 100 : (newFollowers > 0 ? 100 : 0);
                     }
                 }
             }
@@ -2214,6 +2250,7 @@
                 renderPlatformComparison(filteredAccounts, filteredPosts);
                 updateCharts(filteredAccounts, filteredPosts);
                 renderPlatformTable();
+                renderPeakTimes(filteredAccounts, filteredPosts);
 
             }
         
@@ -2389,6 +2426,94 @@
                 `;
                 grid.innerHTML += card;
             });
+        }
+
+        // ==========================================
+        // PEAK POSTING TIMES
+        // ==========================================
+        function renderPeakTimes(accounts, posts) {
+            const tbody = document.getElementById('peak-times-table-body');
+            if (!tbody) return;
+            tbody.innerHTML = '';
+
+            const accountPostStats = {};
+
+            posts.forEach(post => {
+                const accountId = post.account_id;
+                if (!accountId) return;
+
+                if (!accountPostStats[accountId]) {
+                    accountPostStats[accountId] = {
+                        day: Array(7).fill(null).map(() => ({ posts: 0, engagement: 0 })),
+                        hour: Array(24).fill(null).map(() => ({ posts: 0, engagement: 0 }))
+                    };
+                }
+
+                const postDate = new Date(post.posted_at);
+                const dayOfWeek = postDate.getDay(); // 0 = Sunday, 6 = Saturday
+                const hourOfDay = postDate.getHours();
+                const engagement = (post.likes || 0) + (post.comments || 0) + (post.shares || 0);
+
+                accountPostStats[accountId].day[dayOfWeek].posts++;
+                accountPostStats[accountId].day[dayOfWeek].engagement += engagement;
+                accountPostStats[accountId].hour[hourOfDay].posts++;
+                accountPostStats[accountId].hour[hourOfDay].engagement += engagement;
+            });
+
+            accounts.forEach(acc => {
+                const stats = accountPostStats[acc.id];
+                if (!stats) {
+                    // Add a row for accounts with no post data if needed
+                    return;
+                }
+
+                let bestDay = { day: -1, avgEngagement: -1 };
+                stats.day.forEach((data, dayIndex) => {
+                    if (data.posts > 0) {
+                        const avg = data.engagement / data.posts;
+                        if (avg > bestDay.avgEngagement) {
+                            bestDay = { day: dayIndex, avgEngagement: avg };
+                        }
+                    }
+                });
+
+                let bestHour = { hour: -1, avgEngagement: -1 };
+                stats.hour.forEach((data, hourIndex) => {
+                    if (data.posts > 0) {
+                        const avg = data.engagement / data.posts;
+                        if (avg > bestHour.avgEngagement) {
+                            bestHour = { hour: hourIndex, avgEngagement: avg };
+                        }
+                    }
+                });
+
+                const days = ['Sunday', 'Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday'];
+                const formatAMPM = (h) => { const s = h >= 12 ? 'PM' : 'AM'; const h12 = h % 12 || 12; return `${h12} ${s}`; };
+                
+                const bestDayStr = bestDay.day !== -1 ? days[bestDay.day] : 'N/A';
+                const bestTimeStr = bestHour.hour !== -1 ? `${formatAMPM(bestHour.hour)} - ${formatAMPM((bestHour.hour + 1) % 24)}` : 'N/A';
+                const peakEngagement = Math.max(bestDay.avgEngagement, bestHour.avgEngagement);
+
+                const row = `
+                    <tr>
+                        <td>
+                            <div class="page-name">
+                                <div class="page-avatar" style="background:${getPlatformColor(acc.platform).bg}; color:${getPlatformColor(acc.platform).text}; font-size: 13px; font-weight: 700;">${getCountryCode(acc)}</div>
+                                <div><div style="font-weight:600">${acc.name}</div><div style="font-size:12px;color:gray">${acc.handle||''}</div></div>
+                            </div>
+                        </td>
+                        <td><span class="platform-badge" style="background:${getPlatformColor(acc.platform).bg}; color:${getPlatformColor(acc.platform).text}"><i class="${getPlatformIcon(acc.platform)}"></i> ${capitalize(acc.platform)}</span></td>
+                        <td style="font-weight: 600;">${bestDayStr}</td>
+                        <td style="font-weight: 600;">${bestTimeStr}</td>
+                        <td style="font-weight: 600; color: var(--primary);">${peakEngagement > 0 ? formatNumber(peakEngagement) : 'N/A'}</td>
+                    </tr>
+                `;
+                tbody.innerHTML += row;
+            });
+
+            if (tbody.innerHTML === '') {
+                tbody.innerHTML = `<tr><td colspan="5" style="text-align: center; padding: 40px; color: var(--gray);">No post data available to calculate peak times for the selected filters.</td></tr>`;
+            }
         }
 
         // ==========================================
@@ -2645,36 +2770,36 @@
         // Follower Growth Chart
         async function updateFollowerGrowthChart() {
             try {
-                // Fetch snapshots data sorted by date
                 const { data: snapshots, error } = await supabase
                     .from('daily_snapshots')
-                    .select('recorded_at, followers_count')
+                    .select('account_id, recorded_at, followers_count')
                     .order('recorded_at', { ascending: true });
 
                 if (error) throw error;
 
-                // Group data by date and sum followers
                 const dailyData = {};
+                const accountFollowers = {}; // Store latest follower count for each account
+
                 snapshots.forEach(snap => {
                     const date = snap.recorded_at.split('T')[0];
+                    accountFollowers[snap.account_id] = snap.followers_count || 0;
+
                     if (!dailyData[date]) {
                         dailyData[date] = 0;
                     }
-                    dailyData[date] += (snap.followers_count || 0);
+                    // Sum of latest values for all accounts on this date
+                    dailyData[date] = Object.values(accountFollowers).reduce((a, b) => a + b, 0);
                 });
 
-                // Convert to arrays for the chart
                 const labels = Object.keys(dailyData).sort();
                 const data = labels.map(date => dailyData[date]);
 
-                // Limit the number of data points shown (e.g., last 30 days)
                 const limitedLabels = labels.slice(-30).map(date => {
                     const d = new Date(date);
                     return d.toLocaleDateString('en-US', { month: 'short', day: 'numeric' });
                 });
                 const limitedData = data.slice(-30);
 
-                // Update the chart
                 window.followerChart.data.labels = limitedLabels;
                 window.followerChart.data.datasets[0].data = limitedData;
                 window.followerChart.update();
@@ -2862,12 +2987,12 @@
         targetPlatforms.forEach(p => { stats[p] = { count: 0, totalEng: 0, followers: 0, bestTimeMap: {} }; });
 
         accounts.forEach(acc => {
-            const p = acc.platform.toLowerCase();
+            const p = acc.platform?.toLowerCase();
             if (stats[p]) stats[p].followers += (acc.followers_count || 0);
         });
 
         posts.forEach(post => {
-            const p = post.platform.toLowerCase();
+            const p = post.platform?.toLowerCase();
             if (stats[p]) {
                 stats[p].count += 1;
                 const eng = (post.likes||0) + (post.comments||0) + (post.shares||0);
@@ -2982,14 +3107,14 @@
                     platformEngagementByDate[platform][date] = {
                         engagement: 0,
                         impressions: 0,
-                        followers: 0,
+                        followers: {}, // Use an object to store latest follower count per account
                         count: 0
                     };
                 }
                 
                 platformEngagementByDate[platform][date].engagement += snap.engagement || 0;
                 platformEngagementByDate[platform][date].impressions += snap.impressions || 0;
-                platformEngagementByDate[platform][date].followers += snap.followers_count || 0;
+                platformEngagementByDate[platform][date].followers[snap.account_id] = snap.followers_count || 0; // Store latest
                 platformEngagementByDate[platform][date].count++;
             });
             
@@ -3374,7 +3499,6 @@
                 const accId = snap.account_id;
                 return filteredAccounts.some(acc => acc.id === accId);
             });
-
             let filteredPrev = { fol: 0, imp: 0, eng: 0, click: 0 };
             const yesterday = getPreviousDayValues(allFilteredSnapshots);
             filteredPrev = yesterday;
