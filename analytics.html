@@ -2966,7 +2966,7 @@
             const tbody = document.getElementById('platformTableBody');
             if (!tbody) return;
             
-            // ✅ สร้างแผนที่ข้อมูลจาก daily_snapshots (แหล่งข้อมูลหลัก)
+            // ✅ Create a data map from daily_snapshots (primary data source)
             const platformEngagementByDate = {};
             
             rawData.snapshots.forEach(snap => {
@@ -2993,7 +2993,7 @@
                 platformEngagementByDate[platform][date].count++;
             });
             
-            // ✅ สร้างสถิติจากข้อมูลจริง
+            // ✅ Create stats from real data
             const platformStats = {};
             const allPlatforms = ['facebook', 'instagram', 'tiktok', 'youtube', 'twitter'];
             
@@ -3008,7 +3008,7 @@
                 };
             });
             
-            // ✅ ข้อมูลปัจจุบันจาก social_accounts
+            // ✅ Current data from social_accounts
             rawData.accounts.forEach(acc => {
                 const platform = acc.platform?.toLowerCase() || 'unknown';
                 if (platformStats[platform]) {
@@ -3019,7 +3019,7 @@
                 }
             });
 
-            // ✅ นับ posts จาก posts table
+            // ✅ Count posts from posts table
             rawData.posts.forEach(post => {
                 const platform = post.platform?.toLowerCase() || 'unknown';
                 if (platformStats[platform]) {
@@ -3029,13 +3029,13 @@
 
             tbody.innerHTML = '';
             
-            // ✅ คำนวณ Growth Rate จาก daily_snapshots (ข้อมูลที่ชัดเจน)
+            // ✅ Calculate Growth Rate from daily_snapshots (clear data)
             allPlatforms.forEach(platform => {
                 const stats = platformStats[platform];
                 const dateData = platformEngagementByDate[platform] || {};
                 const dates = Object.keys(dateData).sort();
                 
-                // ✅ คำนวณ Growth จากการเปลี่ยนแปลง engagement ระหว่างวัน
+                // ✅ Calculate Growth from engagement change between days
                 let growth = 0;
                 if (dates.length >= 2) {
                     const latestDate = dates[dates.length - 1];
@@ -3044,7 +3044,7 @@
                     const latestData = dateData[latestDate];
                     const previousData = dateData[previousDate];
                     
-                    // เฉลี่ย engagement ต่อ account ในแต่ละวัน
+                    // Average engagement per account for each day
                     const latestEngPerAccount = latestData.count > 0 
                         ? latestData.engagement / latestData.count 
                         : 0;
@@ -3053,11 +3053,11 @@
                         ? previousData.engagement / previousData.count 
                         : 0;
                     
-                    // คำนวณ growth rate
+                    // Calculate growth rate
                     if (prevEngPerAccount > 0) {
                         growth = ((latestEngPerAccount - prevEngPerAccount) / prevEngPerAccount) * 100;
                     } else if (latestEngPerAccount > 0) {
-                        growth = 100; // ถ้าวันก่อนหน้าเป็น 0 แต่วันนี้มีค่า
+                        growth = 100; // If previous day was 0 but today has value
                     }
                 }
                 
@@ -3333,7 +3333,7 @@
                     statusHtml = '<span class="performance-indicator high"><i class="fas fa-check"></i> Active</span>';
                 }
 
-                // ใช้ฟังก์ชัน getCountryCode แทน
+                // Use getCountryCode function instead
                 const countryCode = getCountryCode(acc);
 
                 const row = `<tr>
@@ -3356,11 +3356,11 @@
         }
 
         function renderSummaryCards(allAccounts, filteredAccounts, allHistoryMap, filteredHistoryMap, days, newFollowers, growthNewFollowers) {
-            // ✅ ดึงข้อมูลวันต่อวัน แทนการเปรียบเทียบข้อมูลสะสม
+            // ✅ Get day-over-day data instead of comparing cumulative data
             const latestValues = getLatestValues(rawData.snapshots);
             const previousValues = getPreviousDayValues(rawData.snapshots);
             
-            // ✅ ใช้ข้อมูลปัจจุบันจาก accounts เท่านั้น
+            // ✅ Use current data from accounts only
             let filteredCurr = { fol: 0, imp: 0, eng: 0, click: 0 };
             filteredAccounts.forEach(acc => {
                 filteredCurr.fol += (acc.followers_count || 0);
@@ -3369,7 +3369,7 @@
                 filteredCurr.click += (acc.clicks || 0);
             });
 
-            // ✅ ใช้ข้อมูลวันก่อนหน้า จาก daily_snapshots
+            // ✅ Use previous day's data from daily_snapshots
             const allFilteredSnapshots = rawData.snapshots.filter(snap => {
                 const accId = snap.account_id;
                 return filteredAccounts.some(acc => acc.id === accId);
@@ -3379,7 +3379,7 @@
             const yesterday = getPreviousDayValues(allFilteredSnapshots);
             filteredPrev = yesterday;
 
-            // ✅ คำนวณ growth ที่ถูกต้อง
+            // ✅ Calculate correct growth
             const calcGrowth = (curr, prev) => {
                 if (isNaN(curr) || isNaN(prev) || prev <= 0) {
                     return 0;
@@ -3393,17 +3393,17 @@
             updateCardUI('total-clicks', filteredCurr.click, calcGrowth(filteredCurr.click, filteredPrev.click));
             updateCardUI('new-followers', newFollowers, growthNewFollowers);
 
-            // ✅ Engagement Rate - วันต่อวัน
+            // ✅ Engagement Rate - day-over-day
             const engRateCurr = filteredCurr.fol > 0 ? ((filteredCurr.eng / filteredCurr.fol) * 100) : 0;
             const engRatePrev = filteredPrev.fol > 0 ? ((filteredPrev.eng / filteredPrev.fol) * 100) : 0;
             document.getElementById('avg-engagement-rate').innerText = engRateCurr.toFixed(2) + '%';
             updatePercentUI(document.querySelector('.stat-card.rate'), calcGrowth(engRateCurr, engRatePrev));
 
-            // ✅ Engagement Rate (filtered) - วันต่อวัน
+            // ✅ Engagement Rate (filtered) - day-over-day
             document.getElementById('engagement-rate').innerText = engRateCurr.toFixed(2) + '%';
             updatePercentUI(document.querySelector('.stat-card.engagement-rate'), calcGrowth(engRateCurr, engRatePrev));
 
-            // ✅ CTR (Click-Through Rate) - วันต่อวัน
+            // ✅ CTR (Click-Through Rate) - day-over-day
             const ctrCurr = filteredCurr.imp > 0 ? (filteredCurr.click / filteredCurr.imp) * 100 : 0;
             const ctrPrev = filteredPrev.imp > 0 ? (filteredPrev.click / filteredPrev.imp) * 100 : 0;
             updateCardUI('ctr', ctrCurr, calcGrowth(ctrCurr, ctrPrev));
@@ -3414,7 +3414,7 @@
             window.currentHistoryMap = filteredHistoryMap;
         }
 
-        // ✅ ฟังก์ชันดึงค่าวันล่าสุด
+        // ✅ Function to get latest values
         function getLatestValues(snapshots) {
             const accountMap = {};
             
@@ -3430,7 +3430,7 @@
             Object.values(accountMap).forEach(snaps => {
                 if (snaps.length === 0) return;
                 
-                // เรียงจากล่าสุด
+                // Sort by latest
                 snaps.sort((a, b) => new Date(b.recorded_at) - new Date(a.recorded_at));
                 
                 const latest = snaps[0];
@@ -3443,7 +3443,7 @@
             return curr;
         }
 
-        // ✅ ฟังก์ชันใหม่: ดึงค่าวันก่อนหน้า
+        // ✅ New function: get previous day's values
         function getPreviousDayValues(snapshots) {
             const accountMap = {};
             
@@ -3459,10 +3459,10 @@
             Object.values(accountMap).forEach(snaps => {
                 if (snaps.length < 2) return; // Must have at least 2 days
                 
-                // เรียงจากล่าสุด
+                // Sort by latest
                 snaps.sort((a, b) => new Date(b.recorded_at) - new Date(a.recorded_at));
                 
-                // ดึง snapshot ที่ 2 (วันที่แล้ว)
+                // Get the 2nd snapshot (yesterday)
                 const prevDay = snaps[1];
                 prev.fol += (prevDay.followers_count || 0);
                 prev.imp += (prevDay.impressions || 0);
