@@ -201,6 +201,7 @@
     .platform-selector .fa-brands { font-size: 1.2rem; }
     .fa-facebook { color: #1877F2; }
     .fa-instagram { color: #E4405F; }
+    .fa-youtube { color: #FF0000; }
 
     .legend { display:flex; justify-content:center; flex-wrap:wrap; gap:15px; margin-top:20px; }
     .legend-item { display:flex; align-items:center; gap:5px; }
@@ -711,6 +712,9 @@
             
             <input type="checkbox" id="platform-tt" value="tiktok">
             <label for="platform-tt"><i class="fa-brands fa-tiktok"></i> TikTok</label>
+
+            <input type="checkbox" id="platform-yt" value="youtube">
+            <label for="platform-yt"><i class="fa-brands fa-youtube"></i> YouTube</label>
           </div>
         </div>
 
@@ -1591,11 +1595,12 @@
             if (p.toLowerCase() === 'facebook') return `<i class="fa-brands fa-facebook" style="color:#1877F2;"></i>`;
             if (p.toLowerCase() === 'instagram') return `<i class="fa-brands fa-instagram" style="color:#E4405F;"></i>`;
             if (p.toLowerCase() === 'tiktok') return `<i class="fa-brands fa-tiktok" style="color:#000000;"></i>`;
+            if (p.toLowerCase() === 'youtube') return `<i class="fa-brands fa-youtube" style="color:#FF0000;"></i>`;
             return `<span>${p}</span>`;
         }).join(' ');
 
         let mediaHtml = '';
-     
+
         if ((content.type === 'ai-carousel' || content.type === 'real-carousel')) {
           let videoHtml = '';
           let imagesHtml = '';
@@ -1966,6 +1971,7 @@
       setCheck('platform-fb', platformSet.has('facebook'));
       setCheck('platform-ig', platformSet.has('instagram'));
       setCheck('platform-tt', platformSet.has('tiktok'));
+      setCheck('platform-yt', platformSet.has('youtube'));
 
       // --- Carousel Video ---
       if ((content.type === 'ai-carousel' || content.type === 'real-carousel') && content.carouselVideo) {
@@ -2061,6 +2067,7 @@
       setCheck('platform-fb', false);
       setCheck('platform-ig', false);
       setCheck('platform-tt', false);
+      setCheck('platform-yt', false);
 
       const delBtn = document.getElementById('delete-content');
       if(delBtn) delBtn.style.display = 'none';
@@ -2306,6 +2313,7 @@
     if (getCheck('platform-fb')) selectedPlatforms.push('facebook');
     if (getCheck('platform-ig')) selectedPlatforms.push('instagram');
     if (getCheck('platform-tt')) selectedPlatforms.push('tiktok');
+    if (getCheck('platform-yt')) selectedPlatforms.push('youtube');
 
     const payload = {
       id: (activityId && !activityId.startsWith('legacy_')) ? activityId : newActivityId(),
@@ -2471,6 +2479,7 @@
       if (platformSet.has('facebook')) platformIcons += `<i class="fa-brands fa-facebook" style="color:#1877F2; ${iconStyle}"></i>`;
       if (platformSet.has('instagram')) platformIcons += `<i class="fa-brands fa-instagram" style="color:#E4405F; ${iconStyle}"></i>`;
       if (platformSet.has('tiktok')) platformIcons += `<i class="fa-brands fa-tiktok" style="color:#000000; ${iconStyle}"></i>`;
+      if (platformSet.has('youtube')) platformIcons += `<i class="fa-brands fa-youtube" style="color:#FF0000; ${iconStyle}"></i>`;
 
       const videoIndicator = (dayData.carouselVideo) ? ' <i class="fas fa-film" style="font-size:0.7rem; margin-left:3px;"></i>' : '';
 
