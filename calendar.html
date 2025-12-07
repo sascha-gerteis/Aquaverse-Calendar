@@ -300,6 +300,69 @@
       object-fit: cover;
     }
 
+    /* Generate Video button for carousel images */
+    .generate-video-btn {
+      position: absolute;
+      bottom: 0;
+      left: 0;
+      right: 0;
+      background: rgba(26, 42, 108, 0.9);
+      color: white;
+      border: none;
+      padding: 8px;
+      font-size: 0.75rem;
+      cursor: pointer;
+      transition: all 0.3s ease;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 5px;
+      opacity: 0;
+      transform: translateY(100%);
+    }
+    
+    .carousel-image-item:hover .generate-video-btn {
+      opacity: 1;
+      transform: translateY(0);
+    }
+    
+    .generate-video-btn:hover {
+      background: rgba(26, 42, 108, 1);
+    }
+    
+    .generate-video-btn.loading {
+      background: rgba(253, 187, 45, 0.9);
+    }
+    
+    .generate-video-btn.loading i {
+      animation: spin 1s linear infinite;
+    }
+    
+    @keyframes spin {
+      0% { transform: rotate(0deg); }
+      100% { transform: rotate(360deg); }
+    }
+
+    /* Video generation status */
+    .video-generation-status {
+      margin-top: 10px;
+      padding: 10px;
+      background: #f8f9fa;
+      border-radius: 6px;
+      border-left: 4px solid var(--accent);
+      display: none;
+    }
+    
+    .video-generation-status.active {
+      display: block;
+    }
+    
+    .video-generation-status .status-text {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+
     /* ====== Tablet tweaks ====== */
     @media (max-width:768px) {
       header { flex-direction:column; align-items:flex-start; }
@@ -314,6 +377,13 @@
       .market-checkboxes { grid-template-columns:repeat(2, 1fr); }
       .modal-content { width: 100%; padding:18px; }
       .carousel-images-grid { grid-template-columns: repeat(2, 1fr); }
+      
+      .generate-video-btn {
+        opacity: 1;
+        transform: translateY(0);
+        font-size: 0.7rem;
+        padding: 6px;
+      }
     }
 
     .calendar-fade { animation:fadeIn .5s ease-in-out; }
@@ -572,6 +642,13 @@
           </div>
         </div>
 
+        <!-- Video Generation Status -->
+        <div class="video-generation-status" id="video-generation-status">
+          <div class="status-text">
+            <span id="video-generation-text">Generating video from selected image...</span>
+          </div>
+        </div>
+
         <!-- Carousel Video Section -->
         <div class="carousel-video-section" id="carousel-video-section" style="display:none; margin-top: 15px; background: #f8f9fa; padding: 15px; border-radius: 8px; border: 1px dashed #ccc;">
           <label style="color:var(--primary);"><i class="fas fa-film"></i> Carousel Video</label>
@@ -742,6 +819,7 @@
   const SUPABASE_URL = "https://merpsvkfmjbugrgnwwlq.supabase.co";
   const SUPABASE_ANON_KEY = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Im1lcnBzdmtmbWpidWdyZ253d2xxIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NjE4NzcyMDksImV4cCI6MjA3NzQ1MzIwOX0.HYqgv5VFQxQ0E1QsxXYLLXu_r6LguyAEaErDSkHUc88";
   const GENERATE_CAROUSEL_WEBHOOK_URL = "https://saschag.app.n8n.cloud/webhook/calendar-carousel";
+  const GENERATE_VIDEO_FROM_IMAGE_WEBHOOK_URL = "https://saschag.app.n8n.cloud/webhook-test/generate-video-from-image";
   
   const LIST_VIDEOS_WEBHOOK_URL = "https://saschag.app.n8n.cloud/webhook/list-videos"; 
   const STORAGE_BASE_URL = "https://merpsvkfmjbugrgnwwlq.supabase.co/storage/v1/object/public";
@@ -749,6 +827,7 @@
   const BUCKET_SHORTFORM = "ShortForm";
   const BUCKET_SHORTVIDEO = "ShortVideo";
   const BUCKET_CAROUSEL = "carousel-image";
+  const BUCKET_CAROUSEL_VIDEO = "carouselvideo";
 
   const z2 = (n) => String(n).padStart(2, "0");
   const supabase = createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
@@ -766,7 +845,7 @@
   let currentlyEditingDay = null;
 
   let monthDataCache = {};
-  let realtimeChannel = null;
+  let pollingInterval = null;
   const table = 'calendars';
 
   function showNotification(message, type = 'success') {
@@ -823,6 +902,347 @@
       console.error(err);
       showNotification("AI Carousel generation failed (network).", "error");
       return { ok: false, error: err?.message || "network_error" };
+    }
+  }
+
+ async function waitForGeneratedVideo(payloadId, day) {
+    let attempts = 0;
+    const maxAttempts = 60; // 10 minutes (60 * 10 seconds)
+    const interval = 10000; // 10 seconds
+
+    console.log(`🔍 Start Polling for Video. Looking for ID part: "${payloadId}"`);
+    showNotification('Video generation in progress... Waiting for video.', 'success');
+
+    const statusEl = document.getElementById('video-generation-status');
+    const statusText = document.getElementById('video-generation-text');
+    statusEl.classList.add('active');
+
+    const poll = setInterval(async () => {
+      attempts++;
+      statusText.innerHTML = `Checking for video (${attempts}/${maxAttempts})...`;
+      console.log(`Attempt ${attempts}: Reading storage...`);
+
+      const { data: files, error } = await supabase
+        .storage
+        .from(BUCKET_CAROUSEL_VIDEO)
+        .list('', { limit: 100, sortBy: { column: 'created_at', order: 'desc' } });
+
+      console.log("📂 Files found in bucket:", files);
+
+      if (error) {
+        console.error("❌ Polling Error (Check Storage Policies):", error);
+        return;
+      }
+
+      // Look for files that match the payload ID
+      // Handle multiple patterns:
+      // Pattern 1: act_<id>_<date>.mp4
+      // Pattern 2: video_<date>_act_<id>.mp4
+      
+      const payloadIdPart = payloadId.replace('act_', ''); // Remove 'act_' prefix if present
+      const matchedFiles = files.filter(f => {
+        const filename = f.name.toLowerCase();
+        const idPart = payloadIdPart.toLowerCase();
+        
+        // Check various patterns for matching
+        return (
+          filename.includes(`act_${idPart}`) || 
+          filename.includes(idPart) ||
+          filename.includes(payloadId.toLowerCase())
+        );
+      });
+
+      console.log(`Looking for: "${payloadId}" or "${payloadIdPart}", Found: ${matchedFiles.length} files`);
+      console.log(`Matched files:`, matchedFiles.map(f => f.name));
+
+      if (matchedFiles.length > 0) {
+        clearInterval(poll);
+
+        const videoFilename = matchedFiles[0].name; // Get the first matched file
+        console.log("✅ Found Video!", videoFilename);
+
+        // Update the carousel video section in the modal if it's open
+        const modal = document.getElementById('edit-modal');
+        if (modal.style.display === 'flex') {
+          document.getElementById('carousel-video-preview').style.display = 'block';
+          document.getElementById('carousel-video-filename').textContent = videoFilename;
+
+          const videoPlayer = document.getElementById('carousel-video-player');
+          videoPlayer.src = `${STORAGE_BASE_URL}/${BUCKET_CAROUSEL_VIDEO}/${encodeURIComponent(videoFilename)}`;
+        }
+
+        // Update the activity data in database
+        const id = monthId(currentDate);
+        const { data: sel } = await supabase.from('calendars').select('days').eq('id', id).maybeSingle();
+
+        if (sel && sel.days) {
+          const days = { ...sel.days };
+          const currentDayArr = days[day] || [];
+          const indexToUpdate = currentDayArr.findIndex(item => item.id === payloadId);
+
+          if (indexToUpdate > -1) {
+            currentDayArr[indexToUpdate] = {
+              ...currentDayArr[indexToUpdate],
+              carouselVideo: videoFilename,
+              videoGenerated: true,
+              videoGeneratedAt: new Date().toISOString()
+            };
+            days[day] = currentDayArr;
+
+            await supabase.from('calendars').upsert({ id, days }, { onConflict: 'id' });
+
+            monthDataCache = days;
+            renderCalendar(currentDate);
+
+            statusText.innerHTML = `
+              <i class="fas fa-check-circle" style="color:#28a745; margin-right:8px;"></i> 
+              <strong>Complete!</strong> Video added to carousel.
+            `;
+
+            setTimeout(() => {
+              statusEl.classList.remove('active');
+            }, 3000);
+
+            showNotification(`Success! Video generated and added.`);
+          }
+        }
+      }
+
+      if (attempts >= maxAttempts) {
+        clearInterval(poll);
+        statusText.innerHTML = `
+          <i class="fas fa-clock" style="color:#dc3545; margin-right:8px;"></i> 
+          <strong>Timeout.</strong> Video generation took too long.
+        `;
+        setTimeout(() => {
+          statusEl.classList.remove('active');
+        }, 5000);
+        showNotification('Timeout: Video not found. Please check manually.', 'error');
+      }
+    }, interval);
+  }
+
+  // NEW FUNCTION: Generate video from image (simplified - just trigger and wait)
+  async function generateVideoFromImage(imageUrl, activityId, imageIndex) {
+    try {
+      // Show loading status - STEP 1: START
+      const statusEl = document.getElementById('video-generation-status');
+      const statusText = document.getElementById('video-generation-text');
+      statusEl.classList.add('active');
+      statusText.innerHTML = '<i class="fas fa-hourglass-start" style="color:#fdbb2d; margin-right:8px;"></i> Checking for existing video...';
+
+      // Get the current activity data
+      const activityIdInput = document.getElementById('edit-activity-id').value;
+      const day = currentlyEditingDay;
+
+      // Find the activity in the current day's data
+      const rawDayData = monthDataCache[day] || null;
+      const dayDataArray = Array.isArray(rawDayData) ? rawDayData : (rawDayData ? [rawDayData] : []);
+      const activity = dayDataArray.find(item => item.id === activityIdInput);
+
+      if (!activity) {
+        throw new Error('Activity not found');
+      }
+
+      // Get the date
+      const y = currentDate.getFullYear();
+      const m = z2(currentDate.getMonth() + 1);
+      const d = z2(day);
+      const dateStr = `${y}-${m}-${d}`;
+
+      console.log('Checking for existing video:', {
+        image_url: imageUrl,
+        date: dateStr,
+        activity_id: activityIdInput
+      });
+
+      // STEP 1: Check if video already exists in the bucket
+      const { data: existingFiles, error: listError } = await supabase
+        .storage
+        .from(BUCKET_CAROUSEL_VIDEO)
+        .list('', { limit: 100, sortBy: { column: 'created_at', order: 'desc' } });
+
+      if (listError) {
+        console.warn('Could not check storage for existing files, proceeding to generate:', listError);
+        // Skip checking and go to generation
+      } else {
+        console.log('Existing files in bucket:', existingFiles);
+
+        // Extract the ID part from activityIdInput
+        const activityIdPart = activityIdInput.replace(/^act_/, '');
+        
+        // Look for existing video that matches this activity
+        const existingVideo = existingFiles.find(f => {
+          const filename = f.name.toLowerCase();
+          const idPart = activityIdPart.toLowerCase();
+          
+          // Check various patterns for matching
+          return (
+            filename.includes(`act_${idPart}`) || 
+            filename.includes(idPart) ||
+            filename.includes(activityIdInput.toLowerCase())
+          );
+        });
+
+        console.log('Looking for video with ID part:', activityIdPart, 'Found:', existingVideo ? existingVideo.name : 'none');
+
+        // If video exists, use it
+        if (existingVideo) {
+          console.log('✅ Found existing video:', existingVideo.name);
+          statusText.innerHTML = `
+            <i class="fas fa-check-circle" style="color:#28a745; margin-right:8px;"></i> 
+            <strong>Found existing video!</strong> Using: ${existingVideo.name}
+          `;
+
+          // Update the carousel video section in the modal if it's open
+          const modal = document.getElementById('edit-modal');
+          if (modal.style.display === 'flex') {
+            document.getElementById('carousel-video-preview').style.display = 'block';
+            document.getElementById('carousel-video-filename').textContent = existingVideo.name;
+
+            const videoPlayer = document.getElementById('carousel-video-player');
+            videoPlayer.src = `${STORAGE_BASE_URL}/${BUCKET_CAROUSEL_VIDEO}/${encodeURIComponent(existingVideo.name)}`;
+          }
+
+          // Update the activity data
+          const id = monthId(currentDate);
+          const { data: sel } = await supabase.from('calendars').select('days').eq('id', id).maybeSingle();
+
+          if (sel && sel.days) {
+            const days = { ...sel.days };
+            const currentDayArr = days[day] || [];
+            const indexToUpdate = currentDayArr.findIndex(item => item.id === activityIdInput);
+
+            if (indexToUpdate > -1) {
+              currentDayArr[indexToUpdate] = {
+                ...currentDayArr[indexToUpdate],
+                carouselVideo: existingVideo.name,
+                videoGenerated: true,
+                videoGeneratedAt: new Date().toISOString()
+              };
+              days[day] = currentDayArr;
+
+              await supabase.from('calendars').upsert({ id, days }, { onConflict: 'id' });
+
+              monthDataCache = days;
+              renderCalendar(currentDate);
+
+              statusText.innerHTML = `
+                <i class="fas fa-check-circle" style="color:#28a745; margin-right:8px;"></i> 
+                <strong>Complete!</strong> Video added to carousel.
+              `;
+
+              setTimeout(() => {
+                statusEl.classList.remove('active');
+              }, 3000);
+
+              showNotification(`Success! Using existing video.`);
+            }
+          }
+
+          return;
+        }
+      }
+
+      // STEP 2: No existing video found, generate new one
+      statusText.innerHTML = '<i class="fas fa-spinner fa-spin" style="color:#1a2a6c; margin-right:8px;"></i> Video not found. Starting generation...';
+
+      console.log('Sending video generation request:', {
+        image_url: imageUrl,
+        date: dateStr,
+        activity_id: activityIdInput
+      });
+
+      // Send webhook request to generate video
+      const response = await fetch(GENERATE_VIDEO_FROM_IMAGE_WEBHOOK_URL, {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          image_url: imageUrl,
+          date: dateStr,
+          activity_id: activityIdInput
+        })
+      });
+
+      console.log('Webhook response status:', response.status);
+      console.log('Webhook response headers:', response.headers);
+
+      if (!response.ok) {
+        const errorText = await response.text();
+        console.error('Webhook error response:', errorText);
+        throw new Error(`Webhook failed: ${response.status} - ${errorText}`);
+      }
+
+      const data = await response.json();
+      console.log('Webhook success response:', data);
+
+      if (data.task_id || data.message) {
+        // STEP 3: WAITING - Start polling for the generated video
+        statusText.innerHTML = '<i class="fas fa-spinner fa-spin" style="color:#1a2a6c; margin-right:8px;"></i> Video generation in progress...';
+        // Wait for video using the activity ID
+        await waitForGeneratedVideo(activityIdInput, day);
+      } else {
+        throw new Error('No task ID or confirmation message returned from webhook');
+      }
+
+    } catch (error) {
+      console.error('Video generation error:', error);
+      const statusText = document.getElementById('video-generation-text');
+      const statusEl = document.getElementById('video-generation-status');
+      statusText.innerHTML = `<i class="fas fa-exclamation-circle" style="color:#dc3545; margin-right:8px;"></i> Video generation failed: ${error.message}`;
+      setTimeout(() => {
+        statusEl.classList.remove('active');
+      }, 5000);
+      showNotification('Video generation failed', 'error');
+    }
+  }
+
+  
+  // NEW FUNCTION: Update activity with generated video
+  async function updateActivityWithGeneratedVideo(day, activityId, videoFilename, dateObj) {
+    try {
+      const id = monthId(dateObj);
+      const { data: sel } = await supabase
+        .from('calendars')
+        .select('days')
+        .eq('id', id)
+        .maybeSingle();
+      
+      if (sel && sel.days) {
+        const days = { ...sel.days };
+        const currentDayArr = days[day] || [];
+        const indexToUpdate = currentDayArr.findIndex(item => item.id === activityId);
+
+        if (indexToUpdate > -1) {
+          currentDayArr[indexToUpdate] = {
+            ...currentDayArr[indexToUpdate],
+            carouselVideo: videoFilename,
+            videoGenerated: true,
+            videoGeneratedAt: new Date().toISOString()
+          };
+          
+          days[day] = currentDayArr;
+          
+          const { error } = await supabase
+            .from('calendars')
+            .upsert({ id, days }, { onConflict: 'id' });
+          
+          if (error) {
+            console.error('Error saving video to database:', error);
+            throw error;
+          }
+          
+          // Update local cache AND re-render calendar
+          monthDataCache = days;
+          renderCalendar(dateObj);
+          updateFolderCounts();
+          
+          console.log('✅ Video updated successfully:', videoFilename);
+        }
+      }
+    } catch (error) {
+      console.error('Error updating activity with video:', error);
+      showNotification('Failed to update activity with video', 'error');
     }
   }
 
@@ -966,9 +1386,9 @@
   }
 
   async function bindMonth(dateObj) {
-    if (realtimeChannel) {
-      try { await supabase.removeChannel(realtimeChannel); } catch {}
-      realtimeChannel = null;
+    if (pollingInterval) {
+      clearInterval(pollingInterval);
+      pollingInterval = null;
     }
 
     const id = monthId(dateObj);
@@ -986,23 +1406,27 @@
     renderCalendar(dateObj);
     updateFolderCounts();
 
-    try {
-      realtimeChannel = supabase
-        .channel(`db-changes-${id}`)
-        .on('postgres_changes', {
-          event: '*',
-          schema: 'public',
-          table: table,
-          filter: `id=eq.${id}`
-        }, (payload) => {
-          const newDays = payload?.new?.days;
-          if (newDays) {
+    // Replace realtime subscription with polling
+    pollingInterval = setInterval(async () => {
+      try {
+        const { data: pollData, error: pollError } = await supabase
+          .from(table)
+          .select('days')
+          .eq('id', id)
+          .maybeSingle();
+
+        if (!pollError && pollData && pollData.days) {
+          const newDays = pollData.days;
+          if (JSON.stringify(newDays) !== JSON.stringify(monthDataCache)) {
             monthDataCache = newDays;
             renderCalendar(dateObj);
+            updateFolderCounts();
           }
-        })
-        .subscribe();
-    } catch(e) { console.error("Realtime subscription failed", e); }
+        }
+      } catch (e) {
+        console.warn("Polling failed:", e);
+      }
+    }, 30000); // Poll every 30 seconds
   }
 
   async function writeDay(dateObj, day, payload) {
@@ -1178,7 +1602,7 @@
         
         if (content.carouselVideo) {
           
-          const videoUrl = `${STORAGE_BASE_URL}/ShortVideo/${encodeURIComponent(content.carouselVideo)}`;
+          const videoUrl = `${STORAGE_BASE_URL}/${BUCKET_CAROUSEL_VIDEO}/${encodeURIComponent(content.carouselVideo)}`;
           
           videoHtml = `
             <div class="preview-block">
@@ -1550,8 +1974,8 @@
         if(preview) preview.style.display = 'block';
         setText('carousel-video-filename', content.carouselVideo);
         if(player) {
-            const bucket = "ShortVideo";
-            player.src = `${STORAGE_BASE_URL}/${bucket}/${encodeURIComponent(content.carouselVideo)}`;
+            // Use the correct bucket for carousel videos
+            player.src = `${STORAGE_BASE_URL}/${BUCKET_CAROUSEL_VIDEO}/${encodeURIComponent(content.carouselVideo)}`;
         }
       } else {
         const preview = document.getElementById('carousel-video-preview');
@@ -1566,15 +1990,55 @@
             const imagesGrid = document.createElement('div');
             imagesGrid.className = 'carousel-images-grid';
             
-            content.images.forEach(filename => {
+            content.images.forEach((filename, index) => {
               const cleanName = filename.replace('carousel-image/', '').replace('carousel-image\\', '');
               const url = `${STORAGE_BASE_URL}/${BUCKET_CAROUSEL}/${encodeURIComponent(cleanName)}`;
               const imageItem = document.createElement('div');
               imageItem.className = 'carousel-image-item';
-              imageItem.innerHTML = `<img src="${url}" alt="Carousel image" onerror="this.src='https://placehold.co/100x100?text=Error';">`;
+              imageItem.innerHTML = `
+                <img src="${url}" alt="Carousel image" onerror="this.src='https://placehold.co/100x100?text=Error';">
+                <button class="generate-video-btn" data-image-url="${url}" data-image-index="${index}">
+                  <i class="fas fa-video"></i> Generate Video
+                </button>
+              `;
               imagesGrid.appendChild(imageItem);
             });
             imagesContainer.appendChild(imagesGrid);
+            
+            // Add event listeners to generate video buttons - with proper error handling
+            setTimeout(() => {
+              imagesContainer.querySelectorAll('.generate-video-btn').forEach(btn => {
+                btn.addEventListener('click', async (e) => {
+                  e.preventDefault();
+                  e.stopPropagation();
+                  console.log('Generate video button clicked');
+                  
+                  const imageUrl = btn.dataset.imageUrl;
+                  const imageIndex = btn.dataset.imageIndex;
+                  const activityId = content.id;
+                  
+                  // Add loading state to button
+                  const originalHTML = btn.innerHTML;
+                  btn.classList.add('loading');
+                  
+                  btn.disabled = true;
+                  
+                  try {
+                    await generateVideoFromImage(imageUrl, activityId, imageIndex);
+                  } catch (error) {
+                    console.error('Error in generate video handler:', error);
+                    showNotification('Failed to start video generation', 'error');
+                  } finally {
+                    // Reset button state after a delay
+                    setTimeout(() => {
+                      btn.classList.remove('loading');
+                      btn.innerHTML = originalHTML;
+                      btn.disabled = false;
+                    }, 2000);
+                  }
+                });
+              });
+            }, 100);
         }
         const imgSec = document.getElementById('carousel-images-section');
         if(imgSec) imgSec.style.display = 'block';
@@ -1622,6 +2086,9 @@
     if(carVidSec) carVidSec.style.display = (type === 'ai-carousel' || type === 'real-carousel') ? 'block' : 'none';
     if(carImgSec) carImgSec.style.display = (type === 'ai-carousel' || type === 'real-carousel') ? 'block' : 'none';
 
+    // Hide video generation status
+    document.getElementById('video-generation-status').classList.remove('active');
+
     document.getElementById('edit-modal').style.display = 'flex';
 
     // Handle Manual Video (Non-Carousel)
@@ -1631,7 +2098,7 @@
         
         const preview = document.getElementById('preview-container');
         const player = document.getElementById('video-player-preview');
-        
+ 
         if(fName && preview && player) {
             preview.style.display = 'block';
             player.src = getFileUrl(fName, content.type);
@@ -1648,47 +2115,60 @@
   function closeModal() {
     document.getElementById('edit-modal').style.display = 'none';
     currentlyEditingDay = null;
+    // Hide video generation status
+    document.getElementById('video-generation-status').classList.remove('active');
   }
 
   async function openCarouselVideoPicker() {
-    const modal = document.getElementById('carousel-video-picker-modal');
-    const container = document.getElementById('carousel-video-list-container');
-    const searchInput = document.getElementById('carousel-video-search');
+  const modal = document.getElementById('carousel-video-picker-modal');
+  const container = document.getElementById('carousel-video-list-container');
+  const searchInput = document.getElementById('carousel-video-search');
 
-    searchInput.value = ''; 
-    modal.style.display = 'flex';
-    container.innerHTML = '<div style="text-align:center; margin-top:20px;"><i class="fas fa-spinner fa-spin"></i> Loading Library...</div>';
+  searchInput.value = ''; 
+  modal.style.display = 'flex';
+  container.innerHTML = '<div style="text-align:center; margin-top:20px;"><i class="fas fa-spinner fa-spin"></i> Loading Library...</div>';
 
-    try {
-      const type = document.getElementById('content-type').value;
-      const currentActivityId = document.getElementById('edit-activity-id').value;
+  try {
+    const type = document.getElementById('content-type').value;
+    const currentActivityId = document.getElementById('edit-activity-id').value;
 
-      let bucket = "ShortForm"; 
-      if (type === 'ai-carousel' || type === 'real-carousel') {
-        bucket = "ShortVideo"; 
-      }
-     
-      const res = await fetch(`${LIST_VIDEOS_WEBHOOK_URL}?bucket=${bucket}`);
-      if (!res.ok) throw new Error(`API Error: ${res.status}`);
-
-      const allFiles = await res.json();
-
-      const usedFilenames = getUsedFilenames(currentActivityId);
-      const availableFiles = allFiles.filter(file => !usedFilenames.has(file.name));
-    
-      renderCarouselVideoList(availableFiles);
-
-      searchInput.onkeyup = (e) => {
-        const term = e.target.value.toLowerCase();
-        const filtered = availableFiles.filter(f => f.name.toLowerCase().includes(term));
-        renderCarouselVideoList(filtered);
-      };
-
-    } catch (err) {
-      container.innerHTML = `<div style="color:red; text-align:center;">Error loading videos.<br>${err.message}</div>`;
-      console.error(err);
+    let bucket = BUCKET_CAROUSEL_VIDEO; 
+    if (type === 'ai-carousel' || type === 'real-carousel') {
+      bucket = "carouselvideo"; 
     }
+   
+    const res = await fetch(`${LIST_VIDEOS_WEBHOOK_URL}?bucket=${bucket}`);
+    if (!res.ok) throw new Error(`API Error: ${res.status}`);
+    
+    const responseText = await res.text(); // Get response as text first
+    let allFiles = [];
+    if (responseText.trim()) {
+      try {
+        allFiles = JSON.parse(responseText); // Parse only if not empty
+      } catch (jsonError) {
+        console.error('JSON parse error:', jsonError);
+        throw new Error('Invalid JSON response from server');
+      }
+    } else {
+      throw new Error('Empty response from server');
+    }
+
+    const usedFilenames = getUsedFilenames(currentActivityId);
+    const availableFiles = allFiles.filter(file => !usedFilenames.has(file.name));
+  
+    renderCarouselVideoList(availableFiles);
+
+    searchInput.onkeyup = (e) => {
+      const term = e.target.value.toLowerCase();
+      const filtered = availableFiles.filter(f => f.name.toLowerCase().includes(term));
+      renderCarouselVideoList(filtered);
+    };
+
+  } catch (err) {
+    container.innerHTML = `<div style="color:red; text-align:center;">Error loading videos.<br>${err.message}</div>`;
+    console.error(err);
   }
+}
 
   function renderCarouselVideoList(files) {
     const container = document.getElementById('carousel-video-list-container');
@@ -1730,11 +2210,7 @@
     document.getElementById('carousel-video-filename').textContent = filename;
     
     const videoPlayer = document.getElementById('carousel-video-player');
-    const type = document.getElementById('content-type').value;
-    videoPlayer.src = getFileUrl(filename, type);
-
-    const bucket = "ShortVideo";
-    videoPlayer.src = `${STORAGE_BASE_URL}/${bucket}/${encodeURIComponent(filename)}`;
+    videoPlayer.src = `${STORAGE_BASE_URL}/${BUCKET_CAROUSEL_VIDEO}/${encodeURIComponent(filename)}`;
 
     document.getElementById('carousel-video-picker-modal').style.display = 'none';
   }
@@ -2302,7 +2778,7 @@
 
       const usedFilenames = getUsedFilenames(currentActivityId);
       const availableFiles = allFiles.filter(file => !usedFilenames.has(file.name));
-
+    
       renderVideoList(availableFiles);
       
       searchInput.onkeyup = (e) => {
@@ -2462,5 +2938,4 @@
   };
 </script>
 </body>
-
 </html>

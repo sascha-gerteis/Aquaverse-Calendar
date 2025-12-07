@@ -1822,7 +1822,7 @@
                         <button class="btn btn-secondary">
                             <i class="fas fa-info-circle"></i> Learn More
                         </button>
-                    </div>
+                    </div }
                 </div>
                 <table class="pages-table">
                     <thead>
@@ -2258,7 +2258,7 @@
         // ==========================================
         // TOP POSTS WITH ENGAGEMENT RATE AND TAGS
         // ==========================================
-        window.filterPostsByTab = function(platform, element) {
+       window.filterPostsByTab = function(platform, element) {
             if(element) {
                 document.querySelectorAll('.platform-tab').forEach(el => el.classList.remove('active'));
                 element.classList.add('active');
@@ -2267,18 +2267,28 @@
             const source = currentFilteredPosts || [];
             let postsToShow = [];
 
+            // Date filter: only posts from the last 7 days
+            const sevenDaysAgo = new Date();
+            sevenDaysAgo.setDate(sevenDaysAgo.getDate() - 7);
+
+            const recentPosts = source.filter(p => new Date(p.posted_at) >= sevenDaysAgo);
+
+            const getEngRate = (p) => {
+                const engagement = (p.likes || 0) + (p.comments || 0) + (p.shares || 0);
+                const followers = p.social_accounts?.followers_count || 1;
+                return followers > 0 ? (engagement / followers) * 100 : 0;
+            };
+
             if (platform === 'all') {
-                const fb = source.filter(p => p.platform === 'facebook').sort((a,b) => b.likes - a.likes).slice(0, 10);
-                const ig = source.filter(p => p.platform === 'instagram').sort((a,b) => b.likes - a.likes).slice(0, 10);
-                const tt = source.filter(p => p.platform === 'tiktok').sort((a,b) => b.likes - a.likes).slice(0, 10);
-                
-                postsToShow = [...fb, ...ig, ...tt];
-                postsToShow.sort((a,b) => b.likes - a.likes);
+                // Sort all recent posts by engagement rate and take the top ones
+                postsToShow = recentPosts
+                    .sort((a, b) => getEngRate(b) - getEngRate(a))
+                    .slice(0, 20); // Show top 20 from all platforms
             } else {
-                postsToShow = source
+                postsToShow = recentPosts
                     .filter(p => p.platform === platform)
-                    .sort((a,b) => b.likes - a.likes)
-                    .slice(0, 10);
+                    .sort((a, b) => getEngRate(b) - getEngRate(a))
+                    .slice(0, 10); // Show top 10 for the selected platform
             }
 
             // Calculate average engagement rate for comparison
@@ -2309,11 +2319,11 @@
             currentAverageEngagementRate = validPosts > 0 ? totalEngagementRate / validPosts : 0;
         }
 
-        function getEngagementRateTag(engagementRate) {
+        function getEngagementRateTag(engagementRate, averageThreshold) {
             // Define thresholds based on average engagement rate
-            const averageThreshold = currentAverageEngagementRate;
+            const avgThreshold = averageThreshold;
             
-            if (engagementRate > averageThreshold) { // Above average
+            if (engagementRate > avgThreshold) { // Above average
                 return {
                     text: 'Above Average',
                     class: 'above-average',
@@ -2338,6 +2348,13 @@
                 return;
             }
 
+            // Define hardcoded average engagement rates
+            const platformAvgRates = {
+                facebook: 0.25,
+                instagram: 1.0,
+                tiktok: 5.0 // Default or calculated average for others
+            };
+
             posts.forEach(post => {
                 const acc = post.social_accounts || {};
                 const date = new Date(post.posted_at).toLocaleDateString('en-US', { day: 'numeric', month: 'short' });
@@ -2354,13 +2371,17 @@
                     playIcon = '<div style="position:absolute;top:50%;left:50%;transform:translate(-50%,-50%);font-size:40px;color:white;opacity:0.8;text-shadow:0 2px 4px rgba(0,0,0,0.5);"><i class="fas fa-play-circle"></i></div>';
                 }
 
-                // Calculate engagement rate
+                // Calculate engagement rate for this post
                 const engagement = (post.likes || 0) + (post.comments || 0) + (post.shares || 0);
                 const followers = acc.followers_count || 1; // Avoid division by zero
                 const engagementRate = (engagement / followers) * 100;
                 
-                // Get engagement rate tag
-                const tag = getEngagementRateTag(engagementRate);
+                // Get platform average rate from our hardcoded values
+                const platform = post.platform;
+                const platformAvgRate = platformAvgRates[platform] || 0;
+                
+                // Get engagement rate tag based on the hardcoded average
+                const tag = getEngagementRateTag(engagementRate, platformAvgRate);
 
                 const card = `
                     <div class="post-card">
@@ -2412,7 +2433,7 @@
                             <div class="engagement-rate-bar">
                                 <div style="display: flex; justify-content: space-between; align-items: center; font-size: 12px;">
                                     <span style="color: var(--gray);">
-                                        Avg. Rate: <span style="color: var(--dark);">${engagementRate.toFixed(2)}%
+                                        Avg. Rate: <span style="color: var(--dark);">${platformAvgRate.toFixed(2)}%
                                         </span>
                                     </span>
                                     <a href="${post.post_url || '#'}" target="_blank" style="margin-right: 20px; text-decoration:none;font-weight:600;color:var(--primary);">
@@ -2460,40 +2481,56 @@
                 accountPostStats[accountId].hour[hourOfDay].engagement += engagement;
             });
 
+            const tableData = [];
+
             accounts.forEach(acc => {
                 const stats = accountPostStats[acc.id];
-                if (!stats) {
-                    // Add a row for accounts with no post data if needed
-                    return;
+                let bestDayStr = 'N/A';
+                let bestTimeStr = 'N/A';
+                let peakEngagement = 0;
+
+                if (stats) {
+                    let bestDay = { day: -1, avgEngagement: -1 };
+                    stats.day.forEach((data, dayIndex) => {
+                        if (data.posts > 0) {
+                            const avg = data.engagement / data.posts;
+                            if (avg > bestDay.avgEngagement) {
+                                bestDay = { day: dayIndex, avgEngagement: avg };
+                            }
+                        }
+                    });
+
+                    let bestHour = { hour: -1, avgEngagement: -1 };
+                    stats.hour.forEach((data, hourIndex) => {
+                        if (data.posts > 0) {
+                            const avg = data.engagement / data.posts;
+                            if (avg > bestHour.avgEngagement) {
+                                bestHour = { hour: hourIndex, avgEngagement: avg };
+                            }
+                        }
+                    });
+
+                    const days = ['Sunday', 'Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday'];
+                    const formatAMPM = (h) => { const s = h >= 12 ? 'PM' : 'AM'; const h12 = h % 12 || 12; return `${h12} ${s}`; };
+                    
+                    if (bestDay.day !== -1) bestDayStr = days[bestDay.day];
+                    if (bestHour.hour !== -1) bestTimeStr = `${formatAMPM(bestHour.hour)} - ${formatAMPM((bestHour.hour + 1) % 24)}`;
+                    peakEngagement = Math.max(bestDay.avgEngagement, bestHour.avgEngagement);
                 }
-
-                let bestDay = { day: -1, avgEngagement: -1 };
-                stats.day.forEach((data, dayIndex) => {
-                    if (data.posts > 0) {
-                        const avg = data.engagement / data.posts;
-                        if (avg > bestDay.avgEngagement) {
-                            bestDay = { day: dayIndex, avgEngagement: avg };
-                        }
-                    }
-                });
-
-                let bestHour = { hour: -1, avgEngagement: -1 };
-                stats.hour.forEach((data, hourIndex) => {
-                    if (data.posts > 0) {
-                        const avg = data.engagement / data.posts;
-                        if (avg > bestHour.avgEngagement) {
-                            bestHour = { hour: hourIndex, avgEngagement: avg };
-                        }
-                    }
-                });
-
-                const days = ['Sunday', 'Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday'];
-                const formatAMPM = (h) => { const s = h >= 12 ? 'PM' : 'AM'; const h12 = h % 12 || 12; return `${h12} ${s}`; };
                 
-                const bestDayStr = bestDay.day !== -1 ? days[bestDay.day] : 'N/A';
-                const bestTimeStr = bestHour.hour !== -1 ? `${formatAMPM(bestHour.hour)} - ${formatAMPM((bestHour.hour + 1) % 24)}` : 'N/A';
-                const peakEngagement = Math.max(bestDay.avgEngagement, bestHour.avgEngagement);
+                tableData.push({
+                    acc,
+                    bestDayStr,
+                    bestTimeStr,
+                    peakEngagement
+                });
+            });
 
+            // Sort data by peakEngagement in descending order
+            tableData.sort((a, b) => b.peakEngagement - a.peakEngagement);
+
+            tableData.forEach(data => {
+                const { acc, bestDayStr, bestTimeStr, peakEngagement } = data;
                 const row = `
                     <tr>
                         <td>
