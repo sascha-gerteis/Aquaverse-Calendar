@@ -1880,9 +1880,12 @@
         const SUPABASE_KEY = 'sb_publishable_HTUvRzrVGDFbqLxrUCCMZQ_tY_oW4zJ';
         
         let supabase;
-        try {
-            if (window.supabase) supabase = window.supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
-        } catch(e) { console.error('Supabase Init Error:', e); }
+        if (window.supabase) {
+            supabase = window.supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
+        } else {
+            console.error('Supabase library not loaded. Dashboard cannot function.');
+            alert('Critical Error: Could not load database library.');
+        }
 
         let rawData = { accounts: [], posts: [], snapshots: [], demographics: null };
 
@@ -1924,17 +1927,56 @@
                 const { data: acc } = await supabase.from('social_accounts').select('*').not('external_id', 'is', null);
                 rawData.accounts = acc || [];
 
-                const { data: posts } = await supabase.from('posts').select(`*, social_accounts(region, platform, name, followers_count)`).order('posted_at', { ascending: false }).limit(500);
+                // --- แก้ไขเพื่อดึงทุกคอลัมน์จาก posts รวมถึง reach ---
+                const postColumns = '*,social_accounts(id,name,platform,region,followers_count)';
+                
+                // พยายามดึงแบบ nested select ก่อน
+                let { data: posts, error: postsError, status: postsStatus } = await supabase
+                    .from('posts')
+                    .select(postColumns)
+                    .order('posted_at', { ascending: false })
+                    .limit(500);
+
+                if (postsError) {
+                    console.warn('Primary posts query failed', { status: postsStatus, error: postsError });
+                    // fallback: ดึง posts แยก แล้วดึง accounts มาแมปเอง
+                    const { data: postsFlat, error: flatErr } = await supabase
+                        .from('posts')
+                        .select('*') // <-- ดึงทุกคอลัมน์ รวมถึง reach
+                        .order('posted_at', { ascending: false })
+                        .limit(500);
+                    if (flatErr) throw flatErr;
+
+                    const { data: accountsAll, error: accErr } = await supabase
+                        .from('social_accounts')
+                        .select('id,name,platform,region,followers_count');
+                    if (accErr) throw accErr;
+
+                    const accMap = {};
+                    (accountsAll || []).forEach(a => accMap[a.id] = a);
+                    (postsFlat || []).forEach(p => p.social_accounts = accMap[p.account_id] || null);
+
+                    posts = postsFlat || [];
+                }
+
                 rawData.posts = posts || [];
 
-                const { data: snaps } = await supabase.from('daily_snapshots').select('*, social_accounts(platform)').order('recorded_at', { ascending: true });
+                // เพิ่ม console.log เพื่อตรวจสอบว่าดึง reach มาได้หรือไม่
+                console.log('Posts fetched:', posts.length, 'Sample post reach:', posts[0]?.reach);
+
+                const { data: snaps, error: snapsErr } = await supabase.from('daily_snapshots').select('*,social_accounts(platform)').order('recorded_at', { ascending: true });
+                if (snapsErr) throw snapsErr;
                 rawData.snapshots = snaps || [];
 
                 // Fetch demographics data from accounts
                 await fetchDemographics();
 
                 renderDataPeriod(rawData.snapshots);
-            } catch (err) { console.error('Fetch Error:', err); }
+            } catch (err) {
+                console.error('Fetch Error:', err);
+                // แสดงรายละเอียดเพื่อดีบักในเบราว์เซอร์
+                alert('Data fetch error: ' + (err.message || JSON.stringify(err)));
+            }
         }
 
         // Fetch demographics data from accounts
@@ -2267,16 +2309,18 @@
             const source = currentFilteredPosts || [];
             let postsToShow = [];
 
-            // Date filter: only posts from the last 7 days
+            // Date filter: only posts from the last 7 days AND have reach > 0
             const sevenDaysAgo = new Date();
             sevenDaysAgo.setDate(sevenDaysAgo.getDate() - 7);
 
-            const recentPosts = source.filter(p => new Date(p.posted_at) >= sevenDaysAgo);
+            const recentPosts = source.filter(p => new Date(p.posted_at) >= sevenDaysAgo && p.reach > 0);
 
             const getEngRate = (p) => {
                 const engagement = (p.likes || 0) + (p.comments || 0) + (p.shares || 0);
-                const followers = p.social_accounts?.followers_count || 1;
-                return followers > 0 ? (engagement / followers) * 100 : 0;
+                const reach = p.reach || 1; // <-- เปลี่ยนจาก followers มาใช้ reach
+                if (reach <= 0) return 0;
+                const rate = (engagement / reach) * 100;
+                return Math.min(rate, 100); // <-- ทำให้มั่นใจว่าค่าไม่เกิน 100%
             };
 
             if (platform === 'all') {
@@ -2307,11 +2351,11 @@
 
             posts.forEach(post => {
                 const engagement = (post.likes || 0) + (post.comments || 0) + (post.shares || 0);
-                const followers = post.social_accounts?.followers_count || 1; // Avoid division by zero
+                const reach = post.reach || 1; // <-- เปลี่ยนจาก followers มาใช้ reach
                 
-                if (followers > 0) {
-                    const engagementRate = (engagement / followers) * 100;
-                    totalEngagementRate += engagementRate;
+                if (reach > 0) {
+                    const engagementRate = (engagement / reach) * 100;
+                    totalEngagementRate += Math.min(engagementRate, 100); // <-- ทำให้มั่นใจว่าค่าไม่เกิน 100%
                     validPosts++;
                 }
             });
@@ -2356,6 +2400,9 @@
             };
 
             posts.forEach(post => {
+                // เพิ่ม console.log เพื่อตรวจสอบค่า reach ของแต่ละโพสต์
+                console.log('Rendering post:', post.id, 'reach:', post.reach);
+
                 const acc = post.social_accounts || {};
                 const date = new Date(post.posted_at).toLocaleDateString('en-US', { day: 'numeric', month: 'short' });
        
@@ -2371,10 +2418,11 @@
                     playIcon = '<div style="position:absolute;top:50%;left:50%;transform:translate(-50%,-50%);font-size:40px;color:white;opacity:0.8;text-shadow:0 2px 4px rgba(0,0,0,0.5);"><i class="fas fa-play-circle"></i></div>';
                 }
 
-                // Calculate engagement rate for this post
+                // Calculate engagement rate for this post based on (likes+comments+shares) / reach
                 const engagement = (post.likes || 0) + (post.comments || 0) + (post.shares || 0);
-                const followers = acc.followers_count || 1; // Avoid division by zero
-                const engagementRate = (engagement / followers) * 100;
+                const reach = post.reach || 1; // <-- เปลี่ยนจาก followers มาใช้ reach
+                let engagementRate = reach > 0 ? (engagement / reach) * 100 : 0;
+                engagementRate = Math.min(engagementRate, 100); // <-- ทำให้มั่นใจว่าค่าไม่เกิน 100%
                 
                 // Get platform average rate from our hardcoded values
                 const platform = post.platform;
@@ -2403,6 +2451,10 @@
                                 <span class="post-page" style="color:${getPlatformColor(acc.platform).text}">
                                     ${acc.name || 'Unknown Account'}
                                 </span>
+                                <!-- การแสดงค่า Reach ในส่วน post-info เพื่อให้เห็นชัดขึ้น -->
+                                <span class="post-reach" style="font-size: 12px; color: var(--gray); margin-left: 10px;">
+                                    <i class="fas fa-user-friends" style="color:#7209b7"></i> Reach: ${formatNumber(post.reach || 0)}
+                                </span>
                             </div>
                             <div class="post-metrics">
                                 <div class="metric">
@@ -2423,10 +2475,11 @@
                                         <i class="fas fa-share" style="color:#4cc9f0"></i> ${formatNumber(post.shares || 0)}
                                     </span>
                                 </div>
-                                <div class="metric">
+                                
+                                <div class="metric"style="calign-items: left;">
                                     <span class="metric-label">Eng. Rate</span>
                                     <span class="metric-value">
-                                        <i class="fas fa-percentage" style="color:#28a745"></i> ${engagementRate.toFixed(2)}%
+                                        <i class="fas fa-percentage" style="calign-items: left;olor:#28a745"></i> ${engagementRate.toFixed(2)}%
                                     </span>
                                 </div>
                             </div>
@@ -2863,16 +2916,15 @@
                     // Fetch clicks data from accounts
                 });
 
-                // Fetch clicks data from accounts
-                const { data: accounts, error } = await supabase
-                    .from('social_accounts')
-                    .select('clicks');
+                // Get the set of account IDs from the filtered posts
+                const filteredAccountIds = new Set(posts.map(p => p.account_id));
+                
+                // Filter the main snapshots data for the relevant accounts
+                const relevantSnapshots = rawData.snapshots.filter(snap => filteredAccountIds.has(snap.account_id));
 
-                if (!error && accounts) {
-                    accounts.forEach(acc => {
-                        totalClicks += (acc.clicks || 0);
-                    });
-                }
+                // Use the existing helper function to get the latest total values
+                const latestValues = getLatestValues(relevantSnapshots);
+                totalClicks = latestValues.click || 0;
 
                 // Update the chart
                 window.engagementChart.data.datasets[0].data = [
@@ -2898,9 +2950,7 @@
                 recorded_at,
                 engagement,
                 account_id,
-                social_accounts (
-                    platform
-                )
+                social_accounts(platform)
             `)
             .order('recorded_at', { ascending: true });
 
@@ -2973,18 +3023,35 @@
         // REGION STATS FUNCTION
         // ==========================================
         function renderRegionStats(accounts) {
-        const container = document.getElementById('region-container');
-        if(!container) return;
-        container.innerHTML = '';
-        const regions = {};
-        accounts.forEach(acc => {
-            const r = acc.region || 'global';
-            if (!regions[r]) regions[r] = { name: r, imp: 0, eng: 0, fol: 0, count: 0 };
-            regions[r].imp += (acc.impressions||0);
-            regions[r].eng += (acc.engagement||0);
-            regions[r].fol += (acc.followers_count||0);
-            regions[r].count++;
-        });
+         const container = document.getElementById('region-container');
+            if(!container) return;
+            container.innerHTML = '';
+            const regions = {};
+
+            // สร้าง Map ของ snapshot ล่าสุดสำหรับแต่ละ account เพื่อให้ดึงข้อมูลได้เร็ว
+            const latestSnapshots = {};
+            rawData.snapshots.forEach(snap => {
+                if (!latestSnapshots[snap.account_id] || new Date(snap.recorded_at) > new Date(latestSnapshots[snap.account_id].recorded_at)) {
+                    latestSnapshots[snap.account_id] = snap;
+                }
+            });
+
+            accounts.forEach(acc => {
+                const r = acc.region || 'global';
+                if (!regions[r]) regions[r] = { name: r, imp: 0, eng: 0, fol: 0, count: 0 };
+                
+                const latestSnap = latestSnapshots[acc.id];
+                
+                // ใช้ข้อมูลล่าสุดจาก snapshots ถ้ามี
+                if (latestSnap) {
+                    regions[r].imp += (latestSnap.impressions || 0);
+                    regions[r].eng += (latestSnap.engagement || 0);
+                    regions[r].fol += (latestSnap.followers_count || 0);
+                } else { // ถ้าไม่มี snapshot ให้ใช้ข้อมูลจากตาราง account เป็นค่าสำรอง
+                    regions[r].fol += (acc.followers_count || 0);
+                }
+                regions[r].count++;
+            });
         Object.values(regions).forEach(stat => {
             const rate = stat.fol > 0 ? (stat.eng / stat.fol) * 100 : 0;
             let level = rate > 1.5 ? (rate > 3.0 ? 'High' : 'Medium') : 'Low';
@@ -3130,7 +3197,7 @@
             
             // ✅ Create a data map from daily_snapshots (primary data source)
             const platformEngagementByDate = {};
-            
+
             rawData.snapshots.forEach(snap => {
                 if (!snap.social_accounts) return;
                 
@@ -3144,6 +3211,7 @@
                     platformEngagementByDate[platform][date] = {
                         engagement: 0,
                         impressions: 0,
+                        reach: 0, // <-- เพิ่ม reach ใน object
                         followers: {}, // Use an object to store latest follower count per account
                         count: 0
                     };
@@ -3151,6 +3219,7 @@
                 
                 platformEngagementByDate[platform][date].engagement += snap.engagement || 0;
                 platformEngagementByDate[platform][date].impressions += snap.impressions || 0;
+                platformEngagementByDate[platform][date].reach += snap.reach || 0; // <-- ดึงค่า reach จาก snapshot
                 platformEngagementByDate[platform][date].followers[snap.account_id] = snap.followers_count || 0; // Store latest
                 platformEngagementByDate[platform][date].count++;
             });
@@ -3170,13 +3239,11 @@
                 };
             });
             
-            // ✅ Current data from social_accounts
+            // ✅ Current data from social_accounts (for followers as a fallback)
             rawData.accounts.forEach(acc => {
                 const platform = acc.platform?.toLowerCase() || 'unknown';
                 if (platformStats[platform]) {
                     platformStats[platform].followers += (acc.followers_count || 0);
-                    platformStats[platform].engagement += (acc.engagement || 0);
-                    platformStats[platform].reach += (acc.impressions || 0);
                     platformStats[platform].accountCount += 1;
                 }
             });
@@ -3191,7 +3258,7 @@
 
             tbody.innerHTML = '';
             
-            // ✅ Calculate Growth Rate from daily_snapshots (clear data)
+            // ✅ Calculate Growth Rate and other metrics from daily_snapshots
             allPlatforms.forEach(platform => {
                 const stats = platformStats[platform];
                 const dateData = platformEngagementByDate[platform] || {};
@@ -3199,27 +3266,34 @@
                 
                 // ✅ Calculate Growth from engagement change between days
                 let growth = 0;
-                if (dates.length >= 2) {
+                if (dates.length > 0) {
                     const latestDate = dates[dates.length - 1];
-                    const previousDate = dates[dates.length - 2];
-                    
                     const latestData = dateData[latestDate];
-                    const previousData = dateData[previousDate];
                     
-                    // Average engagement per account for each day
-                    const latestEngPerAccount = latestData.count > 0 
-                        ? latestData.engagement / latestData.count 
-                        : 0;
-                    
-                    const prevEngPerAccount = previousData.count > 0 
-                        ? previousData.engagement / previousData.count 
-                        : 0;
-                    
-                    // Calculate growth rate
-                    if (prevEngPerAccount > 0) {
-                        growth = ((latestEngPerAccount - prevEngPerAccount) / prevEngPerAccount) * 100;
-                    } else if (latestEngPerAccount > 0) {
-                        growth = 100; // If previous day was 0 but today has value
+                    // ใช้ค่าล่าสุดจาก snapshots
+                    stats.engagement = latestData.engagement;
+                    stats.reach = latestData.reach; // <-- ใช้ค่า reach ที่ถูกต้อง
+                    stats.followers = Object.values(latestData.followers).reduce((a, b) => a + b, 0);
+
+                    if (dates.length >= 2) {
+                        const previousDate = dates[dates.length - 2];
+                        const previousData = dateData[previousDate];
+                        
+                        // Average engagement per account for each day
+                        const latestEngPerAccount = latestData.count > 0 
+                            ? latestData.engagement / latestData.count 
+                            : 0;
+                        
+                        const prevEngPerAccount = previousData.count > 0 
+                            ? previousData.engagement / previousData.count 
+                            : 0;
+                        
+                        // Calculate growth rate
+                        if (prevEngPerAccount > 0) {
+                            growth = ((latestEngPerAccount - prevEngPerAccount) / prevEngPerAccount) * 100;
+                        } else if (latestEngPerAccount > 0) {
+                            growth = 100; // If previous day was 0 but today has value
+                        }
                     }
                 }
                 
@@ -3281,7 +3355,7 @@
                 const engagement = (post.likes || 0) + (post.comments || 0) + (post.shares || 0);
                 const followers = post.social_accounts?.followers_count || 1;
                 const engagementRate = ((engagement / followers) * 100).toFixed(1);
-                const reach = post.impressions || Math.floor(engagement * (Math.random() * 5 + 2)); // Mock reach
+                const reach = post.reach || 0;
 
                 const date = new Date(post.posted_at).toLocaleDateString('en-US', { 
                     year: 'numeric', 
@@ -3487,11 +3561,24 @@
             tbody.innerHTML = '';
             accounts.sort((a,b) => (b.followers_count||0) - (a.followers_count||0));
 
+            // สร้าง Map ของ snapshot ล่าสุดสำหรับแต่ละ account
+            const latestSnapshots = {};
+            rawData.snapshots.forEach(snap => {
+                if (!latestSnapshots[snap.account_id] || new Date(snap.recorded_at) > new Date(latestSnapshots[snap.account_id].recorded_at)) {
+                    latestSnapshots[snap.account_id] = snap;
+                }
+            });
+
             accounts.forEach(acc => {
-                const engRate = (acc.followers_count||0) > 0 ? ((acc.engagement/acc.followers_count)*100).toFixed(2) : '0.00';
+                const latestSnap = latestSnapshots[acc.id] || {}; // ใช้ object ว่างถ้าไม่พบ snapshot
+
+                const followers = latestSnap.followers_count || acc.followers_count || 0;
+                const impressions = latestSnap.impressions || 0;
+                const engagement = latestSnap.engagement || 0;
+                const engRate = followers > 0 ? ((engagement / followers) * 100).toFixed(2) : '0.00';
                 
                 let statusHtml = '<span class="performance-indicator low"><i class="fas fa-minus"></i> No Data</span>';
-                if ((acc.followers_count || 0) > 0) {
+                if (followers > 0) {
                     statusHtml = '<span class="performance-indicator high"><i class="fas fa-check"></i> Active</span>';
                 }
 
@@ -3507,9 +3594,9 @@
                     </td>
                     <td><span class="platform-badge" style="background:${getPlatformColor(acc.platform).bg}; color:${getPlatformColor(acc.platform).text}"><i class="${getPlatformIcon(acc.platform)}"></i> ${capitalize(acc.platform)}</span></td>
                     <td><span class="region-badge">${formatRegion(acc.region)}</span></td>
-                    <td>${formatNumber(acc.followers_count)}</td>
-                    <td>${formatNumber(acc.impressions)}</td>
-                    <td>${formatNumber(acc.engagement)}</td>
+                    <td>${formatNumber(followers)}</td>
+                    <td>${formatNumber(impressions)}</td>
+                    <td>${formatNumber(engagement)}</td>
                     <td>${engRate}%</td>
                     <td>${statusHtml}</td>
                 </tr>`;
@@ -3518,27 +3605,17 @@
         }
 
         function renderSummaryCards(allAccounts, filteredAccounts, allHistoryMap, filteredHistoryMap, days, newFollowers, growthNewFollowers) {
-            // ✅ Get day-over-day data instead of comparing cumulative data
-            const latestValues = getLatestValues(rawData.snapshots);
-            const previousValues = getPreviousDayValues(rawData.snapshots);
+            // --- ส่วนที่แก้ไข ---
+            // สร้าง list ของ account ID ที่ถูก filter
+            const filteredAccountIds = new Set(filteredAccounts.map(acc => acc.id));
             
-            // ✅ Use current data from accounts only
-            let filteredCurr = { fol: 0, imp: 0, eng: 0, click: 0 };
-            filteredAccounts.forEach(acc => {
-                filteredCurr.fol += (acc.followers_count || 0);
-                filteredCurr.imp += (acc.impressions || 0);
-                filteredCurr.eng += (acc.engagement || 0);
-                filteredCurr.click += (acc.clicks || 0);
-            });
+            // กรอง snapshots เฉพาะของ account ที่แสดงผล
+            const relevantSnapshots = rawData.snapshots.filter(snap => filteredAccountIds.has(snap.account_id));
 
-            // ✅ Use previous day's data from daily_snapshots
-            const allFilteredSnapshots = rawData.snapshots.filter(snap => {
-                const accId = snap.account_id;
-                return filteredAccounts.some(acc => acc.id === accId);
-            });
-            let filteredPrev = { fol: 0, imp: 0, eng: 0, click: 0 };
-            const yesterday = getPreviousDayValues(allFilteredSnapshots);
-            filteredPrev = yesterday;
+            // ✅ ใช้ฟังก์ชัน getLatestValues และ getPreviousDayValues กับ snapshots ที่กรองแล้ว
+            const filteredCurr = getLatestValues(relevantSnapshots);
+            const filteredPrev = getPreviousDayValues(relevantSnapshots);
+            // --- สิ้นสุดส่วนที่แก้ไข ---
 
             // ✅ Calculate correct growth
             const calcGrowth = (curr, prev) => {
@@ -3555,8 +3632,8 @@
             updateCardUI('new-followers', newFollowers, growthNewFollowers);
 
             // ✅ Engagement Rate - day-over-day
-            const engRateCurr = filteredCurr.fol > 0 ? ((filteredCurr.eng / filteredCurr.fol) * 100) : 0;
-            const engRatePrev = filteredPrev.fol > 0 ? ((filteredPrev.eng / filteredPrev.fol) * 100) : 0;
+            const engRateCurr = filteredCurr.imp > 0 ? ((filteredCurr.eng / filteredCurr.imp) * 100) : 0; // ใช้ imp ในการคำนวณ ER รวม
+            const engRatePrev = filteredPrev.imp > 0 ? ((filteredPrev.eng / filteredPrev.imp) * 100) : 0;
             document.getElementById('avg-engagement-rate').innerText = engRateCurr.toFixed(2) + '%';
             updatePercentUI(document.querySelector('.stat-card.rate'), calcGrowth(engRateCurr, engRatePrev));
 
