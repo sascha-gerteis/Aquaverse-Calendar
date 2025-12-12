@@ -825,7 +825,8 @@
   const GENERATE_CAROUSEL_WEBHOOK_URL = "https://saschag.app.n8n.cloud/webhook/calendar-carousel";
   const GENERATE_VIDEO_FROM_IMAGE_WEBHOOK_URL = "https://saschag.app.n8n.cloud/webhook/generate-video-from-image";
   
-  const LIST_VIDEOS_WEBHOOK_URL = "https://saschag.app.n8n.cloud/webhook/list-videos"; 
+  const LIST_VIDEOS_WEBHOOK_URL = 'https://merpsvkfmjbugrgnwwlq.supabase.co/functions/v1/list-files';
+
   const STORAGE_BASE_URL = "https://merpsvkfmjbugrgnwwlq.supabase.co/storage/v1/object/public";
 
   const BUCKET_SHORTFORM = "ShortForm";
@@ -2059,22 +2060,24 @@
                     const day = currentlyEditingDay;
                     const activityId = document.getElementById('edit-activity-id').value;
                     const id = monthId(currentDate);
-                    const { data: sel } = await supabase.from('calendars').select('days').eq('id', id).maybeSingle();
-                    if (sel && sel.days) {
-                      const days = { ...sel.days };
-                      const currentDayArr = days[day] || [];
-                      const activityIndex = currentDayArr.findIndex(item => item.id === activityId);
-                      if (activityIndex > -1) {
-                        const activity = currentDayArr[activityIndex];
-                        if (activity.images && activity.images[index]) {
-                          activity.images.splice(index, 1);
-                          days[day] = currentDayArr;
-                          await supabase.from('calendars').upsert({ id, days }, { onConflict: 'id' });
-                          monthDataCache = days;
-                          openEditModal(day, activityId);
+                    supabase.from('calendars').select('days').eq('id', id).maybeSingle().then(({ data: sel }) => {
+                      if (sel && sel.days) {
+                        const days = { ...sel.days };
+                        const currentDayArr = days[day] || [];
+                        const activityIndex = currentDayArr.findIndex(item => item.id === activityId);
+                        if (activityIndex > -1) {
+                          const activity = currentDayArr[activityIndex];
+                          if (activity.images && activity.images[index]) {
+                            activity.images.splice(index, 1);
+                            days[day] = currentDayArr;
+                            supabase.from('calendars').upsert({ id, days }, { onConflict: 'id' }).then(() => {
+                              monthDataCache = days;
+                              openEditModal(day, activityId);
+                            });
+                          }
                         }
                       }
-                    }
+                    });
                   }
                 });
               });
@@ -2191,7 +2194,8 @@
         throw new Error('Invalid JSON response from server');
       }
     } else {
-      throw new Error('Empty response from server');
+      // ไม่ throw error แต่ให้เป็น array ว่าง
+      allFiles = [];
     }
 
     const usedFilenames = getUsedFilenames(currentActivityId);
@@ -2273,9 +2277,12 @@
               const currentDayArr = days[day] || [];
               const activityIndex = currentDayArr.findIndex(item => item.id === activityId);
               if (activityIndex > -1) {
-                delete currentDayArr[activityIndex].carouselVideo;
-                delete currentDayArr[activityIndex].videoGenerated;
-                delete currentDayArr[activityIndex].videoGeneratedAt;
+                const activity = currentDayArr[activityIndex];
+                if (activity.carouselVideo === filename) {
+                  delete activity.carouselVideo;
+                  delete activity.videoGenerated;
+                  delete activity.videoGeneratedAt;
+                }
                 days[day] = currentDayArr;
                 supabase.from('calendars').upsert({ id, days }, { onConflict: 'id' }).then(() => {
                   monthDataCache = days;
@@ -2300,8 +2307,7 @@
         console.error('Supabase delete error:', error);
         throw error;
       }
-      
-      // ตรวจสอบหลังลบเพื่อยืนยัน
+    
       const { data: files } = await supabase.storage.from(bucket).list('', { limit: 100 });
       const stillExists = files.some(f => f.name === filename);
       if (stillExists) {
@@ -2866,16 +2872,27 @@
     try {
       const type = document.getElementById('content-type').value;
       const currentActivityId = document.getElementById('edit-activity-id').value;
-     
+    
       let bucket = "ShortForm"; 
       if (type === 'ai-shortform') {
           bucket = "ShortVideo"; 
       }
-   
+  
       const res = await fetch(`${LIST_VIDEOS_WEBHOOK_URL}?bucket=${bucket}`);
       if (!res.ok) throw new Error(`API Error: ${res.status}`);
-      
-      const allFiles = await res.json();
+      const responseText = await res.text();
+      let allFiles = [];
+      if (responseText.trim()) {
+        try {
+          allFiles = JSON.parse(responseText);
+        } catch (jsonError) {
+          console.error('JSON parse error:', jsonError);
+          throw new Error('Invalid JSON response from server');
+        }
+      } else {
+        // Instead of throwing, just show no videos
+        allFiles = [];
+      }
 
       const usedFilenames = getUsedFilenames(currentActivityId);
       const availableFiles = allFiles.filter(file => !usedFilenames.has(file.name));
@@ -2892,7 +2909,7 @@
       container.innerHTML = `<div style="color:red; text-align:center;">Error loading videos.<br>${err.message}</div>`;
       console.error(err);
     }
-  }
+}
 
   function renderVideoList(files) {
     const container = document.getElementById('video-list-container');
