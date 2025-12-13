@@ -385,6 +385,8 @@
         font-size: 0.7rem;
         padding: 6px;
       }
+      
+
     }
 
     .calendar-fade { animation:fadeIn .5s ease-in-out; }
@@ -392,6 +394,31 @@
 
     .global-view .market-tags { display:none; }
     .individual-view .market-tags { display:flex; }
+
+    /* Post status indicator */
+    .post-status {
+      display: inline-block;
+      background: #28a745;
+      color: white;
+      font-size: 0.65rem;
+      padding: 2px 6px;
+      border-radius: 10px;
+      font-weight: 600;
+      margin-left: 8px;
+      vertical-align: middle;
+      box-shadow: 0 1px 3px rgba(0,0,0,0.3);
+    }
+    .post-status.not-posted {
+      background: #dc3545;
+    }
+    .post-status.partial-posted {
+      background: #ffc107;
+      color: #333;
+    }
+
+    .activity-block {
+      position: relative;
+    }
 
     /* ====== MOBILE: real single-column list ====== */
     @media (max-width:600px){
@@ -1698,27 +1725,35 @@
             ? `<div class="form-group" style="margin-top:10px;"><label>AI Prompt</label><div class="form-control" style="background:#f9f9f9;">${content.aiPrompt}</div></div>` 
             : '';
 
+        // Add checkbox for marking post status next to title
+        const isPosted = content.markedAsPosted === true;
+        const checkboxHtml = `
+          <label style="display: inline-flex; align-items: center; gap: 8px; cursor: pointer; margin-left: 15px; font-size: 0.9rem;">
+            <input type="checkbox" ${isPosted ? 'checked' : ''} 
+                   onchange="toggleActivityPosted('${content.id}', this.checked)" style="transform: scale(1.1);">
+            <span style="font-weight: 600; color: ${isPosted ? '#28a745' : '#6c757d'};">
+              <i class="fas ${isPosted ? 'fa-check-circle' : 'fa-circle'}"></i> 
+              Posted
+            </span>
+          </label>
+        `;
+
+        const timeDisplay = content.postTime ? `<span class="preview-meta-pill"><i class="far fa-clock"></i> <strong>Time:</strong> ${content.postTime}</span>` : '';
+
         body.innerHTML += `
           ${index > 0 ? '<hr style="margin: 20px 0; border-top: 1px solid #eee;">' : ''}
-          <h3 class="preview-title-activity">Activity ${index + 1}: ${getContentTypeName(content.type)}</h3>
+          <h3 class="preview-title-activity" style="display: flex; align-items: center; flex-wrap: wrap;">
+            Activity ${index + 1}: ${getContentTypeName(content.type)}
+            ${checkboxHtml}
+          </h3>
           ${mediaHtml}
           <div class="form-group"><label>Theme</label><div class="form-control preview-theme">${content.theme || '-'}</div></div>
           ${aiBlock}
           <div class="preview-meta-row">
              <div class="preview-meta-pill"><i class="fa-solid fa-globe"></i> <strong>Markets:</strong> ${markets}</div>
              <div class="preview-meta-pill"><i class="fa-solid fa-share-nodes"></i> <strong>Platforms:</strong> ${platformIcons || '-'}</div>
+             ${timeDisplay}
           </div>
-        `;
-          
-        const timeDisplay = content.postTime ? `<span class="preview-meta-pill"><i class="far fa-clock"></i> <strong>Time:</strong> ${content.postTime}</span>` : '';
-
-        body.innerHTML += `
-          <div class="form-group"><label>Theme</label><div class="form-control preview-theme">${content.theme || '-'}</div></div>
-          ${aiBlock}
-          <div class="preview-meta-row">
-             <div class="preview-meta-pill"><i class="fa-solid fa-globe"></i> <strong>Markets:</strong> ${markets}</div>
-             <div class="preview-meta-pill"><i class="fa-solid fa-share-nodes"></i> <strong>Platforms:</strong> ${platformIcons || '-'}</div>
-             ${timeDisplay} </div>
         `;
       
       
@@ -1727,6 +1762,12 @@
 
     const modal = document.getElementById('view-modal');
     modal.style.display = 'flex';
+    
+    // Reset scroll position to top of modal
+    const modalContent = modal.querySelector('.modal-content');
+    if (modalContent) {
+      modalContent.scrollTop = 0;
+    }
 
     const close = () => { modal.style.display = 'none'; };
     
@@ -1736,6 +1777,72 @@
     if(closeBtn) closeBtn.onclick = close;
     if(okBtn) okBtn.onclick = close;
   }
+
+  // Function to toggle post status of each activity
+  async function toggleActivityPosted(activityId, isPosted) {
+    try {
+      // Find the day of this activity
+      let targetDay = null;
+      for (const [day, dayData] of Object.entries(monthDataCache || {})) {
+        const dayDataArray = Array.isArray(dayData) ? dayData : (dayData ? [dayData] : []);
+        const activityExists = dayDataArray.find(activity => activity.id === activityId);
+        if (activityExists) {
+          targetDay = day;
+          break;
+        }
+      }
+
+      if (!targetDay) {
+        console.error('Activity not found:', activityId);
+        return;
+      }
+
+      // Update data in cache
+      const days = { ...monthDataCache };
+      const currentDayArr = days[targetDay] || [];
+      const dayDataArray = Array.isArray(currentDayArr) ? currentDayArr : [currentDayArr];
+      
+      const activityIndex = dayDataArray.findIndex(item => item.id === activityId);
+      if (activityIndex > -1) {
+        dayDataArray[activityIndex] = {
+          ...dayDataArray[activityIndex],
+          markedAsPosted: isPosted
+        };
+        days[targetDay] = dayDataArray;
+
+        // Save to database
+        const id = monthId(currentDate);
+        await supabase.from('calendars').upsert({ id, days }, { onConflict: 'id' });
+
+        // Update cache and re-render
+        monthDataCache = days;
+        renderCalendar(currentDate);
+
+        const statusText = isPosted ? 'Posted' : 'Unposted';
+        showNotification(`Activity marked as ${statusText}`);
+        
+        // Update checkbox in modal if modal is open
+        const modal = document.getElementById('view-modal');
+        if (modal && modal.style.display === 'flex') {
+          const checkboxInModal = modal.querySelector(`input[onchange*="${activityId}"]`);
+          if (checkboxInModal) {
+            checkboxInModal.checked = isPosted;
+            const labelSpan = checkboxInModal.parentElement.querySelector('span');
+            if (labelSpan) {
+              labelSpan.style.color = isPosted ? '#28a745' : '#6c757d';
+              labelSpan.innerHTML = `<i class="fas ${isPosted ? 'fa-check-circle' : 'fa-circle'}"></i> Posted`;
+            }
+          }
+        }
+      }
+    } catch (error) {
+      console.error('Error updating post status:', error);
+      showNotification('Failed to update post status', 'error');
+    }
+  }
+
+  // Make function accessible from outside
+  window.toggleActivityPosted = toggleActivityPosted;
 
   document.addEventListener('DOMContentLoaded', async () => {
     buildMarketButtons();
@@ -1924,7 +2031,7 @@
 
     const content = activityId ? dayDataArray.find(item => item.id === activityId) : null;
 
-    // --- Safety Helper: ฟังก์ชันช่วยใส่ค่าแบบปลอดภัย (กัน Error) ---
+    // --- Safety Helper: Safe value setting functions (prevent errors) ---
     const setVal = (id, val) => { const el = document.getElementById(id); if(el) el.value = val; };
     const setCheck = (id, val) => { const el = document.getElementById(id); if(el) el.checked = val; };
     const setText = (id, val) => { const el = document.getElementById(id); if(el) el.textContent = val; };
@@ -2194,7 +2301,7 @@
         throw new Error('Invalid JSON response from server');
       }
     } else {
-      // ไม่ throw error แต่ให้เป็น array ว่าง
+      // Don't throw error, return empty array instead
       allFiles = [];
     }
 
@@ -2264,10 +2371,10 @@
     const filename = document.getElementById('carousel-video-filename').textContent.trim();
     if (filename) {
       if (!confirm('Are you sure you want to delete this video from storage?')) return;
-      // ลบไฟล์
+      // Delete file
       deleteFileFromStorage(BUCKET_CAROUSEL_VIDEO, filename).then(success => {
         if (success) {
-          // ลบออกจาก content
+          // Remove from content
           const day = currentlyEditingDay;
           const activityId = document.getElementById('edit-activity-id').value;
           const id = monthId(currentDate);
@@ -2530,6 +2637,77 @@
     }
   }
 
+  // Function to check post status of each day
+  function getPostStatus(dayDataArray, dayNumber) {
+    if (!dayDataArray || dayDataArray.length === 0) {
+      return 'no-content';
+    }
+
+    // Check if it's previous month - if so, consider all posts as posted
+    const now = new Date();
+    const calendarYear = currentDate.getFullYear();
+    const calendarMonth = currentDate.getMonth();
+    const currentYear = now.getFullYear();
+    const currentMonth = now.getMonth();
+
+    // If calendar shows month before current month, consider all as posted
+    if (calendarYear < currentYear || 
+        (calendarYear === currentYear && calendarMonth < currentMonth)) {
+      return 'all-posted';
+    }
+
+    let totalActivities = 0;
+    let postedActivities = 0;
+
+    dayDataArray.forEach(activity => {
+      if (activity && activity.type && activity.type !== 'no-post') {
+        totalActivities++;
+        // Check if posted or not - use manual marking as primary method
+        if (activity.markedAsPosted === true) {
+          postedActivities++;
+        }
+      }
+    });
+
+    if (totalActivities === 0) return 'no-content';
+    if (postedActivities === 0) return 'not-posted';
+    if (postedActivities === totalActivities) return 'all-posted';
+    return 'partial-posted';
+  }
+
+  // Helper function to check if scheduled time has passed (including date)
+  function isPastTime(postTimeStr, dayNumber) {
+    if (!postTimeStr) return false;
+    
+    const now = new Date();
+    const currentYear = currentDate.getFullYear();
+    const currentMonth = currentDate.getMonth();
+    
+    // Create Date object for calendar date
+    const calendarDate = new Date(currentYear, currentMonth, dayNumber);
+    
+    // Convert postTime to Date object
+    const [hours, minutes] = postTimeStr.split(':').map(Number);
+    const postDateTime = new Date(currentYear, currentMonth, dayNumber, hours, minutes, 0, 0);
+    
+    // Check if current time has passed the scheduled time
+    return now >= postDateTime;
+  }
+
+  // Function to create HTML for post status
+  function createPostStatusHtml(status) {
+    switch (status) {
+      case 'all-posted':
+        return '<div class="post-status">Posted</div>';
+      case 'partial-posted':
+        return '<div class="post-status partial-posted">Partial</div>';
+      case 'not-posted':
+        return '<div class="post-status not-posted">Not Posted</div>';
+      default:
+        return '';
+    }
+  }
+
   function renderCalendar(date) {
     const calendarEl = document.getElementById('calendar');
     const monthYearEl = document.getElementById('current-month');
@@ -2615,15 +2793,21 @@
         const rawDayData = (monthDataCache && monthDataCache[d]) || null;
         const dayDataArray = Array.isArray(rawDayData) ? rawDayData : (rawDayData ? [rawDayData] : []);
 
+        // Check post status
+        const postStatus = getPostStatus(dayDataArray, d);
+        const postStatusHtml = createPostStatusHtml(postStatus);
+
         let activitiesHtml = '';
         dayDataArray.forEach((activityData, index) => {
           activitiesHtml += createActivityHtml(activityData, index);
         });
 
         let html = `<div class="date-number">${d}`;
+        // Add post status next to day number
+        html += postStatusHtml;
         if (isEditMode) html += `<span class="edit-indicator"><i class="fas fa-edit"></i></span>`;
         html += `</div>`;
-
+        
         html += activitiesHtml;
 
         if (activitiesHtml.trim() === '' && currentView === 'global') {
@@ -2674,6 +2858,10 @@
             const rawDayData = (monthDataCache && monthDataCache[dayCount]) || null;
             const dayDataArray = Array.isArray(rawDayData) ? rawDayData : (rawDayData ? [rawDayData] : []);
 
+            // Check post status
+            const postStatus = getPostStatus(dayDataArray, dayCount);
+            const postStatusHtml = createPostStatusHtml(postStatus);
+
             let activitiesHtml = '';
             dayDataArray.forEach(activityData => {
             
@@ -2681,9 +2869,11 @@
             });
 
             let dayHTML = `<div class="date-number">${dayCount}`;
+            // Add post status next to day number
+            dayHTML += postStatusHtml;
             if (isEditMode) dayHTML += `<span class="edit-indicator"><i class="fas fa-edit"></i></span>`;
             dayHTML += `</div>`;
-
+            
             dayHTML += activitiesHtml;
 
             if (activitiesHtml.trim() === '' && currentView === 'global') {
