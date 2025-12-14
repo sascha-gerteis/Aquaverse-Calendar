@@ -30,12 +30,20 @@
             font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
         }
 
+        html {
+            height: 100%;
+            margin: 0;
+            padding: 0;
+        }
+
         body {
             background-color: #f5f7fb;
             color: var(--dark);
             line-height: 1.6;
             display: flex;
             min-height: 100vh;
+            margin: 0;
+            padding: 0;
         }
 
         /* Sidebar Styles */
@@ -105,12 +113,17 @@
             flex: 1;
             overflow-y: auto;
             max-height: 100vh;
+            display: flex;
+            flex-direction: column;
         }
 
         .container {
             max-width: 1600px;
             margin: 0 auto;
-            padding: 20px;
+            padding: 20px 20px 0 20px;
+            flex: 1;
+            display: flex;
+            flex-direction: column;
         }
 
         header {
@@ -359,6 +372,18 @@
             box-shadow: var(--box-shadow);
         }
 
+        .content-section:last-child {
+            margin-bottom: 0;
+            flex: 1;
+            display: flex;
+            flex-direction: column;
+        }
+
+        .content-section:last-child .pages-table {
+            flex: 1;
+            margin-bottom: 0;
+        }
+
         .section-header {
             display: flex;
             justify-content: space-between;
@@ -489,6 +514,16 @@
             width: 100%;
             border-collapse: collapse;
             margin-top: 20px;
+        }
+
+        /* ตรวจสอบให้ตารางสุดท้ายใช้พื้นที่เต็มที่ */
+        .content-section:last-child .pages-table {
+            height: 100%;
+            min-height: 300px;
+        }
+
+        .content-section:last-child .pages-table tbody {
+            height: 100%;
         }
 
         .pages-table th,
@@ -1060,6 +1095,35 @@
             cursor: pointer;
             user-select: none;
         }
+        .post-engagement-tag.boost-high { 
+    background-color: rgba(16, 185, 129, 0.9); 
+    color: white; 
+        }
+
+        .post-engagement-tag.boost-test { 
+            background-color: rgba(59, 130, 246, 0.9); 
+            color: white; 
+        }
+
+        .post-engagement-tag.hold-reach { 
+            background-color: rgba(239, 68, 68, 0.9); 
+            color: white; 
+        }
+
+        .post-engagement-tag.hold-engagement { 
+            background-color: rgba(248, 113, 113, 0.9); 
+            color: white; 
+        }
+
+        .post-engagement-tag.no-boost { 
+            background-color: rgba(245, 158, 11, 0.9); 
+            color: white; 
+        }
+
+        .post-engagement-tag.not-scored { 
+            background-color: rgba(107, 114, 128, 0.9); 
+            color: white; 
+        }
 
         /* ===================================== */
         /* TABLET (iPad 1024px)                  */
@@ -1470,21 +1534,21 @@
                     <div class="stat-title">Total Impressions</div>
                     <div class="stat-value" id="total-impressions">0</div>
                     <div class="stat-change positive">
-                        <i class="fas fa-arrow-up"></i> <span>18.5%</span>
+                        <i class="fas fa-arrow-up"></i> <span>0%</span>
                     </div>
-                    <div class="comparison-text">vs previous period</div>
+                    <div class="comparison-text">vs previous day</div>
                 </div>
 
-                <div class="stat-card reach">
+                <div class="stat-card followers">
                     <div class="stat-header">
                         <div class="stat-icon"><i class="fas fa-users"></i></div>
                     </div>
                     <div class="stat-title">Total Followers</div>
                     <div class="stat-value" id="total-followers">0</div>
                     <div class="stat-change positive">
-                        <i class="fas fa-arrow-up"></i> <span>12.3%</span>
+                        <i class="fas fa-arrow-up"></i> <span>0%</span>
                     </div>
-                    <div class="comparison-text">Across all platforms</div>
+                    <div class="comparison-text">vs previous day</div>
                 </div>
 
                 <div class="stat-card engagement">
@@ -1513,12 +1577,12 @@
 
                 <div class="stat-card clicks">
                     <div class="stat-header">
-                        <div class="stat-icon"><i class="fas fa-mouse-pointer"></i></div>
+                        <div class="stat-icon"><i class="fas fa-play-circle"></i></div>
                     </div>
-                    <div class="stat-title">Total Clicks</div>
-                    <div class="stat-value" id="total-clicks">0</div>
+                    <div class="stat-title">Total Views</div>
+                    <div class="stat-value" id="total-views">0</div>
                     <div class="stat-change positive">
-                        <i class="fas fa-arrow-up"></i> <span>15.8%</span>
+                        <i class="fas fa-arrow-up"></i> <span>0%</span>
                     </div>
                     <div class="comparison-text">vs previous period</div>
                 </div>
@@ -1548,16 +1612,16 @@
                     <div class="comparison-text">Above industry avg (4.2%)</div>
                 </div>
 
-                <div class="stat-card ctr">
+               <div class="stat-card ctr">
                     <div class="stat-header">
-                        <div class="stat-icon"><i class="fas fa-mouse-pointer"></i></div>
+                        <div class="stat-icon"><i class="fas fa-eye"></i></div>
                     </div>
-                    <div class="stat-title">Click-Through Rate</div>
-                    <div class="stat-value" id="ctr">3.4%</div>
+                    <div class="stat-title">Avg. View Rate</div>
+                    <div class="stat-value" id="view-rate">0%</div>
                     <div class="stat-change negative">
-                        <i class="fas fa-arrow-down"></i> <span>0.8%</span>
+                        <i class="fas fa-arrow-down"></i> <span>0.0%</span>
                     </div>
-                    <div class="comparison-text">428K total clicks</div>
+                    <div class="comparison-text">Based on Followers</div>
                 </div>
             </div>
 
@@ -1791,6 +1855,8 @@
                     </div>
                 </div>
 
+                
+
                 <div class="posts-scroll-container">
                     <div class="posts-grid" id="posts-grid">
                         <!-- Posts will be populated here -->
@@ -1822,7 +1888,7 @@
                         <button class="btn btn-secondary">
                             <i class="fas fa-info-circle"></i> Learn More
                         </button>
-                    </div }
+                    </div>
                 </div>
                 <table class="pages-table">
                     <thead>
@@ -1851,7 +1917,7 @@
                         <button class="btn btn-secondary">
                             <i class="fas fa-sort"></i> Sort
                         </button>
-                    </div }
+                    </div>
                 </div>
                 <table class="pages-table">
                     <thead>
@@ -1874,7 +1940,7 @@
         </div>
     </div>
 
-    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2.39.8/dist/umd/supabase.min.js"></script>
     <script>
         const SUPABASE_URL = 'https://merpsvkfmjbugrgnwwlq.supabase.co';
         const SUPABASE_KEY = 'sb_publishable_HTUvRzrVGDFbqLxrUCCMZQ_tY_oW4zJ';
@@ -1924,10 +1990,11 @@
         // ==========================================
         async function fetchAllData() {
             try {
+                // 3.1: ดึงข้อมูล Accounts ทั้งหมด
                 const { data: acc } = await supabase.from('social_accounts').select('*').not('external_id', 'is', null);
                 rawData.accounts = acc || [];
 
-                // --- แก้ไขเพื่อดึงทุกคอลัมน์จาก posts รวมถึง reach ---
+                // ✅ 3.2: ดึงข้อมูล Posts ล่าสุด 500 โพสต์ พร้อมข้อมูล account ที่เกี่ยวข้อง
                 const postColumns = '*,social_accounts(id,name,platform,region,followers_count)';
                 
                 // พยายามดึงแบบ nested select ก่อน
@@ -1959,11 +2026,33 @@
                     posts = postsFlat || [];
                 }
 
+                // ✅ เพิ่ม: ดึงข้อมูล posts_scored แยกต่างหาก
+                const { data: postsScored, error: scoredError } = await supabase
+                    .from('posts_scored')
+                    .select('external_id, decision');
+
+                if (scoredError) {
+                    console.warn('Error fetching posts_scored:', scoredError);
+                } else {
+                    // สร้าง Map สำหรับ lookup ที่เร็ว
+                    const scoredMap = {};
+                    (postsScored || []).forEach(scored => {
+                        scoredMap[scored.external_id] = scored;
+                    });
+
+                    // เชื่อมข้อมูล posts กับ posts_scored
+                    (posts || []).forEach(post => {
+                        post.posts_scored = scoredMap[post.external_id] ? [scoredMap[post.external_id]] : [];
+                    });
+                }
+
                 rawData.posts = posts || [];
 
                 // เพิ่ม console.log เพื่อตรวจสอบว่าดึง reach มาได้หรือไม่
-                console.log('Posts fetched:', posts.length, 'Sample post reach:', posts[0]?.reach);
+                console.log('Posts fetched:', posts.length, 'Sample post reach:', posts[0]?.reach, 'Sample decision:', posts[0]?.posts_scored);
 
+               
+                // 3.3: ดึงข้อมูล Snapshots (ข้อมูลรายวัน) ทั้งหมด
                 const { data: snaps, error: snapsErr } = await supabase.from('daily_snapshots').select('*,social_accounts(platform)').order('recorded_at', { ascending: true });
                 if (snapsErr) throw snapsErr;
                 rawData.snapshots = snaps || [];
@@ -1984,7 +2073,7 @@
             try {
                 const { data: accounts, error } = await supabase
                     .from('social_accounts')
-                    .select('demographics, region');
+                    .select('age,gender,country, region');
 
                 if (error) throw error;
 
@@ -2000,31 +2089,27 @@
                 let totalLocationCount = 0;
 
                 accounts.forEach(acc => {
-                    if (acc.demographics) {
-                        // Age groups
-                        if (acc.demographics.age_groups) {
-                            Object.entries(acc.demographics.age_groups).forEach(([age, count]) => {
-                                combinedDemographics.age_groups[age] = (combinedDemographics.age_groups[age] || 0) + count;
-                                totalAgeCount += count;
-                            });
-                        }
+                    if (acc.age && typeof acc.age === 'object') {
+                        Object.entries(acc.age).forEach(([age, count]) => {
+                            combinedDemographics.age_groups[age] = (combinedDemographics.age_groups[age] || 0) + count;
+                            totalAgeCount += count;
+                        });
+                    }
 
-                        // Gender
-                        if (acc.demographics.gender) {
-                            Object.entries(acc.demographics.gender).forEach(([gender, count]) => {
-                                combinedDemographics.gender[gender] = (combinedDemographics.gender[gender] || 0) + count;
-                                totalGenderCount += count;
-                            });
-                        }
-
-                        // Top locations (map Thai names to English)
-                        if (acc.demographics.top_countries) {
-                            Object.entries(acc.demographics.top_countries).forEach(([location, count]) => {
-                                const englishLocation = mapThaiCountryToEnglish(location);
-                                combinedDemographics.top_countries[englishLocation] = (combinedDemographics.top_countries[englishLocation] || 0) + count;
-                                totalLocationCount += count;
-                            });
-                        }
+                    if (acc.gender && typeof acc.gender === 'object') {
+                        Object.entries(acc.gender).forEach(([gender, count]) => {
+                            // Map F, M, U to full names
+                            const genderKey = gender === 'F' ? 'Female' : gender === 'M' ? 'Male' : 'Other';
+                            combinedDemographics.gender[genderKey] = (combinedDemographics.gender[genderKey] || 0) + count;
+                            totalGenderCount += count;
+                        });
+                    }
+                    if (acc.country && typeof acc.country === 'object') {
+                        Object.entries(acc.country).forEach(([countryCode, count]) => {
+                            // No need to map from Thai, countryCode is the key
+                            combinedDemographics.top_countries[countryCode] = (combinedDemographics.top_countries[countryCode] || 0) + count;
+                            totalLocationCount += count;
+                        });
                     }
                 });
 
@@ -2065,24 +2150,21 @@
         // Function to map country codes to country names
         function mapCountryCodeToName(code) {
             const countryMap = {
-                'US': 'United States',
-                'UK': 'United Kingdom',
-                'CA': 'Canada',
-                'AU': 'Australia',
-                'DE': 'Germany',
-                'FR': 'France',
-                'JP': 'Japan',
-                'KR': 'South Korea',
-                'IN': 'India',
-                'BR': 'Brazil',
-                'MX': 'Mexico',
-                'ES': 'Spain',
-                'IT': 'Italy',
-                'CN': 'China',
-                'SG': 'Singapore',
-                'AE': 'United Arab Emirates',
-                'IL': 'Israel',
-                'TH': 'Thailand'
+            'AE': 'United Arab Emirates','AF': 'Afghanistan','AL': 'Albania','AR': 'Argentina','AT': 'Austria',
+            'AU': 'Australia','BA': 'Bosnia and Herzegovina','BD': 'Bangladesh','BH': 'Bahrain','BN': 'Brunei',
+            'BO': 'Bolivia','BR': 'Brazil','BT': 'Bhutan','BZ': 'Belize','CA': 'Canada',
+            'CI': "Côte d'Ivoire",'CL': 'Chile','CN': 'China','CO': 'Colombia','CR': 'Costa Rica','CY': 'Cyprus',
+            'DE': 'Germany','DO': 'Dominican Republic','DZ': 'Algeria','EC': 'Ecuador','EG': 'Egypt','ES': 'Spain',
+            'FR': 'France','GB': 'United Kingdom','HK': 'Hong Kong','HN': 'Honduras','HR': 'Croatia','ID': 'Indonesia',
+            'IE': 'Ireland','IL': 'Israel','IN': 'India','IQ': 'Iraq','IR': 'Iran','IT': 'Italy',
+            'JM': 'Jamaica','JP': 'Japan','KE': 'Kenya','KH': 'Cambodia','KR': 'South Korea','KW': 'Kuwait',
+            'KZ': 'Kazakhstan','LA': 'Laos','LK': 'Sri Lanka','LT': 'Lithuania','LY': 'Libya','MA': 'Morocco',
+            'MK': 'North Macedonia','MM': 'Myanmar','MN': 'Mongolia','MV': 'Maldives','MX': 'Mexico','MY': 'Malaysia',
+            'NG': 'Nigeria','NL': 'Netherlands','NO': 'Norway','NP': 'Nepal','NZ': 'New Zealand','PA': 'Panama',
+            'PE': 'Peru','PG': 'Papua New Guinea','PH': 'Philippines','PK': 'Pakistan','PR': 'Puerto Rico','QA': 'Qatar',
+            'RE': 'Réunion','RU': 'Russia','SA': 'Saudi Arabia','SE': 'Sweden','SG': 'Singapore','SI': 'Slovenia',
+            'SK': 'Slovakia','TH': 'Thailand','TN': 'Tunisia','TR': 'Turkey','TW': 'Taiwan','UG': 'Uganda',
+            'US': 'United States','UZ': 'Uzbekistan','VE': 'Venezuela','VN': 'Vietnam','ZA': 'South Africa','ZW': 'Zimbabwe'
             };
             return countryMap[code] || code;
         }
@@ -2113,7 +2195,7 @@
 
         // Function to render demographics
         function renderDemographics() {
-            const demographics = rawData.demographics;
+           const demographics = rawData.demographics;
             
             if (!demographics) return;
 
@@ -2125,7 +2207,7 @@
                 if (Object.keys(demographics.age_groups).length > 0) {
                     // Sort by age
                     const sortedAges = Object.entries(demographics.age_groups).sort((a, b) => {
-                        const getMinAge = (range) => parseInt(range.split('-')[0]);
+                        const getMinAge = (range) => parseInt(range.split('-')[0].replace('+', ''));
                         return getMinAge(a[0]) - getMinAge(b[0]);
                     });
 
@@ -2176,10 +2258,11 @@
                 let locationHTML = '<h4 style="margin-bottom: 16px; font-size: 14px; color: var(--gray);">Top Locations</h4>';
                 
                 if (Object.keys(demographics.top_countries).length > 0) {
-                    Object.entries(demographics.top_countries).forEach(([location, percent]) => {
+                    
+                    Object.entries(demographics.top_countries).forEach(([countryCode, percent]) => {
                         locationHTML += `
                             <div class="demo-item">
-                                <span class="demo-label">${mapCountryCodeToName(location)}</span>
+                                <span class="demo-label">${mapCountryCodeToName(countryCode)}</span>
                                 <div class="demo-bar"><div class="demo-bar-fill" style="width: ${percent}%"></div></div>
                                 <span class="demo-value">${percent}%</span>
                             </div>
@@ -2301,206 +2384,515 @@
         // TOP POSTS WITH ENGAGEMENT RATE AND TAGS
         // ==========================================
        window.filterPostsByTab = function(platform, element) {
-            if(element) {
-                document.querySelectorAll('.platform-tab').forEach(el => el.classList.remove('active'));
-                element.classList.add('active');
-            }
-
-            const source = currentFilteredPosts || [];
-            let postsToShow = [];
-
-            // Date filter: only posts from the last 7 days AND have reach > 0
-            const sevenDaysAgo = new Date();
-            sevenDaysAgo.setDate(sevenDaysAgo.getDate() - 7);
-
-            const recentPosts = source.filter(p => new Date(p.posted_at) >= sevenDaysAgo && p.reach > 0);
-
-            const getEngRate = (p) => {
-                const engagement = (p.likes || 0) + (p.comments || 0) + (p.shares || 0);
-                const reach = p.reach || 1; // <-- เปลี่ยนจาก followers มาใช้ reach
-                if (reach <= 0) return 0;
-                const rate = (engagement / reach) * 100;
-                return Math.min(rate, 100); // <-- ทำให้มั่นใจว่าค่าไม่เกิน 100%
-            };
-
-            if (platform === 'all') {
-                // Sort all recent posts by engagement rate and take the top ones
-                postsToShow = recentPosts
-                    .sort((a, b) => getEngRate(b) - getEngRate(a))
-                    .slice(0, 20); // Show top 20 from all platforms
-            } else {
-                postsToShow = recentPosts
-                    .filter(p => p.platform === platform)
-                    .sort((a, b) => getEngRate(b) - getEngRate(a))
-                    .slice(0, 10); // Show top 10 for the selected platform
-            }
-
-            // Calculate average engagement rate for comparison
-            calculateAverageEngagementRate(postsToShow);
-            renderPostGrid(postsToShow);
+        if(element) {
+            document.querySelectorAll('.platform-tab').forEach(el => el.classList.remove('active'));
+            element.classList.add('active');
         }
 
-        function calculateAverageEngagementRate(posts) {
-            if (posts.length === 0) {
-                currentAverageEngagementRate = 0;
-                return;
+        const source = currentFilteredPosts || [];
+        let postsToShow = [];
+
+        // Date filter: only posts from the last 7 days AND have reach >= 100
+        const sevenDaysAgo = new Date();
+        sevenDaysAgo.setDate(sevenDaysAgo.getDate() - 30);
+
+        const recentPosts = source.filter(p => new Date(p.posted_at) >= sevenDaysAgo && (p.reach || 0) >= 100);
+
+        // Calculate average engagement rate per account using ERR formula: (Likes + Comments + Shares + Saves) / Reach * 100
+         const accountAvgRates = {};
+        recentPosts.forEach(post => {
+            const accId = post.account_id;
+            if (!accountAvgRates[accId]) {
+                accountAvgRates[accId] = { totalEngRate: 0, count: 0 };
             }
+            const engagement = (post.likes || 0) + (post.comments || 0) + (post.shares || 0) + (post.saves || 0);
+            const reach = post.reach || 1;
+            const engRate = reach > 0 ? (engagement / reach) * 100 : 0;
+            accountAvgRates[accId].totalEngRate += engRate;
+            accountAvgRates[accId].count += 1;
+        });
 
-            let totalEngagementRate = 0;
-            let validPosts = 0;
-
-            posts.forEach(post => {
-                const engagement = (post.likes || 0) + (post.comments || 0) + (post.shares || 0);
-                const reach = post.reach || 1; // <-- เปลี่ยนจาก followers มาใช้ reach
-                
-                if (reach > 0) {
-                    const engagementRate = (engagement / reach) * 100;
-                    totalEngagementRate += Math.min(engagementRate, 100); // <-- ทำให้มั่นใจว่าค่าไม่เกิน 100%
-                    validPosts++;
-                }
-            });
-
-            currentAverageEngagementRate = validPosts > 0 ? totalEngagementRate / validPosts : 0;
+        if (platform === 'all') {
+            // ✅ เรียงตาม Decision Priority ก่อน แล้วตามด้วย Engagement Rate
+            postsToShow = recentPosts
+                .sort((a, b) => {
+                    // ดึง decision จากแต่ละโพสต์
+                    const aDecision = a.posts_scored && a.posts_scored.length > 0 ? a.posts_scored[0].decision : null;
+                    const bDecision = b.posts_scored && b.posts_scored.length > 0 ? b.posts_scored[0].decision : null;
+                    
+                    const aPriority = getDecisionPriority(aDecision);
+                    const bPriority = getDecisionPriority(bDecision);
+                    
+                    // เรียงตาม priority ก่อน (เลขน้อยก่อน)
+                    if (aPriority !== bPriority) {
+                        return aPriority - bPriority;
+                    }
+                    
+                    // ถ้า priority เท่ากัน ให้เรียงตาม engagement rate (สูงก่อน)
+                    const aEngRate = getEngRate(a);
+                    const bEngRate = getEngRate(b);
+                    return bEngRate - aEngRate;
+                })
+                .slice(0, 40); // Show top 40 from all platforms
+        } else {
+            postsToShow = recentPosts
+                .filter(p => p.platform === platform)
+                .sort((a, b) => {
+                    // ดึง decision จากแต่ละโพสต์
+                    const aDecision = a.posts_scored && a.posts_scored.length > 0 ? a.posts_scored[0].decision : null;
+                    const bDecision = b.posts_scored && b.posts_scored.length > 0 ? b.posts_scored[0].decision : null;
+                    
+                    const aPriority = getDecisionPriority(aDecision);
+                    const bPriority = getDecisionPriority(bDecision);
+                    
+                    // เรียงตาม priority ก่อน (เลขน้อยก่อน)
+                    if (aPriority !== bPriority) {
+                        return aPriority - bPriority;
+                    }
+                    
+                    // ถ้า priority เท่ากัน ให้เรียงตาม engagement rate (สูงก่อน)
+                    const aEngRate = getEngRate(a);
+                    const bEngRate = getEngRate(b);
+                    return bEngRate - aEngRate;
+                })
+                .slice(0, 20); // Show top 20 for the selected platform
         }
 
-        function getEngagementRateTag(engagementRate, averageThreshold) {
-            // Define thresholds based on average engagement rate
-            const avgThreshold = averageThreshold;
+        window.renderPostGrid(postsToShow, accountAvgRates);
+    }
+    
+    function getDecisionPriority(decision) {
+            if (!decision) return 999; // Not Scored อยู่ท้ายสุด
+            const d = decision.toLowerCase();
             
-            if (engagementRate > avgThreshold) { // Above average
-                return {
-                    text: 'Above Average',
-                    class: 'above-average',
-                    icon: 'fas fa-arrow-up'
-                };
-            } else { // Below or equal to average
-                return {
-                    text: 'Below Average',
-                    class: 'below-average',
-                    icon: 'fas fa-arrow-down'
-                };
-            }
+            if (d.includes('boost – high') || d.includes('boost - high')) return 1;
+            if (d.includes('boost – test') || d.includes('boost - test')) return 2;
+            if (d.includes('hold (low reach)')) return 3;
+            if (d.includes('hold (low engagements)')) return 4; 
+            if (d.includes('no boost')) return 5;
+            
+            return 999; // Unknown decisions ไปท้ายสุด
         }
 
-        function renderPostGrid(posts) {
-            const grid = document.getElementById('posts-grid');
-            if(!grid) return;
-            grid.innerHTML = '';
-            
-            if (posts.length === 0) {
-                grid.innerHTML = '<div style="grid-column:1/-1;text-align:center;padding:40px;color:#999"><i class="fas fa-search" style="font-size:24px;margin-bottom:10px"></i><br>No posts found matching criteria</div>';
-                return;
-            }
+    // ERR Formula: (Likes + Comments + Shares + Saves) / Reach * 100
+    function getEngRate(p) {
+        const engagement = (p.likes || 0) + (p.comments || 0) + (p.shares || 0) + (p.saves || 0);
+        const reach = p.reach || 1;
+        if (reach <= 0) return 0;
+        const rate = (engagement / reach) * 100;
+        return Math.min(rate, 100);
+    }
 
-            // Define hardcoded average engagement rates
-            const platformAvgRates = {
-                facebook: 0.25,
-                instagram: 1.0,
-                tiktok: 5.0 // Default or calculated average for others
+   function getDecisionTagClass(decision) {
+        if (!decision) return 'not-scored';
+        const d = decision.toLowerCase();
+        
+        if (d.includes('boost – high') || d.includes('boost - high')) return 'boost-high';
+        if (d.includes('boost – test') || d.includes('boost - test')) return 'boost-test';
+        if (d.includes('hold (low reach)')) return 'hold-reach';
+        if (d.includes('hold (low engagements)')) return 'hold-engagement';
+        if (d.includes('no boost')) return 'no-boost';
+        
+        return 'not-scored';
+    }
+
+    // ✅ เพิ่มฟังก์ชันที่ขาดหายไป
+    function getEngagementRateTag(engagementRate, avgRate) {
+        if (engagementRate > avgRate) {
+            return {
+                text: 'Above Average',
+                class: 'above-average'
             };
+        } else if (Math.abs(engagementRate - avgRate) <= 0.5) {
+            return {
+                text: 'Average',
+                class: 'average'
+            };
+        } else {
+            return {
+                text: 'Below Average',
+                class: 'below-average'
+            };
+        }
+    }
 
-            posts.forEach(post => {
-                // เพิ่ม console.log เพื่อตรวจสอบค่า reach ของแต่ละโพสต์
-                console.log('Rendering post:', post.id, 'reach:', post.reach);
-
-                const acc = post.social_accounts || {};
-                const date = new Date(post.posted_at).toLocaleDateString('en-US', { day: 'numeric', month: 'short' });
-       
-                let bgImage = 'linear-gradient(45deg, #f3f4f6, #e5e7eb)';
-                let playIcon = '';
+    window.boostPost = async function(postId, externalId, buttonElement) {
+            console.log('Manual boost requested for post:', postId, externalId);
+            
+            // เปลี่ยน UI ของปุ่มให้แสดงว่ากำลังทำงาน
+            const originalHTML = buttonElement.innerHTML;
+            buttonElement.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Boosting...';
+            buttonElement.disabled = true;
+            buttonElement.style.background = '#6c757d';
+            
+            try {
+                // 1. แสดง Modal เพื่อให้เลือกประเภทการบูส
+                const boostType = await showBoostModal();
                 
-                if (post.image_url && post.image_url.startsWith('http')) {
-                    bgImage = `url('${post.image_url}')`;
+                if (!boostType) {
+                    // ผู้ใช้ยกเลิก
+                    resetBoostButton(buttonElement, originalHTML);
+                    return;
                 }
                 
-                const type = (post.media_type || '').toUpperCase();
-                if (['VIDEO', 'REELS'].includes(type) || post.platform === 'tiktok') {
-                    playIcon = '<div style="position:absolute;top:50%;left:50%;transform:translate(-50%,-50%);font-size:40px;color:white;opacity:0.8;text-shadow:0 2px 4px rgba(0,0,0,0.5);"><i class="fas fa-play-circle"></i></div>';
-                }
-
-                // Calculate engagement rate for this post based on (likes+comments+shares) / reach
-                const engagement = (post.likes || 0) + (post.comments || 0) + (post.shares || 0);
-                const reach = post.reach || 1; // <-- เปลี่ยนจาก followers มาใช้ reach
-                let engagementRate = reach > 0 ? (engagement / reach) * 100 : 0;
-                engagementRate = Math.min(engagementRate, 100); // <-- ทำให้มั่นใจว่าค่าไม่เกิน 100%
+                // 2. อัปเดตสถานะในฐานข้อมูล
+                await updatePostBoostStatus(externalId, boostType);
                 
-                // Get platform average rate from our hardcoded values
-                const platform = post.platform;
-                const platformAvgRate = platformAvgRates[platform] || 0;
+                // 3. แสดงผลสำเร็จ
+                buttonElement.innerHTML = '<i class="fas fa-check"></i> Boosted!';
+                buttonElement.style.background = 'linear-gradient(135deg, #28a745, #20c997)';
                 
-                // Get engagement rate tag based on the hardcoded average
-                const tag = getEngagementRateTag(engagementRate, platformAvgRate);
-
-                const card = `
-                    <div class="post-card">
-                        <div class="post-image" style="background-image: ${bgImage};">
-                            <span class="post-platform-overlay" style="background:${getPlatformColor(acc.platform).text}; color:white">
-                                <i class="${getPlatformIcon(acc.platform)}"></i> ${capitalize(acc.platform)}
-                            </span>
-                            <span class="post-engagement-tag ${tag.class}">
-                                <i class="${tag.icon}"></i> ${tag.text}
-                            </span>
-                            ${playIcon}
+                // 4. อัปเดต Tag ของโพสต์ในหน้าเว็บ
+                updatePostTagInUI(postId, boostType);
+                
+                // 5. แจ้งเตือนความสำเร็จ
+                showNotification(`Post boosted successfully as "${boostType}"!`, 'success');
+                
+                // 6. รีเซ็ตปุ่มหลัง 2 วินาที
+                setTimeout(() => {
+                    resetBoostButton(buttonElement, originalHTML);
+                }, 2000);
+                
+            } catch (error) {
+                console.error('Error boosting post:', error);
+                showNotification('Failed to boost post: ' + error.message, 'error');
+                resetBoostButton(buttonElement, originalHTML);
+            }
+        }
+        
+        // แสดง Modal เพื่อเลือกประเภทการบูส
+        function showBoostModal() {
+            return new Promise((resolve) => {
+                const modal = document.createElement('div');
+                modal.style.cssText = `
+                    position: fixed; 
+                    top: 0; left: 0; right: 0; bottom: 0; 
+                    background: rgba(0,0,0,0.5); 
+                    display: flex; 
+                    justify-content: center; 
+                    align-items: center; 
+                    z-index: 10000;
+                `;
+                
+                modal.innerHTML = `
+                    <div style="background: white; 
+                                border-radius: 12px; 
+                                padding: 30px; 
+                                box-shadow: 0 10px 30px rgba(0,0,0,0.3);
+                                max-width: 400px;
+                                width: 90%;">
+                        <h3 style="margin: 0 0 20px 0; 
+                                   color: var(--dark); 
+                                   text-align: center;
+                                   font-size: 18px;">
+                            <i class="fas fa-rocket" style="color: var(--primary);"></i>
+                            Select Boost Type
+                        </h3>
+                        <div style="display: flex; flex-direction: column; gap: 10px;">
+                            <button class="boost-option" data-boost="BOOST – High" 
+                                    style="padding: 15px; 
+                                           border: 2px solid #28a745; 
+                                           background: rgba(40, 167, 69, 0.1); 
+                                           border-radius: 8px; 
+                                           cursor: pointer; 
+                                           transition: all 0.3s ease;
+                                           font-weight: 600;
+                                           color: #28a745;">
+                                <i class="fas fa-fire"></i> BOOST – High (Premium Budget)
+                            </button>
+                            <button class="boost-option" data-boost="BOOST – Test" 
+                                    style="padding: 15px; 
+                                           border: 2px solid #007bff; 
+                                           background: rgba(0, 123, 255, 0.1); 
+                                           border-radius: 8px; 
+                                           cursor: pointer; 
+                                           transition: all 0.3s ease;
+                                           font-weight: 600;
+                                           color: #007bff;">
+                                <i class="fas fa-flask"></i> BOOST – Test (Low Budget)
+                            </button>
                         </div>
-                        <div class="post-content">
-                            <h4 class="post-title" title="${post.caption || 'No caption'}">
-                                ${post.caption ? post.caption.substring(0, 60)+(post.caption.length>60?'...':'') : 'No Caption'}
-                            </h4>
-                            <div class="post-info">
-                                <span class="post-date">${date}</span>
-                                <span class="post-page" style="color:${getPlatformColor(acc.platform).text}">
-                                    ${acc.name || 'Unknown Account'}
-                                </span>
-                                <!-- การแสดงค่า Reach ในส่วน post-info เพื่อให้เห็นชัดขึ้น -->
-                                <span class="post-reach" style="font-size: 12px; color: var(--gray); margin-left: 10px;">
-                                    <i class="fas fa-user-friends" style="color:#7209b7"></i> Reach: ${formatNumber(post.reach || 0)}
-                                </span>
-                            </div>
-                            <div class="post-metrics">
-                                <div class="metric">
-                                    <span class="metric-label">Likes</span>
-                                    <span class="metric-value">
-                                        <i class="fas fa-heart" style="color:#f72585"></i> ${formatNumber(post.likes || 0)}
-                                    </span>
-                                </div>
-                                <div class="metric">
-                                    <span class="metric-label">Comments</span>
-                                    <span class="metric-value">
-                                        <i class="fas fa-comment" style="color:#4361ee"></i> ${formatNumber(post.comments || 0)}
-                                    </span>
-                                </div>
-                                <div class="metric">
-                                    <span class="metric-label">Shares</span>
-                                    <span class="metric-value">
-                                        <i class="fas fa-share" style="color:#4cc9f0"></i> ${formatNumber(post.shares || 0)}
-                                    </span>
-                                </div>
-                                
-                                <div class="metric"style="calign-items: left;">
-                                    <span class="metric-label">Eng. Rate</span>
-                                    <span class="metric-value">
-                                        <i class="fas fa-percentage" style="calign-items: left;olor:#28a745"></i> ${engagementRate.toFixed(2)}%
-                                    </span>
-                                </div>
-                            </div>
-                            <div class="engagement-rate-bar">
-                                <div style="display: flex; justify-content: space-between; align-items: center; font-size: 12px;">
-                                    <span style="color: var(--gray);">
-                                        Avg. Rate: <span style="color: var(--dark);">${platformAvgRate.toFixed(2)}%
-                                        </span>
-                                    </span>
-                                    <a href="${post.post_url || '#'}" target="_blank" style="margin-right: 20px; text-decoration:none;font-weight:600;color:var(--primary);">
-                                        View Post <i class="fas fa-external-link-alt"></i>
-                                    </a>
-                                </div>
-                            </div>
-                       
+                        <div style="display: flex; gap: 10px; margin-top: 20px;">
+                            <button id="cancel-boost" 
+                                    style="flex: 1; 
+                                           padding: 10px; 
+                                           border: 1px solid #ccc; 
+                                           background: white; 
+                                           border-radius: 6px; 
+                                           cursor: pointer;">
+                                Cancel
+                            </button>
                         </div>
                     </div>
                 `;
-                grid.innerHTML += card;
+                
+                document.body.appendChild(modal);
+                
+                // Event listeners
+                modal.querySelectorAll('.boost-option').forEach(btn => {
+                    btn.addEventListener('mouseover', (e) => {
+                        e.target.style.transform = 'translateY(-2px)';
+                        e.target.style.boxShadow = '0 4px 8px rgba(0,0,0,0.1)';
+                    });
+                    btn.addEventListener('mouseout', (e) => {
+                        e.target.style.transform = 'translateY(0)';
+                        e.target.style.boxShadow = 'none';
+                    });
+                    btn.addEventListener('click', (e) => {
+                        const boostType = e.target.dataset.boost;
+                        document.body.removeChild(modal);
+                        resolve(boostType);
+                    });
+                });
+                
+                modal.querySelector('#cancel-boost').addEventListener('click', () => {
+                    document.body.removeChild(modal);
+                    resolve(null);
+                });
+                
+                // Close on outside click
+                modal.addEventListener('click', (e) => {
+                    if (e.target === modal) {
+                        document.body.removeChild(modal);
+                        resolve(null);
+                    }
+                });
             });
         }
+        
+        // อัปเดตสถานะการบูสในฐานข้อมูล
+        async function updatePostBoostStatus(externalId, boostType) {
+            const { error } = await supabase
+                .from('posts_scored')
+                .upsert({
+                    external_id: externalId,
+                    decision: boostType,
+                    scored_at: new Date().toISOString(),
+                    manually_boosted: true
+                }, { 
+                    onConflict: 'external_id' 
+                });
+            
+            if (error) {
+                throw new Error(error.message);
+            }
+        }
+        
+        // อัปเดต Tag ของโพสต์ในหน้าเว็บโดยไม่ต้อง reload
+        function updatePostTagInUI(postId, boostType) {
+            const postCard = document.querySelector(`[data-post-id="${postId}"]`);
+            if (postCard) {
+                const tag = postCard.querySelector('.post-engagement-tag');
+                if (tag) {
+                    const tagClass = getDecisionTagClass(boostType);
+                    tag.className = `post-engagement-tag ${tagClass}`;
+                    tag.textContent = boostType;
+                }
+            }
+        }
+        
+        // รีเซ็ตปุ่มกลับสู่สถานะเดิม
+        function resetBoostButton(buttonElement, originalHTML) {
+            buttonElement.innerHTML = originalHTML;
+            buttonElement.disabled = false;
+            buttonElement.style.background = 'linear-gradient(135deg, #ff6b6b, #ff8e53)';
+        }
+        
+        // แสดงการแจ้งเตือน
+        function showNotification(message, type = 'info') {
+            const notification = document.createElement('div');
+            notification.style.cssText = `
+                position: fixed;
+                top: 20px;
+                right: 20px;
+                padding: 15px 20px;
+                border-radius: 8px;
+                color: white;
+                font-weight: 600;
+                z-index: 10001;
+                box-shadow: 0 4px 12px rgba(0,0,0,0.2);
+                transform: translateX(100%);
+                transition: transform 0.3s ease;
+            `;
+            
+            if (type === 'success') {
+                notification.style.background = 'linear-gradient(135deg, #28a745, #20c997)';
+                notification.innerHTML = `<i class="fas fa-check-circle"></i> ${message}`;
+            } else if (type === 'error') {
+                notification.style.background = 'linear-gradient(135deg, #dc3545, #c82333)';
+                notification.innerHTML = `<i class="fas fa-exclamation-circle"></i> ${message}`;
+            } else {
+                notification.style.background = 'linear-gradient(135deg, #007bff, #0056b3)';
+                notification.innerHTML = `<i class="fas fa-info-circle"></i> ${message}`;
+            }
+            
+            document.body.appendChild(notification);
+            
+            // แสดงการแจ้งเตือน
+            setTimeout(() => {
+                notification.style.transform = 'translateX(0)';
+            }, 100);
+            
+            // ซ่อนการแจ้งเตือนหลัง 3 วินาที
+            setTimeout(() => {
+                notification.style.transform = 'translateX(100%)';
+                setTimeout(() => {
+                    document.body.removeChild(notification);
+                }, 300);
+            }, 3000);
+        }
+
+    window.renderPostGrid = function(posts, accountAvgRates) {
+        const grid = document.getElementById('posts-grid');
+        if(!grid) return;
+        grid.innerHTML = '';
+        
+        if (posts.length === 0) {
+            grid.innerHTML = '<div style="grid-column:1/-1;text-align:center;padding:40px;color:#999"><i class="fas fa-search" style="font-size:24px;margin-bottom:10px"></i><br>No posts found matching criteria</div>';
+            return;
+        }
+
+        if (!accountAvgRates) {
+            accountAvgRates = {};
+            posts.forEach(post => {
+                const accId = post.account_id;
+                if (!accountAvgRates[accId]) {
+                    accountAvgRates[accId] = { totalEngRate: 0, count: 0 };
+                }
+                const engagement = (post.likes || 0) + (post.comments || 0) + (post.shares || 0) + (post.saves || 0);
+                const reach = post.reach || 1;
+                const engRate = reach > 0 ? (engagement / reach) * 100 : 0;
+                accountAvgRates[accId].totalEngRate += engRate;
+                accountAvgRates[accId].count += 1;
+            });
+        }
+
+        posts.forEach(post => {
+            const acc = post.social_accounts || {};
+            const date = new Date(post.posted_at).toLocaleDateString('en-US', { day: 'numeric', month: 'short' });
+       
+            let bgImage = 'linear-gradient(45deg, #f3f4f6, #e5e7eb)';
+            let playIcon = '';
+            
+            if (post.image_url && post.image_url.startsWith('http')) {
+                bgImage = `url('${post.image_url}')`;
+            }
+            
+            const type = (post.media_type || '').toUpperCase();
+            if (['VIDEO', 'REELS'].includes(type) || post.platform === 'tiktok') {
+                playIcon = '<div style="position:absolute;top:50%;left:50%;transform:translate(-50%,-50%);font-size:40px;color:white;opacity:0.8;text-shadow:0 2px 4px rgba(0,0,0,0.5);"><i class="fas fa-play-circle"></i></div>';
+            }
+
+            // ERR Formula: (Likes + Comments + Shares + Saves) / Reach * 100
+            const engagement = (post.likes || 0) + (post.comments || 0) + (post.shares || 0) + (post.saves || 0);
+            const reach = post.reach || 1;
+            let engagementRate = reach > 0 ? (engagement / reach) * 100 : 0;
+            engagementRate = Math.min(engagementRate, 100);
+            
+            const accId = post.account_id;
+            const avgRate = accountAvgRates[accId] ? accountAvgRates[accId].totalEngRate / accountAvgRates[accId].count : 0;
+            
+            // ✅ เปลี่ยนจาก Above Average เป็นค่า decision
+            let decision = 'Not Scored';
+            let tagClass = 'not-scored';
+            
+            if (post.posts_scored && post.posts_scored.length > 0) {
+                decision = post.posts_scored[0].decision || 'Not Scored';
+                tagClass = getDecisionTagClass(decision);
+            } else {
+                // ถ้าไม่มีข้อมูล decision ให้ใช้ Above/Below Average เหมือนเดิม
+                const tag = getEngagementRateTag(engagementRate, avgRate);
+                decision = tag.text;
+                tagClass = tag.class;
+            }
+
+            const card = `
+                <div class="post-card" data-post-id="${post.id}">
+                    <div class="post-image" style="background-image: ${bgImage};">
+                        <span class="post-platform-overlay" style="background:${getPlatformColor(acc.platform).text}; color:white">
+                            <i class="${getPlatformIcon(acc.platform)}"></i> ${capitalize(acc.platform)}
+                        </span>
+                        <span class="post-engagement-tag ${tagClass}">
+                            ${decision}
+                        </span>
+                        ${playIcon}
+                    </div>
+                    <div class="post-content">
+                        <h4 class="post-title" title="${post.caption || 'No caption'}">
+                            ${post.caption ? post.caption.substring(0, 60)+(post.caption.length>60?'...':'') : 'No Caption'}
+                        </h4>
+                        <div class="post-info">
+                            <span class="post-date">${date}</span>
+                            <span class="post-page" style="color:${getPlatformColor(acc.platform).text}">
+                                ${acc.name || 'Unknown Account'}
+                            </span>
+                            <span class="post-reach" style="font-size: 12px; color: var(--gray); margin-left: 10px;">
+                                <i class="fas fa-user-friends" style="color:#7209b7"></i> Reach: ${formatNumber(post.reach || 0)}
+                            </span>
+                        </div>
+                        <div class="post-metrics">
+                            <div class="metric">
+                                <span class="metric-label">Likes</span>
+                                <span class="metric-value">
+                                    <i class="fas fa-heart" style="color:#f72585"></i> ${formatNumber(post.likes || 0)}
+                                </span>
+                            </div>
+                            <div class="metric">
+                                <span class="metric-label">Comments</span>
+                                <span class="metric-value">
+                                    <i class="fas fa-comment" style="color:#4361ee"></i> ${formatNumber(post.comments || 0)}
+                                </span>
+                            </div>
+                            <div class="metric">
+                                <span class="metric-label">Shares</span>
+                                <span class="metric-value">
+                                    <i class="fas fa-share" style="color:#4cc9f0"></i> ${formatNumber(post.shares || 0)}
+                                </span>
+                            </div>
+                            <div class="metric">
+                                <span class="metric-label">Saves</span>
+                                <span class="metric-value">
+                                    <i class="fas fa-bookmark" style="color:#ff8c00"></i> ${formatNumber(post.saves || 0)}
+                                </span>
+                            </div>
+                            <div class="metric" style="align-items: left;">
+                                <span class="metric-label">Eng. Rate</span>
+                                <span class="metric-value">
+                                    <i class="fas fa-percentage" style="color:#28a745"></i> ${engagementRate.toFixed(2)}%
+                                </span>
+                            </div>
+                        </div>
+                        <div class="engagement-rate-bar">
+                            <div style="display: flex; justify-content: space-between; align-items: center; font-size: 12px;">
+                                <span style="color: var(--gray);">
+                                    Avg. Rate: <span style="color: var(--dark);">${avgRate.toFixed(2)}%</span>
+                                </span>
+                                <div style="display: flex; gap: 8px; align-items: center;">
+                                    <a href="${post.post_url || '#'}" target="_blank" style="text-decoration:none;font-weight:600;color:var(--primary);font-size:12px;">
+                                        View Post <i class="fas fa-external-link-alt"></i>
+                                    </a>
+                                    <button class="boost-btn" onclick="boostPost('${post.id}', '${post.external_id}', this)" 
+                                            style="background: linear-gradient(135deg, #ff6b6b, #ff8e53); 
+                                                   color: white; 
+                                                   border: none; 
+                                                   padding: 6px 12px; 
+                                                   border-radius: 20px; 
+                                                   font-size: 11px; 
+                                                   font-weight: 600; 
+                                                   cursor: pointer; 
+                                                   transition: all 0.3s ease;
+                                                   box-shadow: 0 2px 4px rgba(255, 107, 107, 0.3);"
+                                            onmouseover="this.style.transform='scale(1.05)'; this.style.boxShadow='0 4px 8px rgba(255, 107, 107, 0.4)'"
+                                            onmouseout="this.style.transform='scale(1)'; this.style.boxShadow='0 2px 4px rgba(255, 107, 107, 0.3)'">
+                                        <i class="fas fa-rocket"></i> Boost
+                                    </button>
+                                </div>
+                            </div>
+                        </div>
+            `;
+            grid.innerHTML += card;
+        });
+    }
 
         // ==========================================
         // PEAK POSTING TIMES
@@ -2696,7 +3088,7 @@
             window.engagementChart = new Chart(engagementCtx, {
                 type: 'bar',
                 data: {
-                    labels: ['Likes', 'Comments', 'Shares', 'Saves', 'Clicks'],
+                    labels: ['Likes', 'Comments', 'Shares', 'Saves', 'Views'],
                     datasets: [{
                         label: 'Total Count',
                         data: [0, 0, 0, 0, 0],
@@ -2906,25 +3298,17 @@
                 let totalComments = 0;
                 let totalShares = 0;
                 let totalSaves = 0;
-                let totalClicks = 0;
 
                 posts.forEach(post => {
                     totalLikes += (post.likes || 0);
                     totalComments += (post.comments || 0);
                     totalShares += (post.shares || 0);
                     totalSaves += (post.saves || 0);
-                    // Fetch clicks data from accounts
                 });
 
-                // Get the set of account IDs from the filtered posts
                 const filteredAccountIds = new Set(posts.map(p => p.account_id));
-                
-                // Filter the main snapshots data for the relevant accounts
-                const relevantSnapshots = rawData.snapshots.filter(snap => filteredAccountIds.has(snap.account_id));
-
-                // Use the existing helper function to get the latest total values
-                const latestValues = getLatestValues(relevantSnapshots);
-                totalClicks = latestValues.click || 0;
+                const relevantAccounts = rawData.accounts.filter(acc => filteredAccountIds.has(acc.id));
+                const totalViews = relevantAccounts.reduce((sum, acc) => sum + (acc.views || 0), 0);
 
                 // Update the chart
                 window.engagementChart.data.datasets[0].data = [
@@ -2932,7 +3316,7 @@
                     totalComments,
                     totalShares,
                     totalSaves,
-                    totalClicks
+                    totalViews
                 ];
                 window.engagementChart.update();
             } catch (error) {
@@ -2983,8 +3367,8 @@
             
             platformData[platform][date] += snap.engagement || 0;
         });
-
-        // Create labels from all dates
+        
+        // Create labels from all dates (last 30 days)
         const allDates = new Set();
         Object.values(platformData).forEach(data => {
             Object.keys(data).forEach(date => allDates.add(date));
@@ -3074,6 +3458,9 @@
         if (Object.keys(regions).length === 0) container.innerHTML = '<div style="padding:20px; color:#999;">No data for this region.</div>';
     }
 
+    // ==========================================
+    // PLATFORM COMPARISON - Updated with ERR formula
+    // ==========================================
     function renderPlatformComparison(accounts, posts) {
         const container = document.getElementById('platform-comparison-grid');
         if(!container) return;
@@ -3088,7 +3475,7 @@
         }
 
         const stats = {};
-        targetPlatforms.forEach(p => { stats[p] = { count: 0, totalEng: 0, followers: 0, bestTimeMap: {} }; });
+        targetPlatforms.forEach(p => { stats[p] = { count: 0, totalEng: 0, totalReach: 0, followers: 0, bestTimeMap: {} }; });
 
         accounts.forEach(acc => {
             const p = acc.platform?.toLowerCase();
@@ -3099,8 +3486,9 @@
             const p = post.platform?.toLowerCase();
             if (stats[p]) {
                 stats[p].count += 1;
-                const eng = (post.likes||0) + (post.comments||0) + (post.shares||0);
+                const eng = (post.likes||0) + (post.comments||0) + (post.shares||0) + (post.saves||0);
                 stats[p].totalEng += eng;
+                stats[p].totalReach += (post.reach || 0);
                
                 if (post.posted_at) {
                     const hour = new Date(post.posted_at).getHours();
@@ -3114,11 +3502,14 @@
             const s = stats[platform];
 
             const avgEng = s.count > 0 ? Math.round(s.totalEng / s.count) : 0;
-            const engRate = s.followers > 0 ? ((s.totalEng / s.followers) * 100).toFixed(2) : '0.00';
+            // ERR Formula: (Total Engagement / Total Reach) * 100
+            const engRate = s.totalReach > 0 ? ((s.totalEng / s.totalReach) * 100).toFixed(2) : '0.00';
            
             let bestTimeStr = 'N/A';
             let maxEng = -1, bestSlot = -1;
-            for (const [slot, eng] of Object.entries(s.bestTimeMap)) { if (eng > maxEng) { maxEng = eng; bestSlot = parseInt(slot); } }
+            for (const [slot, eng] of Object.entries(s.bestTimeMap)) { 
+                if (eng > maxEng) { maxEng = eng; bestSlot = parseInt(slot); } 
+            }
             if (bestSlot !== -1) {
                 const formatAMPM = (h) => { const s = h >= 12 ? 'PM' : 'AM'; const h12 = h % 12 || 12; return `${h12} ${s}`; };
                 bestTimeStr = `${formatAMPM(bestSlot)} - ${formatAMPM((bestSlot + 2) % 24)}`;
@@ -3446,7 +3837,7 @@
         function updateCardUI(id, val, growth) {
             const el = document.getElementById(id);
             if(!el) return;
-            el.innerText = id === 'ctr' ? val.toFixed(2) + '%' : formatNumber(val);
+            el.innerText = id === 'view-rate' ? val.toFixed(2) + '%' : formatNumber(val);
             updatePercentUI(el.closest('.stat-card'), growth);
         }
 
@@ -3604,112 +3995,164 @@
             });
         }
 
-        function renderSummaryCards(allAccounts, filteredAccounts, allHistoryMap, filteredHistoryMap, days, newFollowers, growthNewFollowers) {
-            // --- ส่วนที่แก้ไข ---
-            // สร้าง list ของ account ID ที่ถูก filter
-            const filteredAccountIds = new Set(filteredAccounts.map(acc => acc.id));
-            
-            // กรอง snapshots เฉพาะของ account ที่แสดงผล
-            const relevantSnapshots = rawData.snapshots.filter(snap => filteredAccountIds.has(snap.account_id));
+    // ==========================================
+    // RENDER SUMMARY CARDS - Fixed version
+    // ==========================================
+    function renderSummaryCards(allAccounts, filteredAccounts, allHistoryMap, filteredHistoryMap, days, newFollowers, growthNewFollowers) {
+        // 1. คำนวณสำหรับ "แพลตฟอร์มที่เลือก" (ใช้กับการ์ดส่วนใหญ่)
+        const filteredAccountIds = new Set(filteredAccounts.map(acc => acc.id));
+        const relevantSnapshots = rawData.snapshots.filter(snap => filteredAccountIds.has(snap.account_id));
+        const filteredCurr = getLatestValues(relevantSnapshots);
+        const filteredPrev = getPreviousDayValues(relevantSnapshots);
 
-            // ✅ ใช้ฟังก์ชัน getLatestValues และ getPreviousDayValues กับ snapshots ที่กรองแล้ว
-            const filteredCurr = getLatestValues(relevantSnapshots);
-            const filteredPrev = getPreviousDayValues(relevantSnapshots);
-            // --- สิ้นสุดส่วนที่แก้ไข ---
+        // 2. คำนวณสำหรับ "ทุกแพลตฟอร์ม" (ใช้เฉพาะการ์ด Avg. Engagement Rate)
+        const allPlatformCurr = getLatestValues(rawData.snapshots);
+        const allPlatformPrev = getPreviousDayValues(rawData.snapshots);
 
-            // ✅ Calculate correct growth
-            const calcGrowth = (curr, prev) => {
-                if (isNaN(curr) || isNaN(prev) || prev <= 0) {
-                    return 0;
-                }
-                return ((curr - prev) / prev) * 100;
-            };
+        const calcGrowth = (curr, prev) => {
+            if (isNaN(curr) || isNaN(prev) || prev <= 0) {
+                return 0;
+            }
+            return ((curr - prev) / prev) * 100;
+        };
 
-            updateCardUI('total-impressions', filteredCurr.imp, calcGrowth(filteredCurr.imp, filteredPrev.imp));
-            updateCardUI('total-followers', filteredCurr.fol, calcGrowth(filteredCurr.fol, filteredPrev.fol));
-            updateCardUI('total-engagement', filteredCurr.eng, calcGrowth(filteredCurr.eng, filteredPrev.eng));
-            updateCardUI('total-clicks', filteredCurr.click, calcGrowth(filteredCurr.click, filteredPrev.click));
-            updateCardUI('new-followers', newFollowers, growthNewFollowers);
+        // ✅ Calculate Total Views from filtered accounts
+        const totalViews = filteredAccounts.reduce((sum, acc) => sum + (acc.views || 0), 0);
+        // For growth, we'll just show 0% as we don't have historical view data in this format
+        updateCardUI('total-views', totalViews, 0);
 
-            // ✅ Engagement Rate - day-over-day
-            const engRateCurr = filteredCurr.imp > 0 ? ((filteredCurr.eng / filteredCurr.imp) * 100) : 0; // ใช้ imp ในการคำนวณ ER รวม
-            const engRatePrev = filteredPrev.imp > 0 ? ((filteredPrev.eng / filteredPrev.imp) * 100) : 0;
-            document.getElementById('avg-engagement-rate').innerText = engRateCurr.toFixed(2) + '%';
-            updatePercentUI(document.querySelector('.stat-card.rate'), calcGrowth(engRateCurr, engRatePrev));
 
-            // ✅ Engagement Rate (filtered) - day-over-day
-            document.getElementById('engagement-rate').innerText = engRateCurr.toFixed(2) + '%';
-            updatePercentUI(document.querySelector('.stat-card.engagement-rate'), calcGrowth(engRateCurr, engRatePrev));
+        // อัปเดตการ์ดตามปกติด้วยข้อมูลที่กรองแล้ว
+        updateCardUI('total-impressions', filteredCurr.imp, calcGrowth(filteredCurr.imp, filteredPrev.imp));
+        updateCardUI('total-followers', filteredCurr.fol, calcGrowth(filteredCurr.fol, filteredPrev.fol));
+        updateCardUI('total-engagement', filteredCurr.eng, calcGrowth(filteredCurr.eng, filteredPrev.eng));
+        updateCardUI('new-followers', newFollowers, growthNewFollowers);
 
-            // ✅ CTR (Click-Through Rate) - day-over-day
-            const ctrCurr = filteredCurr.imp > 0 ? (filteredCurr.click / filteredCurr.imp) * 100 : 0;
-            const ctrPrev = filteredPrev.imp > 0 ? (filteredPrev.click / filteredPrev.imp) * 100 : 0;
-            updateCardUI('ctr', ctrCurr, calcGrowth(ctrCurr, ctrPrev));
-
-            document.querySelectorAll('.comparison-text').forEach(el => el.innerText = `vs previous day`);
-
-            window.currentFilteredAccounts = filteredAccounts;
-            window.currentHistoryMap = filteredHistoryMap;
+        // 3. อัปเดตการ์ด "Avg. Engagement Rate" ด้วยข้อมูล "ทุกแพลตฟอร์ม"
+        const avgEngRateAllCurr = allPlatformCurr.reach > 0 ? ((allPlatformCurr.eng / allPlatformCurr.reach) * 100) : 0;
+        const avgEngRateAllPrev = allPlatformPrev.reach > 0 ? ((allPlatformPrev.eng / allPlatformPrev.reach) * 100) : 0;
+        const avgEngRateCard = document.querySelector('.stat-card.rate');
+        if (avgEngRateCard) {
+            document.getElementById('avg-engagement-rate').innerText = avgEngRateAllCurr.toFixed(2) + '%';
+            updatePercentUI(avgEngRateCard, calcGrowth(avgEngRateAllCurr, avgEngRateAllPrev));
+            avgEngRateCard.querySelector('.comparison-text').innerText = 'Across all platforms';
         }
 
-        // ✅ Function to get latest values
-        function getLatestValues(snapshots) {
-            const accountMap = {};
-            
-            snapshots.forEach(snap => {
-                if (!accountMap[snap.account_id]) {
-                    accountMap[snap.account_id] = [];
-                }
-                accountMap[snap.account_id].push(snap);
-            });
-
-            const curr = { fol: 0, imp: 0, eng: 0, click: 0 };
-
-            Object.values(accountMap).forEach(snaps => {
-                if (snaps.length === 0) return;
-                
-                // Sort by latest
-                snaps.sort((a, b) => new Date(b.recorded_at) - new Date(a.recorded_at));
-                
-                const latest = snaps[0];
-                curr.fol += (latest.followers_count || 0);
-                curr.imp += (latest.impressions || 0);
-                curr.eng += (latest.engagement || 0);
-                curr.click += (latest.clicks || 0);
-            });
-
-            return curr;
+        // 4. อัปเดตการ์ด "Engagement Rate" ด้วยข้อมูล "แพลตฟอร์มที่เลือก"
+        const engRateFilteredCurr = filteredCurr.reach > 0 ? ((filteredCurr.eng / filteredCurr.reach) * 100) : 0;
+        const engRateFilteredPrev = filteredPrev.reach > 0 ? ((filteredPrev.eng / filteredPrev.reach) * 100) : 0;
+        const engRateCard = document.querySelector('.stat-card.engagement-rate');
+        if (engRateCard) {
+            document.getElementById('engagement-rate').innerText = engRateFilteredCurr.toFixed(2) + '%';
+            updatePercentUI(engRateCard, calcGrowth(engRateFilteredCurr, engRateFilteredPrev));
+            engRateCard.querySelector('.comparison-text').innerText = 'For selected filters';
         }
 
-        // ✅ New function: get previous day's values
-        function getPreviousDayValues(snapshots) {
-            const accountMap = {};
-            
-            snapshots.forEach(snap => {
-                if (!accountMap[snap.account_id]) {
-                    accountMap[snap.account_id] = [];
-                }
-                accountMap[snap.account_id].push(snap);
-            });
+        // ✅ Calculate and update View Rate card
+        const viewRate = filteredCurr.fol > 0 ? (totalViews / filteredCurr.fol) * 100 : 0;
+        updateCardUI('view-rate', viewRate, 0); // Growth is 0 as we don't have historical data for it
 
-            const prev = { fol: 0, imp: 0, eng: 0, click: 0 };
+        // ตั้งค่าข้อความเริ่มต้นสำหรับการ์ดอื่นๆ
+        document.querySelectorAll('.stat-card:not(.rate):not(.engagement-rate) .comparison-text').forEach(el => {
+            el.innerText = `vs previous day`;
+        });
 
-            Object.values(accountMap).forEach(snaps => {
-                if (snaps.length < 2) return; // Must have at least 2 days
-                
-                // Sort by latest
-                snaps.sort((a, b) => new Date(b.recorded_at) - new Date(a.recorded_at));
-                
-                // Get the 2nd snapshot (yesterday)
-                const prevDay = snaps[1];
-                prev.fol += (prevDay.followers_count || 0);
-                prev.imp += (prevDay.impressions || 0);
-                prev.eng += (prevDay.engagement || 0);
-                prev.click += (prevDay.clicks || 0);
-            });
+        window.currentFilteredAccounts = filteredAccounts;
+        window.currentHistoryMap = filteredHistoryMap;
+    }
 
-            return prev;
+    // ✅ Get latest values with reach field
+    function getLatestValues(snapshots) {
+        if (!snapshots || snapshots.length === 0) {
+            return { fol: 0, imp: 0, eng: 0, click: 0, reach: 0 };
         }
+
+        const accountMap = {};
+        
+        snapshots.forEach(snap => {
+            if (!accountMap[snap.account_id]) {
+                accountMap[snap.account_id] = [];
+            }
+            accountMap[snap.account_id].push(snap);
+        });
+
+        const curr = { fol: 0, imp: 0, eng: 0, click: 0, reach: 0 };
+
+        Object.values(accountMap).forEach(snaps => {
+            if (snaps.length === 0) return;
+            
+            snaps.sort((a, b) => new Date(b.recorded_at) - new Date(a.recorded_at));
+            
+            const latest = snaps[0];
+            curr.fol += (latest.followers_count || 0);
+            curr.imp += (latest.impressions || 0);
+            curr.eng += (latest.engagement || 0);
+            curr.click += (latest.clicks || 0);
+            curr.reach += (latest.reach || 0);
+        });
+
+        return curr;
+    }
+
+    // ✅ Get previous day values with reach field - Compare with yesterday
+    function getPreviousDayValues(snapshots) {
+        if (!snapshots || snapshots.length === 0) {
+            return { fol: 0, imp: 0, eng: 0, click: 0, reach: 0 };
+        }
+
+        const accountMap = {};
+        const allDates = new Set();
+
+        // Group snapshots by account and collect all dates
+        snapshots.forEach(snap => {
+            const date = snap.recorded_at.split('T')[0];
+            allDates.add(date);
+            
+            if (!accountMap[snap.account_id]) {
+                accountMap[snap.account_id] = {};
+            }
+            if (!accountMap[snap.account_id][date]) {
+                accountMap[snap.account_id][date] = [];
+            }
+            accountMap[snap.account_id][date].push(snap);
+        });
+
+        // Get sorted dates
+        const sortedDates = Array.from(allDates).sort().reverse(); // Reverse to get latest first
+        
+        if (sortedDates.length < 2) {
+            // Not enough data for comparison
+            console.log('Not enough dates for comparison. Available dates:', sortedDates);
+            return { fol: 0, imp: 0, eng: 0, click: 0, reach: 0 };
+        }
+
+        const latestDate = sortedDates[0];
+        const previousDate = sortedDates[1]; // Get the date before the latest
+
+        console.log('Latest date:', latestDate, 'Previous date:', previousDate);
+
+        const prev = { fol: 0, imp: 0, eng: 0, click: 0, reach: 0 };
+
+        // For each account, get the latest snapshot from the previous date
+        Object.keys(accountMap).forEach(accountId => {
+            const accountDates = accountMap[accountId];
+            
+            if (accountDates[previousDate]) {
+                // Get the latest snapshot for that account on the previous date
+                const snapsForPrevDate = accountDates[previousDate];
+                snapsForPrevDate.sort((a, b) => new Date(b.recorded_at) - new Date(a.recorded_at));
+                const prevSnap = snapsForPrevDate[0];
+
+                prev.fol += (prevSnap.followers_count || 0);
+                prev.imp += (prevSnap.impressions || 0);
+                prev.eng += (prevSnap.engagement || 0);
+                prev.click += (prevSnap.clicks || 0);
+                prev.reach += (prevSnap.reach || 0);
+            }
+        });
+
+        return prev;
+    }
         document.addEventListener('DOMContentLoaded', initDashboard);
 </script>
 </body>
