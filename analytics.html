@@ -516,7 +516,7 @@
             margin-top: 20px;
         }
 
-        /* ตรวจสอบให้ตารางสุดท้ายใช้พื้นที่เต็มที่ */
+        /* Ensure last table uses full available space */
         .content-section:last-child .pages-table {
             height: 100%;
             min-height: 300px;
@@ -647,6 +647,8 @@
             transition: var(--transition);
             background-color: white;
             position: relative;
+            display: flex;
+            flex-direction: column;
         }
 
         .post-card:hover {
@@ -721,6 +723,9 @@
 
         .post-content {
             padding: 18px;
+            display: flex;
+            flex-direction: column;
+            flex: 1;
         }
 
         .post-title {
@@ -788,9 +793,10 @@
         }
 
         .engagement-rate-bar {
-            margin-top: 15px;
+            margin-top: auto;
             padding-top: 15px;
             border-top: 1px solid var(--light-gray);
+            
         }
 
         .engagement-rate-label {
@@ -1990,14 +1996,14 @@
         // ==========================================
         async function fetchAllData() {
             try {
-                // 3.1: ดึงข้อมูล Accounts ทั้งหมด
+                // 3.1: Fetch all Accounts data
                 const { data: acc } = await supabase.from('social_accounts').select('*').not('external_id', 'is', null);
                 rawData.accounts = acc || [];
 
-                // ✅ 3.2: ดึงข้อมูล Posts ล่าสุด 500 โพสต์ พร้อมข้อมูล account ที่เกี่ยวข้อง
+                // ✅ 3.2: Fetch latest 500 Posts with related account data
                 const postColumns = '*,social_accounts(id,name,platform,region,followers_count)';
                 
-                // พยายามดึงแบบ nested select ก่อน
+                // Try nested select first
                 let { data: posts, error: postsError, status: postsStatus } = await supabase
                     .from('posts')
                     .select(postColumns)
@@ -2006,10 +2012,10 @@
 
                 if (postsError) {
                     console.warn('Primary posts query failed', { status: postsStatus, error: postsError });
-                    // fallback: ดึง posts แยก แล้วดึง accounts มาแมปเอง
+                    // fallback: fetch posts separately, then fetch accounts and map them
                     const { data: postsFlat, error: flatErr } = await supabase
                         .from('posts')
-                        .select('*') // <-- ดึงทุกคอลัมน์ รวมถึง reach
+                        .select('*') // <-- fetch all columns including reach
                         .order('posted_at', { ascending: false })
                         .limit(500);
                     if (flatErr) throw flatErr;
@@ -2026,7 +2032,7 @@
                     posts = postsFlat || [];
                 }
 
-                // ✅ เพิ่ม: ดึงข้อมูล posts_scored แยกต่างหาก
+                // ✅ Added: fetch posts_scored data separately
                 const { data: postsScored, error: scoredError } = await supabase
                     .from('posts_scored')
                     .select('external_id, decision');
@@ -2034,13 +2040,13 @@
                 if (scoredError) {
                     console.warn('Error fetching posts_scored:', scoredError);
                 } else {
-                    // สร้าง Map สำหรับ lookup ที่เร็ว
+                    // Create Map for fast lookup
                     const scoredMap = {};
                     (postsScored || []).forEach(scored => {
                         scoredMap[scored.external_id] = scored;
                     });
 
-                    // เชื่อมข้อมูล posts กับ posts_scored
+                    // Connect posts data with posts_scored
                     (posts || []).forEach(post => {
                         post.posts_scored = scoredMap[post.external_id] ? [scoredMap[post.external_id]] : [];
                     });
@@ -2048,11 +2054,11 @@
 
                 rawData.posts = posts || [];
 
-                // เพิ่ม console.log เพื่อตรวจสอบว่าดึง reach มาได้หรือไม่
+                // Add console.log to check if reach data is fetched
                 console.log('Posts fetched:', posts.length, 'Sample post reach:', posts[0]?.reach, 'Sample decision:', posts[0]?.posts_scored);
 
                
-                // 3.3: ดึงข้อมูล Snapshots (ข้อมูลรายวัน) ทั้งหมด
+                // 3.3: Fetch all Snapshots (daily data)
                 const { data: snaps, error: snapsErr } = await supabase.from('daily_snapshots').select('*,social_accounts(platform)').order('recorded_at', { ascending: true });
                 if (snapsErr) throw snapsErr;
                 rawData.snapshots = snaps || [];
@@ -2063,7 +2069,7 @@
                 renderDataPeriod(rawData.snapshots);
             } catch (err) {
                 console.error('Fetch Error:', err);
-                // แสดงรายละเอียดเพื่อดีบักในเบราว์เซอร์
+                // Show details for debugging in browser
                 alert('Data fetch error: ' + (err.message || JSON.stringify(err)));
             }
         }
@@ -2413,10 +2419,10 @@
         });
 
         if (platform === 'all') {
-            // ✅ เรียงตาม Decision Priority ก่อน แล้วตามด้วย Engagement Rate
+            // ✅ Sort by Decision Priority first, then by Engagement Rate
             postsToShow = recentPosts
                 .sort((a, b) => {
-                    // ดึง decision จากแต่ละโพสต์
+                    // Get decision from each post
                     const aDecision = a.posts_scored && a.posts_scored.length > 0 ? a.posts_scored[0].decision : null;
                     const bDecision = b.posts_scored && b.posts_scored.length > 0 ? b.posts_scored[0].decision : null;
                     
@@ -2462,7 +2468,7 @@
     }
     
     function getDecisionPriority(decision) {
-            if (!decision) return 999; // Not Scored อยู่ท้ายสุด
+            if (!decision) return 999; // Not Scored goes last
             const d = decision.toLowerCase();
             
             if (d.includes('boost – high') || d.includes('boost - high')) return 1;
@@ -2471,7 +2477,7 @@
             if (d.includes('hold (low engagements)')) return 4; 
             if (d.includes('no boost')) return 5;
             
-            return 999; // Unknown decisions ไปท้ายสุด
+            return 999; // Unknown decisions go last
         }
 
     // ERR Formula: (Likes + Comments + Shares + Saves) / Reach * 100
@@ -2496,7 +2502,7 @@
         return 'not-scored';
     }
 
-    // ✅ เพิ่มฟังก์ชันที่ขาดหายไป
+    // ✅ Added missing function
     function getEngagementRateTag(engagementRate, avgRate) {
         if (engagementRate > avgRate) {
             return {
@@ -2519,23 +2525,23 @@
     window.boostPost = async function(postId, externalId, buttonElement) {
             console.log('Manual boost requested for post:', postId, externalId);
             
-            // เปลี่ยน UI ของปุ่มให้แสดงว่ากำลังทำงาน
+            // Change button UI to show loading state
             const originalHTML = buttonElement.innerHTML;
             buttonElement.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Boosting...';
             buttonElement.disabled = true;
             buttonElement.style.background = '#6c757d';
             
             try {
-                // 1. แสดง Modal เพื่อให้เลือกประเภทการบูส
+                // 1. Show Modal to select boost type
                 const boostType = await showBoostModal();
                 
                 if (!boostType) {
-                    // ผู้ใช้ยกเลิก
+                    // User cancelled
                     resetBoostButton(buttonElement, originalHTML);
                     return;
                 }
                 
-                // 2. อัปเดตสถานะในฐานข้อมูล
+                // 2. Update status in database
                 await updatePostBoostStatus(externalId, boostType);
                 
                 // 3. แสดงผลสำเร็จ
@@ -2560,7 +2566,7 @@
             }
         }
         
-        // แสดง Modal เพื่อเลือกประเภทการบูส
+        // Show Modal to select boost type
         function showBoostModal() {
             return new Promise((resolve) => {
                 const modal = document.createElement('div');
@@ -2660,7 +2666,7 @@
             });
         }
         
-        // อัปเดตสถานะการบูสในฐานข้อมูล
+        // Update boost status in database
         async function updatePostBoostStatus(externalId, boostType) {
             const { error } = await supabase
                 .from('posts_scored')
@@ -2678,7 +2684,7 @@
             }
         }
         
-        // อัปเดต Tag ของโพสต์ในหน้าเว็บโดยไม่ต้อง reload
+        // Update post tag in webpage without reload
         function updatePostTagInUI(postId, boostType) {
             const postCard = document.querySelector(`[data-post-id="${postId}"]`);
             if (postCard) {
@@ -2691,7 +2697,7 @@
             }
         }
         
-        // รีเซ็ตปุ่มกลับสู่สถานะเดิม
+        // Reset button to original state
         function resetBoostButton(buttonElement, originalHTML) {
             buttonElement.innerHTML = originalHTML;
             buttonElement.disabled = false;
@@ -2728,12 +2734,12 @@
             
             document.body.appendChild(notification);
             
-            // แสดงการแจ้งเตือน
+            // Show notification
             setTimeout(() => {
                 notification.style.transform = 'translateX(0)';
             }, 100);
             
-            // ซ่อนการแจ้งเตือนหลัง 3 วินาที
+            // Hide notification after 3 seconds
             setTimeout(() => {
                 notification.style.transform = 'translateX(100%)';
                 setTimeout(() => {
@@ -2792,7 +2798,7 @@
             const accId = post.account_id;
             const avgRate = accountAvgRates[accId] ? accountAvgRates[accId].totalEngRate / accountAvgRates[accId].count : 0;
             
-            // ✅ เปลี่ยนจาก Above Average เป็นค่า decision
+            // ✅ Changed from Above Average to decision value
             let decision = 'Not Scored';
             let tagClass = 'not-scored';
             
@@ -2800,7 +2806,7 @@
                 decision = post.posts_scored[0].decision || 'Not Scored';
                 tagClass = getDecisionTagClass(decision);
             } else {
-                // ถ้าไม่มีข้อมูล decision ให้ใช้ Above/Below Average เหมือนเดิม
+                // If no decision data, use Above/Below Average as before
                 const tag = getEngagementRateTag(engagementRate, avgRate);
                 decision = tag.text;
                 tagClass = tag.class;
@@ -3412,7 +3418,7 @@
             container.innerHTML = '';
             const regions = {};
 
-            // สร้าง Map ของ snapshot ล่าสุดสำหรับแต่ละ account เพื่อให้ดึงข้อมูลได้เร็ว
+            // Create Map of latest snapshots for each account for fast data retrieval
             const latestSnapshots = {};
             rawData.snapshots.forEach(snap => {
                 if (!latestSnapshots[snap.account_id] || new Date(snap.recorded_at) > new Date(latestSnapshots[snap.account_id].recorded_at)) {
@@ -3426,7 +3432,7 @@
                 
                 const latestSnap = latestSnapshots[acc.id];
                 
-                // ใช้ข้อมูลล่าสุดจาก snapshots ถ้ามี
+                // Use latest data from snapshots if available
                 if (latestSnap) {
                     regions[r].imp += (latestSnap.impressions || 0);
                     regions[r].eng += (latestSnap.engagement || 0);
@@ -3961,7 +3967,7 @@
             });
 
             accounts.forEach(acc => {
-                const latestSnap = latestSnapshots[acc.id] || {}; // ใช้ object ว่างถ้าไม่พบ snapshot
+                const latestSnap = latestSnapshots[acc.id] || {}; // Use empty object if no snapshot found
 
                 const followers = latestSnap.followers_count || acc.followers_count || 0;
                 const impressions = latestSnap.impressions || 0;
@@ -3999,13 +4005,13 @@
     // RENDER SUMMARY CARDS - Fixed version
     // ==========================================
     function renderSummaryCards(allAccounts, filteredAccounts, allHistoryMap, filteredHistoryMap, days, newFollowers, growthNewFollowers) {
-        // 1. คำนวณสำหรับ "แพลตฟอร์มที่เลือก" (ใช้กับการ์ดส่วนใหญ่)
+        // 1. Calculate for "Selected Platform" (used with most cards)
         const filteredAccountIds = new Set(filteredAccounts.map(acc => acc.id));
         const relevantSnapshots = rawData.snapshots.filter(snap => filteredAccountIds.has(snap.account_id));
         const filteredCurr = getLatestValues(relevantSnapshots);
         const filteredPrev = getPreviousDayValues(relevantSnapshots);
 
-        // 2. คำนวณสำหรับ "ทุกแพลตฟอร์ม" (ใช้เฉพาะการ์ด Avg. Engagement Rate)
+        // 2. Calculate for "All Platforms" (used only for Avg. Engagement Rate card)
         const allPlatformCurr = getLatestValues(rawData.snapshots);
         const allPlatformPrev = getPreviousDayValues(rawData.snapshots);
 
@@ -4022,13 +4028,13 @@
         updateCardUI('total-views', totalViews, 0);
 
 
-        // อัปเดตการ์ดตามปกติด้วยข้อมูลที่กรองแล้ว
+        // Update cards normally with filtered data
         updateCardUI('total-impressions', filteredCurr.imp, calcGrowth(filteredCurr.imp, filteredPrev.imp));
         updateCardUI('total-followers', filteredCurr.fol, calcGrowth(filteredCurr.fol, filteredPrev.fol));
         updateCardUI('total-engagement', filteredCurr.eng, calcGrowth(filteredCurr.eng, filteredPrev.eng));
         updateCardUI('new-followers', newFollowers, growthNewFollowers);
 
-        // 3. อัปเดตการ์ด "Avg. Engagement Rate" ด้วยข้อมูล "ทุกแพลตฟอร์ม"
+        // 3. Update "Avg. Engagement Rate" card with "All Platforms" data
         const avgEngRateAllCurr = allPlatformCurr.reach > 0 ? ((allPlatformCurr.eng / allPlatformCurr.reach) * 100) : 0;
         const avgEngRateAllPrev = allPlatformPrev.reach > 0 ? ((allPlatformPrev.eng / allPlatformPrev.reach) * 100) : 0;
         const avgEngRateCard = document.querySelector('.stat-card.rate');
@@ -4038,7 +4044,7 @@
             avgEngRateCard.querySelector('.comparison-text').innerText = 'Across all platforms';
         }
 
-        // 4. อัปเดตการ์ด "Engagement Rate" ด้วยข้อมูล "แพลตฟอร์มที่เลือก"
+        // 4. Update "Engagement Rate" card with "Selected Platform" data
         const engRateFilteredCurr = filteredCurr.reach > 0 ? ((filteredCurr.eng / filteredCurr.reach) * 100) : 0;
         const engRateFilteredPrev = filteredPrev.reach > 0 ? ((filteredPrev.eng / filteredPrev.reach) * 100) : 0;
         const engRateCard = document.querySelector('.stat-card.engagement-rate');
@@ -4052,7 +4058,7 @@
         const viewRate = filteredCurr.fol > 0 ? (totalViews / filteredCurr.fol) * 100 : 0;
         updateCardUI('view-rate', viewRate, 0); // Growth is 0 as we don't have historical data for it
 
-        // ตั้งค่าข้อความเริ่มต้นสำหรับการ์ดอื่นๆ
+        // Set default text for other cards
         document.querySelectorAll('.stat-card:not(.rate):not(.engagement-rate) .comparison-text').forEach(el => {
             el.innerText = `vs previous day`;
         });
