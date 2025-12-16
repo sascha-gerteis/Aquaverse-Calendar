@@ -853,6 +853,15 @@
   const GENERATE_VIDEO_FROM_IMAGE_WEBHOOK_URL = "https://saschag.app.n8n.cloud/webhook/generate-video-from-image";
   
   const LIST_VIDEOS_WEBHOOK_URL = 'https://merpsvkfmjbugrgnwwlq.supabase.co/functions/v1/list-files';
+  // === Canto API Config ===
+  const CANTO_API_URL = 'https://columbiapicturesaquaverse.canto.global/api/v1/search'; // TODO: Replace with actual Canto API endpoint
+  const CANTO_FOLDER_MAP = {
+
+    //shortform: 'shorts',
+    //longform: 'Long form',
+    shortform: 'KJP07',
+    longform: 'QGKKN'
+  };
 
   const STORAGE_BASE_URL = "https://merpsvkfmjbugrgnwwlq.supabase.co/storage/v1/object/public";
 
@@ -887,6 +896,23 @@
     el.style.background = type === 'success' ? 'var(--primary)' : 'var(--secondary)';
     setTimeout(() => { el.style.display = 'none'; }, 5000);
   }
+// === Canto API Key (replace with your real key, or use env variable in production) ===
+  const CANTO_API_KEY = 'fc36a26ad08f445c81309c07a5393958';
+  // Fetch video list from Canto for a given folder
+ const LIST_CANTO_WEBHOOK_URL = "https://saschag.app.n8n.cloud/webhook/list-videos";
+
+  async function fetchCantoVideos(folder) {
+    try {
+      const res = await fetch(`${LIST_CANTO_WEBHOOK_URL}?folder=${encodeURIComponent(folder)}`);
+      if (!res.ok) throw new Error(`Canto proxy error: ${res.status}`);
+      return await res.json(); // ให้ webhook ส่งมาเป็น [{name,size,url,contentType,id}]
+    } catch (err) {
+      console.error('Error fetching Canto videos:', err);
+      return [];
+    }
+  }
+
+
 
   function getFileUrl(filename, type) {
     if (!filename) return '';
@@ -3062,33 +3088,37 @@
     try {
       const type = document.getElementById('content-type').value;
       const currentActivityId = document.getElementById('edit-activity-id').value;
-    
-      let bucket = "ShortForm"; 
-      if (type === 'ai-shortform') {
-          bucket = "ShortVideo"; 
-      }
-  
-      const res = await fetch(`${LIST_VIDEOS_WEBHOOK_URL}?bucket=${bucket}`);
-      if (!res.ok) throw new Error(`API Error: ${res.status}`);
-      const responseText = await res.text();
       let allFiles = [];
-      if (responseText.trim()) {
-        try {
-          allFiles = JSON.parse(responseText);
-        } catch (jsonError) {
-          console.error('JSON parse error:', jsonError);
-          throw new Error('Invalid JSON response from server');
-        }
+      if (type === 'shortform' || type === 'longform') {
+        // Use Canto for Shortform and Longform
+        const folder = CANTO_FOLDER_MAP[type];
+        allFiles = await fetchCantoVideos(folder);
       } else {
-        // Instead of throwing, just show no videos
-        allFiles = [];
+        // Use Supabase as before
+        let bucket = "ShortForm"; 
+        if (type === 'ai-shortform') {
+            bucket = "ShortVideo"; 
+        }
+        const res = await fetch(`${LIST_VIDEOS_WEBHOOK_URL}?bucket=${bucket}`);
+        if (!res.ok) throw new Error(`API Error: ${res.status}`);
+        const responseText = await res.text();
+        if (responseText.trim()) {
+          try {
+            allFiles = JSON.parse(responseText);
+          } catch (jsonError) {
+            console.error('JSON parse error:', jsonError);
+            throw new Error('Invalid JSON response from server');
+          }
+        } else {
+          allFiles = [];
+        }
       }
 
       const usedFilenames = getUsedFilenames(currentActivityId);
       const availableFiles = allFiles.filter(file => !usedFilenames.has(file.name));
-    
+
       renderVideoList(availableFiles);
-      
+
       searchInput.onkeyup = (e) => {
         const term = e.target.value.toLowerCase();
         const filtered = availableFiles.filter(f => f.name.toLowerCase().includes(term));
