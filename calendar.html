@@ -238,6 +238,14 @@
       opacity: 0.7;
     }
 
+    #video-player-preview {
+      transition: opacity 0.3s ease;
+    }
+    
+    #video-player-preview[poster] {
+      background: #000;
+    }
+
     .save-notification {
       position:fixed; bottom:20px; right:20px; background:var(--primary); color:white;
       padding:10px 20px; border-radius:5px; box-shadow:0 2px 10px rgba(0,0,0,0.2);
@@ -610,6 +618,7 @@
         <input type="hidden" id="edit-date"/>
         <input type="hidden" id="edit-market"/>
         <input type="hidden" id="edit-activity-id" />
+        <input type="hidden" id="edit-video-url" />
 
         <div class="form-group">
           <label for="content-type">Content Type</label>
@@ -622,6 +631,26 @@
             <option value="longform">Longform</option>
             <option value="no-post">No Post</option>
           </select>
+        </div>
+
+        <div class="form-group">
+          <label for="content-theme"><i class="fas fa-palette"></i> Theme</label>
+          <input type="text" class="form-control" id="content-theme" placeholder="Enter content theme...">
+        </div>
+
+        <div class="form-group">
+          <label for="content-caption"><i class="fas fa-comment"></i> Caption</label>
+          <div style="margin-bottom: 10px;">
+            <label style="display: inline-block; margin-right: 20px;">
+              <input type="radio" name="caption-mode" value="manual" id="caption-manual" checked>
+              <i class="fas fa-keyboard"></i> Enter manually
+            </label>
+            <label style="display: inline-block;">
+              <input type="radio" name="caption-mode" value="ai" id="caption-ai">
+              <i class="fas fa-robot"></i> Generate with AI
+            </label>
+          </div>
+          <textarea class="form-control" id="content-caption" placeholder="Enter caption text..." rows="3"></textarea>
         </div>
 
         <div class="form-group">
@@ -663,7 +692,13 @@
           <label style="color:var(--primary);"><i class="fas fa-video"></i> Selected Video</label>
           
           <div id="preview-container" style="margin-bottom:10px; display:none;">
-            <video id="video-player-preview" controls style="width:100%; max-height:300px; background:black; border-radius:6px;"></video>
+            <div id="video-loading-indicator" style="display:none; position:absolute; top:50%; left:50%; transform:translate(-50%,-50%); color:white; z-index:10;">
+              <i class="fas fa-spinner fa-spin" style="font-size:24px;"></i>
+            </div>
+            <video id="video-player-preview" controls preload="metadata" crossorigin="anonymous" style="width:100%; max-height:300px; background:black; border-radius:6px; position:relative;" onerror="this.style.display='none'; this.nextElementSibling.style.display='block';"></video>
+            <div id="video-error-message" style="display:none; color:red; text-align:center; padding:10px; background:#f8f9fa; border-radius:6px; margin-top:5px;">
+              <i class="fas fa-exclamation-triangle"></i> Unable to load video preview
+            </div>
           </div>
 
           <div style="display:flex; gap:10px;">
@@ -913,9 +948,17 @@
 
   async function fetchCantoVideos(folder) {
     try {
+      console.log(`Fetching Canto videos for folder: ${folder}`);
       const res = await fetch(`${LIST_CANTO_WEBHOOK_URL}?folder=${encodeURIComponent(folder)}`);
       if (!res.ok) throw new Error(`Canto proxy error: ${res.status}`);
-      return await res.json(); // ให้ webhook ส่งมาเป็น [{name,size,url,contentType,id}]
+      const data = await res.json();
+      console.log(`Canto response for ${folder}:`, data);
+      console.log(`First few files:`, data.slice(0, 3));
+      if (data.length > 0) {
+        console.log(`Fields in first file:`, Object.keys(data[0]));
+        console.log(`Sample file data:`, data[0]);
+      }
+      return data; // ❌ Webhook ยังไม่ส่ง directUrlOriginal - ต้องอัพเดท webhook ให้ส่ง: [{name,size,url,contentType,id,directUrlOriginal}]
     } catch (err) {
       console.error('Error fetching Canto videos:', err);
       return [];
@@ -2071,7 +2114,7 @@
 
   function newActivityId() { return 'act_' + Date.now() + Math.random().toString(36).substr(2, 9); }
 
-  function openEditModal(day, activityId = null) {
+  async function openEditModal(day, activityId = null) {
     currentlyEditingDay = day;
     const month = currentDate.getMonth();
     const year = currentDate.getFullYear();
@@ -2114,6 +2157,15 @@
       
       setVal('content-type', content.type || '');
       setVal('content-theme', content.theme || '');
+      
+      // Handle caption mode and content
+      const isManualMode = content.captionMode === 'manual' || (content.caption && content.caption.trim() && !content.captionMode);
+      setCheck('caption-manual', isManualMode);
+      setCheck('caption-ai', !isManualMode);
+      setVal('content-caption', content.caption || '');
+      
+      // Update caption field visibility
+      toggleCaptionField();
       setVal('ai-prompt', content.aiPrompt || '');
 
       if (content.postTime) {
@@ -2262,9 +2314,15 @@
       
       setVal('content-type', '');
       setVal('content-theme', '');
+      setVal('content-caption', '');
       setVal('ai-prompt', '');
       setVal('post-time-hour', '10');
       setVal('post-time-minute', '00');
+      
+      // Default to AI caption mode for new content
+      setCheck('caption-manual', false);
+      setCheck('caption-ai', true);
+      toggleCaptionField();
 
       setCheck('platform-fb', false);
       setCheck('platform-ig', false);
@@ -2303,24 +2361,132 @@
     // Handle Manual Video (Non-Carousel)
     if (manualVidSec && content && content.type && (content.type.includes('shortform') || content.type === 'longform')) {
         const fName = content.fileName || '';
+        const videoUrl = content.videoUrl || '';
         setVal('selected-filename', fName);
+        setVal('edit-video-url', videoUrl);
         
         const preview = document.getElementById('preview-container');
         const player = document.getElementById('video-player-preview');
+        const errorMsg = document.getElementById('video-error-message');
+        const loadingIndicator = document.getElementById('video-loading-indicator');
  
-        if(fName && preview && player) {
+        if((fName || videoUrl) && preview && player) {
+            console.log(`Loading existing content:`, { fName, videoUrl, contentType: content.type });
+            // Reset video element
+            player.style.display = 'block';
+            if (errorMsg) errorMsg.style.display = 'none';
+            if (loadingIndicator) loadingIndicator.style.display = 'block';
+            player.pause();
+            player.currentTime = 0;
+            
             preview.style.display = 'block';
-            player.src = getFileUrl(fName, content.type);
+            console.log(`Loading video for ${content.type}: ${fName}`, { videoUrl: videoUrl || 'none', hasVideoUrl: !!videoUrl });
+            
+            // For shortform/longform videos, ALWAYS try to get directUrlOriginal from Canto first
+            if (content.type.includes('shortform') || content.type === 'longform') {
+                console.log(`Content type ${content.type} is shortform/longform, trying Canto first`);
+                try {
+                    const folder = CANTO_FOLDER_MAP[content.type] || CANTO_FOLDER_MAP['shortform'];
+                    console.log(`Using Canto folder: ${folder} for content type: ${content.type}`);
+                    const cantoFiles = await fetchCantoVideos(folder);
+                    const matchingFile = cantoFiles.find(f => f.name === fName);
+                    console.log(`Looking for exact match: "${fName}"`);
+                    console.log(`Available files:`, cantoFiles.map(f => `"${f.name}"`));
+                    
+                    // If not found in primary folder, try the other folder
+                    if (!matchingFile) {
+                        console.log(`File not found in ${folder}, trying other folder`);
+                        const otherFolder = (folder === CANTO_FOLDER_MAP['shortform']) ? CANTO_FOLDER_MAP['longform'] : CANTO_FOLDER_MAP['shortform'];
+                        console.log(`Trying folder: ${otherFolder}`);
+                        const otherCantoFiles = await fetchCantoVideos(otherFolder);
+                        const otherMatchingFile = otherCantoFiles.find(f => f.name === fName);
+                        if (otherMatchingFile) {
+                            console.log(`Found file in other folder:`, otherMatchingFile);
+                            folder = otherFolder;
+                            cantoFiles = otherCantoFiles;
+                            matchingFile = otherMatchingFile;
+                        }
+                    }
+                    
+                    // Also try partial match in case of filename differences
+                    if (!matchingFile) {
+                        const partialMatch = cantoFiles.find(f => f.name.includes(fName.split('.')[0]) || fName.includes(f.name.split('.')[0]));
+                        if (partialMatch) {
+                            console.log(`Found partial match:`, partialMatch);
+                            matchingFile = partialMatch;
+                        }
+                    }
+                    if (matchingFile && matchingFile.directUrlOriginal) {
+                        console.log('✅ Found directUrlOriginal in Canto:', matchingFile.directUrlOriginal);
+                        player.src = matchingFile.directUrlOriginal;
+                        // Update the stored videoUrl for future use
+                        setVal('edit-video-url', matchingFile.directUrlOriginal);
+                    } else if (matchingFile && matchingFile.directUrl) {
+                        console.log('⚠️ Found directUrl in Canto (fallback):', matchingFile.directUrl);
+                        player.src = matchingFile.directUrl;
+                        setVal('edit-video-url', matchingFile.directUrl);
+                    } else if (matchingFile && matchingFile.url) {
+                        console.log('⚠️ Found url in Canto (fallback):', matchingFile.url);
+                        player.src = matchingFile.url;
+                        setVal('edit-video-url', matchingFile.url);
+                    } else {
+                        console.log('❌ Video not found in Canto or no usable URL fields');
+                        console.log('Available fields in matching file:', matchingFile ? Object.keys(matchingFile) : 'no matching file');
+                        if (matchingFile) {
+                            console.log('Matching file data:', matchingFile);
+                            console.error('❌ Webhook ไม่ส่ง directUrlOriginal - ต้องอัพเดท webhook ให้ส่ง directUrlOriginal');
+                            console.log('Expected format:', {name: 'filename.mp4', directUrlOriginal: 'https://...'});
+                        }
+                        const fallbackUrl = videoUrl || getFileUrl(fName, content.type);
+                        player.src = fallbackUrl;
+                        console.log('Using Supabase fallback URL:', fallbackUrl);
+                    }
+                } catch (err) {
+                    console.warn('Could not fetch from Canto, using stored videoUrl or Supabase URL:', err);
+                    const fallbackUrl = videoUrl || getFileUrl(fName, content.type);
+                    player.src = fallbackUrl;
+                    console.log('Using fallback URL:', fallbackUrl);
+                }
+            } else {
+                // For other content types, use stored videoUrl or construct Supabase URL
+                const fullUrl = videoUrl || getFileUrl(fName, content.type);
+                console.log('Using URL for non-shortform content:', fullUrl);
+                player.src = fullUrl;
+            }
+            
+            // Handle loading for existing content
+            player.onloadedmetadata = () => {
+              console.log('Video loaded successfully:', player.src);
+              if (loadingIndicator) loadingIndicator.style.display = 'none';
+            };
+            
+            player.onerror = () => {
+              console.error('Video failed to load - both Canto and fallback URLs failed');
+              player.style.display = 'none';
+              if (loadingIndicator) loadingIndicator.style.display = 'none';
+              if (errorMsg) errorMsg.style.display = 'block';
+            };
         } else if (preview) {
              preview.style.display = 'none';
         }
     } else {
         setVal('selected-filename', '');
+        setVal('edit-video-url', '');
         const preview = document.getElementById('preview-container');
+        const player = document.getElementById('video-player-preview');
+        const errorMsg = document.getElementById('video-error-message');
+        const loadingIndicator = document.getElementById('video-loading-indicator');
         if(preview) preview.style.display = 'none';
+        if (player) {
+            player.pause();
+            player.currentTime = 0;
+            player.src = '';
+            player.style.display = 'block';
+        }
+        if (errorMsg) errorMsg.style.display = 'none';
+        if (loadingIndicator) loadingIndicator.style.display = 'none';
     }
   }
-
   function closeModal() {
     document.getElementById('edit-modal').style.display = 'none';
     currentlyEditingDay = null;
@@ -2502,6 +2668,8 @@
     const activityId = getVal('edit-activity-id');
     const type = getVal('content-type');
     const theme = getVal('content-theme');
+    const isManualCaption = getCheck('caption-manual');
+    const caption = isManualCaption ? getVal('content-caption') : null; // Only save caption if manual mode
     const aiPrompt = getVal('ai-prompt');
     const manualFileName = getVal('selected-filename');
 
@@ -2584,8 +2752,11 @@
       id: (activityId && !activityId.startsWith('legacy_')) ? activityId : newActivityId(),
       type,
       theme,
+      caption,
+      captionMode: isManualCaption ? 'manual' : 'ai', // Track caption mode
       platform: selectedPlatforms,
       fileName: manualFileName,
+      videoUrl: getVal('edit-video-url') || null,
       markets: selectedMarketsList,
       postTime: postTime 
     };
@@ -3194,25 +3365,61 @@
         <button class="btn btn-secondary" style="padding:4px 12px; font-size:0.8rem; pointer-events:none;">Select</button>
       `;
    
-      div.onclick = () => selectVideo(file.name);
+      div.onclick = () => selectVideo(file);
       
       container.appendChild(div);
     });
   }
 
-  function selectVideo(filename) {
-    document.getElementById('selected-filename').value = filename;
+  function selectVideo(file) {
+    // Clear any loading indicators in the video picker modal
+    const pickerContainer = document.getElementById('video-list-container');
+    
+    
+    document.getElementById('selected-filename').value = file.name;
+    document.getElementById('edit-video-url').value = file.directUrlOriginal || file.directUrl || file.url || '';
     
     const previewBox = document.getElementById('preview-container');
     const player = document.getElementById('video-player-preview');
+    const errorMsg = document.getElementById('video-error-message');
+    const loadingIndicator = document.getElementById('video-loading-indicator');
  
-    const type = document.getElementById('content-type').value;
-    const fullUrl = getFileUrl(filename, type);
+    // Reset video element
+    player.style.display = 'block';
+    if (errorMsg) errorMsg.style.display = 'none';
+    if (loadingIndicator) loadingIndicator.style.display = 'block';
+    player.pause();
+    player.currentTime = 0;
+    player.src = '';
     
+    // Use directUrlOriginal/directUrl/url for preview if available (Canto), otherwise construct it (Supabase)
+    const fullUrl = file.directUrlOriginal || file.directUrl || file.url || getFileUrl(file.name, document.getElementById('content-type').value);
+    console.log(`Selecting video: ${file.name}`, { 
+      directUrlOriginal: file.directUrlOriginal,
+      directUrl: file.directUrl,
+      url: file.url, 
+      finalUrl: fullUrl 
+    });
+    
+    // Set new source and show preview
     player.src = fullUrl;
     previewBox.style.display = 'block';
     
+    // Close the video picker modal immediately after selection
     document.getElementById('video-picker-modal').style.display = 'none';
+    
+    // Handle loading
+    player.onloadedmetadata = () => {
+      console.log('Video loaded successfully:', fullUrl);
+      if (loadingIndicator) loadingIndicator.style.display = 'none';
+    };
+    
+    player.onerror = () => {
+      console.error('Video failed to load:', fullUrl);
+      player.style.display = 'none';
+      if (loadingIndicator) loadingIndicator.style.display = 'none';
+      if (errorMsg) errorMsg.style.display = 'block';
+    };
   }
 
   // Add the missing functions for video picker
@@ -3222,9 +3429,34 @@
   
   document.getElementById('clear-video-btn').addEventListener('click', () => {
     document.getElementById('selected-filename').value = '';
+    document.getElementById('edit-video-url').value = '';
+    const player = document.getElementById('video-player-preview');
+    const errorMsg = document.getElementById('video-error-message');
+    const loadingIndicator = document.getElementById('video-loading-indicator');
+    player.pause();
+    player.currentTime = 0;
+    player.src = '';
+    player.style.display = 'block';
+    if (errorMsg) errorMsg.style.display = 'none';
+    if (loadingIndicator) loadingIndicator.style.display = 'none';
     document.getElementById('preview-container').style.display = 'none';
-    document.getElementById('video-player-preview').src = '';
   });
+
+  // Caption mode toggle functionality
+  function toggleCaptionField() {
+    const captionTextarea = document.getElementById('content-caption');
+    const isManual = document.getElementById('caption-manual').checked;
+    if (captionTextarea) {
+      captionTextarea.style.display = isManual ? 'block' : 'none';
+      if (!isManual) {
+        captionTextarea.value = ''; // Clear when switching to AI
+      }
+    }
+  }
+
+  // Add event listeners for caption mode radio buttons
+  document.getElementById('caption-manual').addEventListener('change', toggleCaptionField);
+  document.getElementById('caption-ai').addEventListener('change', toggleCaptionField);
 
   // Add the missing waitForAIImages function
   async function waitForAIImages(scheduleId, day, payloadId) {
