@@ -912,7 +912,8 @@
     shortform: 'KJP07',
     longform: 'QGKKN'
   };
-
+// Add this near your other constants
+  const GOOGLE_BUSINESS_WEBHOOK_URL = "https://saschag.app.n8n.cloud/webhook/google-business-post";
   const STORAGE_BASE_URL = "https://merpsvkfmjbugrgnwwlq.supabase.co/storage/v1/object/public";
 
   const BUCKET_SHORTFORM = "ShortForm";
@@ -2750,19 +2751,21 @@
       }
     }
 
+// 1. Gather selected platforms
     const selectedPlatforms = [];
     if (getCheck('platform-fb')) selectedPlatforms.push('facebook');
     if (getCheck('platform-ig')) selectedPlatforms.push('instagram');
     if (getCheck('platform-tt')) selectedPlatforms.push('tiktok');
     if (getCheck('platform-yt')) selectedPlatforms.push('youtube');
-    if (getCheck('platfrom-gg')) selectedPlatforms.push('google');
+    if (getCheck('platform-gg')) selectedPlatforms.push('google');
 
+    // 2. Build the payload object FIRST
     const payload = {
       id: (activityId && !activityId.startsWith('legacy_')) ? activityId : newActivityId(),
       type,
       theme,
       caption,
-      captionMode: isManualCaption ? 'manual' : 'ai', // Track caption mode
+      captionMode: isManualCaption ? 'manual' : 'ai',
       platform: selectedPlatforms,
       fileName: manualFileName,
       videoUrl: getVal('edit-video-url') || null,
@@ -2770,6 +2773,7 @@
       postTime: postTime 
     };
 
+    // 3. Attach carousel data to payload if applicable
     if ((type === 'ai-carousel' || type === 'real-carousel') && carouselVideo) {
       payload.carouselVideo = carouselVideo;
     }
@@ -2787,6 +2791,41 @@
       }
     }
 
+    // 4. NOW trigger the Google Webhook (because 'payload' is now fully defined)
+    if (getCheck('platform-gg')) {
+        let googleImageUrl = null;
+        
+        // Logical check for the image: Use AI image first, then fall back to videoUrl if available
+        if (type === 'ai-carousel' && payload.images && payload.images.length > 0) {
+            const cleanImgName = payload.images[0].replace('carousel-image/', '').replace('carousel-image\\', '');
+            googleImageUrl = `${STORAGE_BASE_URL}/${BUCKET_CAROUSEL}/${cleanImgName}`;
+        } else if (payload.videoUrl) {
+            googleImageUrl = payload.videoUrl;
+        }
+
+        // Replace the image_url line in your googlePayload with this:
+const googlePayload = {
+    date: `${currentDate.getFullYear()}-${z2(currentDate.getMonth() + 1)}-${z2(day)}`,
+    summary: caption || theme, 
+    // Send the whole array of images instead of just the first one
+    images: (type === 'ai-carousel' || type === 'real-carousel') && payload.images 
+            ? payload.images.map(img => `${STORAGE_BASE_URL}/${BUCKET_CAROUSEL}/${img.replace('carousel-image/', '').replace('carousel-image\\', '')}`)
+            : (payload.videoUrl ? [payload.videoUrl] : []),
+    cta_url: "https://aquaversepark.com",
+    activity_id: payload.id
+};
+
+        console.log("Triggering Google Webhook with:", googlePayload);
+
+        fetch(GOOGLE_BUSINESS_WEBHOOK_URL, {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify(googlePayload)
+        }).then(res => console.log('Google Post automation triggered'))
+          .catch(err => console.error('Google automation failed', err));
+    }
+
+    // 5. Update the local array for Supabase
     if (activityId) {
       const index = currentDayArray.findIndex(item => item.id === activityId);
       if (index > -1) currentDayArray[index] = payload;
