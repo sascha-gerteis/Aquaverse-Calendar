@@ -379,6 +379,64 @@
             flex-direction: column;
         }
 
+        .chart-period-selector {
+            display: flex;
+            gap: 8px;
+            margin-right: 15px;
+        }
+
+        .period-btn {
+            padding: 6px 12px;
+            border: 2px solid #e3e6f0;
+            background: white;
+            color: #5a5c69;
+            border-radius: 6px;
+            font-size: 12px;
+            font-weight: 500;
+            cursor: pointer;
+            transition: all 0.2s ease;
+        }
+
+        .period-btn:hover {
+            border-color: var(--primary);
+            color: var(--primary);
+        }
+
+        .period-btn.active {
+            background: var(--primary);
+            border-color: var(--primary);
+            color: white;
+        }
+
+        .chart-period-selector {
+            display: flex;
+            gap: 8px;
+            margin-right: 15px;
+        }
+
+        .period-btn {
+            padding: 6px 12px;
+            border: 2px solid #e3e6f0;
+            background: white;
+            color: #5a5c69;
+            border-radius: 6px;
+            font-size: 12px;
+            font-weight: 500;
+            cursor: pointer;
+            transition: all 0.2s ease;
+        }
+
+        .period-btn:hover {
+            border-color: var(--primary);
+            color: var(--primary);
+        }
+
+        .period-btn.active {
+            background: var(--primary);
+            border-color: var(--primary);
+            color: white;
+        }
+
         .content-section:last-child .pages-table {
             flex: 1;
             margin-bottom: 0;
@@ -594,6 +652,37 @@
             font-size: 12px;
             text-transform: uppercase;
             color: var(--gray);
+        }
+
+        .sort-btn {
+            background: none;
+            border: none;
+            color: var(--gray);
+            cursor: pointer;
+            padding: 0 4px;
+            font-size: 12px;
+            transition: color 0.2s;
+        }
+
+        .sort-btn:hover {
+            color: var(--primary);
+        }
+
+        .sort-btn.sorted-asc i:before {
+            content: "\f145"; /* fa-sort-up */
+        }
+
+        .sort-btn.sorted-desc i:before {
+            content: "\f144"; /* fa-sort-down */
+        }
+
+        .status-filter {
+            margin-left: 8px;
+            padding: 2px 4px;
+            border: 1px solid #ddd;
+            border-radius: 4px;
+            font-size: 11px;
+            background: white;
         }
 
         .pages-table tr:hover {
@@ -1698,6 +1787,11 @@
                         Performance Charts
                     </h2>
                     <div class="section-controls">
+                        <div class="chart-period-selector">
+                            <button class="period-btn active" data-period="7" onclick="updateChartPeriod(7)">7 Days</button>
+                            <button class="period-btn" data-period="15" onclick="updateChartPeriod(15)">15 Days</button>
+                            <button class="period-btn" data-period="30" onclick="updateChartPeriod(30)">30 Days</button>
+                        </div>
                         <button class="btn btn-secondary">
                             <i class="fas fa-download"></i> Export Charts
                         </button>
@@ -1968,12 +2062,16 @@
                                 <tr>
                                     <th>Post</th>
                                     <th style="text-align:center;">Platform</th>
-                                    <th>Spent</th>
-                                    <th>Budget</th>
-                                    <th>Impressions</th>
-                                    <th>Engagements</th>
-                                    <th>Conversions</th>
-                                    <th>Status</th>
+                                    <th>Spent <button class="sort-btn" data-column="spent" title="Sort by Spent"><i class="fas fa-sort"></i></button></th>
+                                    <th>Budget <button class="sort-btn" data-column="budget" title="Sort by Budget"><i class="fas fa-sort"></i></button></th>
+                                    <th>Impressions <button class="sort-btn" data-column="impressions" title="Sort by Impressions"><i class="fas fa-sort"></i></button></th>
+                                    <th>Engagements <button class="sort-btn" data-column="engagements" title="Sort by Engagements"><i class="fas fa-sort"></i></button></th>
+                                    <th>Conversions <button class="sort-btn" data-column="conversions" title="Sort by Conversions"><i class="fas fa-sort"></i></button></th>
+                                    <th>Status <select class="status-filter"><option value="">All</option><option value="ACTIVE">Active</option><option value="INACTIVE">Inactive</option><option value="COMPLETE">Complete</option><option value="PAUSE">Pause</option></select></th>
+
+                                    <th>Start Date <button class="sort-btn" data-column="start_date" title="Sort by Start Date"><i class="fas fa-sort"></i></button></th>
+
+                                    <th>End Date <button class="sort-btn" data-column="end_date" title="Sort by End Date"><i class="fas fa-sort"></i></button></th>
                                 </tr>
                             </thead>
                             <tbody id="boostedPostsTableBody">
@@ -2074,6 +2172,25 @@
         }
 
         let rawData = { accounts: [], posts: [], snapshots: [], demographics: null };
+        
+        let currentChartPeriod = 7; // Default to 7 days
+        
+        // Function to update chart period
+        function updateChartPeriod(days) {
+            currentChartPeriod = days;
+            
+            // Update active button
+            document.querySelectorAll('.period-btn').forEach(btn => {
+                btn.classList.remove('active');
+                if (parseInt(btn.dataset.period) === days) {
+                    btn.classList.add('active');
+                }
+            });
+            
+            // Update charts with new period
+            updateFollowerGrowthChart();
+            updatePlatformComparisonChart();
+        }
 
         // Platform data for charts and tables
         const platformData = [
@@ -2097,12 +2214,14 @@
         // ==========================================
         async function initDashboard() {
             if (!supabase) return alert('Supabase Client Error');
+            initializeCharts();
             await fetchAllData();
             populatePageFilter();
             updateDashboard();
-            initializeCharts();
+            
             renderPlatformTable();
             renderRecentPostsTable();
+            
         }
 
         // ==========================================
@@ -2173,10 +2292,27 @@
 
                
                 // 3.3: Fetch all Snapshots (daily data)
-                const { data: snaps, error: snapsErr } = await supabase.from('daily_snapshots').select('*,social_accounts(platform)').order('recorded_at', { ascending: true });
+              const startDate = new Date();
+                startDate.setDate(startDate.getDate() - 30); // ย้อนหลัง 30 วัน
+
+                const { data: snaps, error: snapsErr } = await supabase
+                    .from('daily_snapshots')
+                    .select('*,social_accounts(platform)')
+                    .gte('recorded_at', startDate.toISOString())
+                    .order('recorded_at', { ascending: true }) // เรียงจากเก่าไปใหม่
+                    .limit(20000); //  <-- [สำคัญ] ต้องเพิ่มบรรทัดนี้เพื่อให้ดึงข้อมูลได้เกิน 1,000 แถว
+
                 if (snapsErr) throw snapsErr;
                 rawData.snapshots = snaps || [];
 
+                // Debug: log snapshot count and date range
+                try {
+                    const snapDates = (rawData.snapshots || []).map(s => s.recorded_at).sort();
+                    console.log('Snapshots fetched:', rawData.snapshots.length, 'Unique dates:', [...new Set(snapDates.map(d => d.split("T")[0]))].length);
+                    if (snapDates.length > 0) console.log('Snapshot range sample:', snapDates[snapDates.length-1], '->', snapDates[0]);
+                } catch (e) {
+                    console.warn('Error logging snapshots debug info', e);
+                }
                 // Fetch demographics data from accounts
                 await fetchDemographics();
 
@@ -2440,7 +2576,7 @@
                 platform: 'all',
                 pageId: 'all',
                 contentType: 'all',
-                time: 30
+                time: 365
             };
 
             let filteredAccounts = rawData.accounts.filter(acc => {
@@ -2471,7 +2607,7 @@
             let allHistoryMap = {};
             rawData.snapshots.forEach(snap => {
                 const snapDate = snap.recorded_at.split('T')[0];
-                if (snapDate <= pastDateStr) allHistoryMap[snap.account_id] = snap;
+                if (snapDate >= pastDateStr) allHistoryMap[snap.account_id] = snap;
             });
 
             // Create filteredHistoryMap for filtered accounts
@@ -2479,46 +2615,85 @@
             rawData.snapshots.forEach(snap => {
                 if (allowedAccountIds.has(snap.account_id)) {
                     const snapDate = snap.recorded_at.split('T')[0];
-                    if (snapDate <= pastDateStr) filteredHistoryMap[snap.account_id] = snap;
+                    if (snapDate >= pastDateStr) filteredHistoryMap[snap.account_id] = snap;
                 }
             });
 
             // Calculate new followers and growth
-            let newFollowers = 0;
-            let growthNewFollowers = 0;
+            // ในฟังก์ชัน updateDashboard() แทนที่ส่วนคำนวณ newFollowers เดิม
+            let totalNewFollowers = 0;
+            let growthNewFollowers = 0; // ประกาศตัวแปรป้องกัน Error
+
             if (filteredAccounts.length > 0) {
                 const accountIds = filteredAccounts.map(acc => acc.id);
-                const relevantSnapshots = rawData.snapshots.filter(snap => accountIds.includes(snap.account_id));
-                
-                if (relevantSnapshots.length > 0) {
-                    // Group by date
-                    const dateGroups = {};
-                    relevantSnapshots.forEach(snap => {
-                        const date = snap.recorded_at.split('T')[0];
-                        if (!dateGroups[date]) dateGroups[date] = 0;
-                        dateGroups[date] += snap.followers_count || 0;
+                const latestMap = {};
+                const prevMap = {};
+                const olderMap = {};
+
+                // ดึง Snapshot ของบัญชีที่เลือก และเรียงวันที่จากใหม่ไปเก่า
+                const relevantSnaps = rawData.snapshots.filter(s => accountIds.includes(s.account_id));
+                const dates = [...new Set(relevantSnaps.map(s => s.recorded_at.split('T')[0]))].sort().reverse();
+
+                if (dates.length >= 2) {
+                    const latestDate = dates[0];
+                    const prevDate = dates[1];
+                    const olderDate = dates[2] || null;
+
+                    relevantSnaps.forEach(snap => {
+                        const d = snap.recorded_at.split('T')[0];
+                        if (d === latestDate && !latestMap[snap.account_id]) latestMap[snap.account_id] = snap.followers_count || 0;
+                        if (d === prevDate && !prevMap[snap.account_id]) prevMap[snap.account_id] = snap.followers_count || 0;
+                        if (olderDate && d === olderDate && !olderMap[snap.account_id]) olderMap[snap.account_id] = snap.followers_count || 0;
                     });
 
-                    const sortedDates = Object.keys(dateGroups).sort();
-                    if (sortedDates.length >= 2) {
-                        const latestDate = sortedDates[sortedDates.length - 1];
-                        const prevDate = sortedDates[sortedDates.length - 2];
-                        newFollowers = dateGroups[latestDate] - dateGroups[prevDate];
+                    let prevTotalNew = 0;
+                    let hasNewFollowersData = false;
+                    accountIds.forEach(id => {
+                        // คำนวณรายบัญชี: วันล่าสุด - เมื่อวาน
+                        if (latestMap[id] !== undefined && prevMap[id] !== undefined) {
+                            totalNewFollowers += (latestMap[id] - prevMap[id]);
+                            hasNewFollowersData = true;
+                        }
+                        // คำนวณเพื่อหา % Growth: เมื่อวาน - วันก่อนหน้า
+                        if (prevMap[id] !== undefined && olderMap[id] !== undefined) {
+                            prevTotalNew += (prevMap[id] - olderMap[id]);
+                        }
+                    });
 
-                        if (sortedDates.length >= 3) {
-                            const prevPrevDate = sortedDates[sortedDates.length - 3];
-                            const newFollowersPrev = dateGroups[prevDate] - dateGroups[prevPrevDate];
-                            growthNewFollowers = newFollowersPrev !== 0 ? ((newFollowers - newFollowersPrev) / Math.abs(newFollowersPrev)) * 100 : (newFollowers > 0 ? 100 : 0);
+                    // ถ้า new followers ติดลบ ให้ตั้งเป็น 0
+                    totalNewFollowers = Math.max(0, totalNewFollowers);
+
+                    if (!hasNewFollowersData) {
+                        totalNewFollowers = 0;
+                        growthNewFollowers = 0;
+                    } else if (totalNewFollowers === 0) {
+                        growthNewFollowers = 0;
+                    } else {
+                        // คำนวณ % Growth
+                        if (totalNewFollowers < 0) {
+                            growthNewFollowers = -Math.abs(
+                                prevTotalNew !== 0
+                                    ? ((totalNewFollowers - prevTotalNew) / Math.abs(prevTotalNew)) * 100
+                                    : 100
+                            );
+                        } else if (prevTotalNew !== 0) {
+                            growthNewFollowers = ((totalNewFollowers - prevTotalNew) / Math.abs(prevTotalNew)) * 100;
+                        } else if (totalNewFollowers > 0) {
+                            growthNewFollowers = 100;
                         }
                     }
                 }
             }
+            // ----------------------------------------------------
 
             let filteredSnapshots = rawData.snapshots.filter(snap => allowedAccountIds.has(snap.account_id));
 
+            // ส่งตัวแปรที่คำนวณได้ไปยังฟังก์ชัน Render
+            renderSummaryCards(rawData.accounts, filteredAccounts, allSnapshots, filteredSnapshots, filter.time, totalNewFollowers, growthNewFollowers);
+
             currentFilteredPosts = filteredPosts;
 
-            renderSummaryCards(rawData.accounts, filteredAccounts, allSnapshots, filteredSnapshots, filter.time, newFollowers, growthNewFollowers);
+            renderSummaryCards(rawData.accounts, filteredAccounts, allSnapshots, filteredSnapshots, filter.time, totalNewFollowers, growthNewFollowers);
             filterAccountTable();
             
             const activeTab = document.querySelector('.platform-tab.active');
@@ -2731,13 +2906,13 @@
                     return;
                 }
                 
-                const { boostType, budget } = boostResult;
+                const { boostType, budget, duration } = boostResult;
                 
                 // 2. Update status in database
                 await updatePostBoostStatus(externalId, boostType);
                 
                 // 3. Send to n8n webhook for boost processing
-                await sendBoostToN8n(externalId, boostType, region, countryName, budget, fbPageId, platform, igPageId, postUrl, pageUrl);
+                await sendBoostToN8n(externalId, boostType, region, countryName, budget, duration, fbPageId, platform, igPageId, postUrl, pageUrl);
                 
                 // 4. แสดงผลสำเร็จ
                 buttonElement.innerHTML = '<i class="fas fa-check"></i> Boosted!';
@@ -2747,7 +2922,7 @@
                 updatePostTagInUI(postId, boostType);
                 
                 // 5. แจ้งเตือนความสำเร็จ
-                showNotification(`Post boosted successfully as "${boostType}" with ${budget} THB budget!`, 'success');
+                showNotification(`Post boosted successfully as "${boostType}" with ${budget} THB budget for ${duration} days!`, 'success');
                 
                 // 6. รีเซ็ตปุ่มหลัง 2 วินาที
                 setTimeout(() => {
@@ -2831,6 +3006,32 @@
                                     Select a boost type to see recommended budget
                                 </div>
                             </div>
+                            <div>
+                                <label style="display: block; 
+                                             margin-bottom: 8px; 
+                                             font-weight: 600; 
+                                             color: var(--dark);">
+                                    <i class="fas fa-clock"></i> Duration (Days)
+                                </label>
+                                <input type="number" 
+                                       id="boost-duration" 
+                                       placeholder="Enter duration in days" 
+                                       min="1"
+                                       max="30"
+                                       style="width: 100%; 
+                                              padding: 12px; 
+                                              border: 2px solid #e1e5e9; 
+                                              border-radius: 8px; 
+                                              font-size: 16px; 
+                                              transition: border-color 0.3s ease;">
+                                <div id="duration-suggestion" 
+                                     style="margin-top: 8px; 
+                                            font-size: 14px; 
+                                            color: #666; 
+                                            font-style: italic;">
+                                    Select a boost type to see recommended duration
+                                </div>
+                            </div>
                             <div style="display: flex; gap: 10px; margin-top: 10px;">
                                 <button id="cancel-boost" 
                                         style="flex: 1; 
@@ -2864,6 +3065,7 @@
                 
                 let selectedBoostType = null;
                 let selectedBudget = null;
+                let selectedDuration = null;
                 
                 // Event listeners for boost options
                 modal.querySelectorAll('.boost-option').forEach(btn => {
@@ -2903,28 +3105,64 @@
                         
                         suggestionEl.style.color = '#ff6b6b';
                         
-                        // Enable confirm button if budget is entered
-                        budgetInput.addEventListener('input', () => {
-                            selectedBudget = parseFloat(budgetInput.value);
-                            if (selectedBudget && selectedBudget > 0) {
+                        // Show duration suggestion
+                        const durationSuggestionEl = modal.querySelector('#duration-suggestion');
+                        const durationInput = modal.querySelector('#boost-duration');
+                        
+                        if (selectedBoostType.includes('High')) {
+                            durationSuggestionEl.innerHTML = '<i class="fas fa-lightbulb"></i> Recommended: <strong>7 days</strong> for optimal performance';
+                            durationInput.placeholder = '7';
+                        } else if (selectedBoostType.includes('Test')) {
+                            durationSuggestionEl.innerHTML = '<i class="fas fa-lightbulb"></i> Recommended: <strong>3 days</strong> for quick testing';
+                            durationInput.placeholder = '3';
+                        }
+                        
+                        durationSuggestionEl.style.color = '#ff6b6b';
+                        
+                        // Function to update confirm button state
+                        const updateConfirmButton = () => {
+                            if (selectedBudget && selectedBudget > 0 && selectedDuration && selectedDuration > 0) {
                                 confirmBtn.style.opacity = '1';
                                 confirmBtn.style.pointerEvents = 'auto';
                             } else {
                                 confirmBtn.style.opacity = '0.6';
                                 confirmBtn.style.pointerEvents = 'none';
                             }
+                        };
+                        
+                        // Enable confirm button if budget and duration are entered
+                        budgetInput.addEventListener('input', () => {
+                            selectedBudget = parseFloat(budgetInput.value);
+                            updateConfirmButton();
                         });
                         
-                        // Auto-fill budget if user clicks suggestion
+                        durationInput.addEventListener('input', () => {
+                            selectedDuration = parseInt(durationInput.value);
+                            updateConfirmButton();
+                        });
+                        
+                        // Auto-fill budget and duration if user clicks suggestion
                         suggestionEl.addEventListener('click', () => {
                             if (selectedBoostType.includes('High')) {
                                 budgetInput.value = '100';
+                                durationInput.value = '7';
                             } else if (selectedBoostType.includes('Test')) {
                                 budgetInput.value = '40';
+                                durationInput.value = '3';
                             }
                             selectedBudget = parseFloat(budgetInput.value);
-                            confirmBtn.style.opacity = '1';
-                            confirmBtn.style.pointerEvents = 'auto';
+                            selectedDuration = parseInt(durationInput.value);
+                            updateConfirmButton();
+                        });
+                        
+                        durationSuggestionEl.addEventListener('click', () => {
+                            if (selectedBoostType.includes('High')) {
+                                durationInput.value = '7';
+                            } else if (selectedBoostType.includes('Test')) {
+                                durationInput.value = '3';
+                            }
+                            selectedDuration = parseInt(durationInput.value);
+                            updateConfirmButton();
                         });
                     });
                 });
@@ -2937,9 +3175,9 @@
                 
                 // Confirm button
                 modal.querySelector('#confirm-boost').addEventListener('click', () => {
-                    if (selectedBoostType && selectedBudget && selectedBudget > 0) {
+                    if (selectedBoostType && selectedBudget && selectedBudget > 0 && selectedDuration && selectedDuration > 0) {
                         document.body.removeChild(modal);
-                        resolve({ boostType: selectedBoostType, budget: selectedBudget });
+                        resolve({ boostType: selectedBoostType, budget: selectedBudget, duration: selectedDuration });
                     }
                 });
                 
@@ -3062,7 +3300,7 @@
         }
         
         // Send boost request to n8n webhook
-        async function sendBoostToN8n(externalId, boostType, accountRegion, countryName, budget, fbPageId, platform, igPageId, postUrl, pageUrl) {
+        async function sendBoostToN8n(externalId, boostType, accountRegion, countryName, budget, duration, fbPageId, platform, igPageId, postUrl, pageUrl) {
             try {
                 // 1. ดึงข้อมูล Ad Account ID และ Token ที่สัมพันธ์กับ Region และ Country ของบัญชีนั้นๆ
                 const accountName = getAccountNameFromCountry(countryName);
@@ -3093,6 +3331,7 @@
                         region: accountRegion,
                         country: countryName, // ส่งชื่อประเทศเต็ม
                         budget: budget, // ส่งงบประมาณที่ผู้ใช้กำหนด
+                        duration: duration, // ส่งระยะเวลาที่ผู้ใช้กำหนด
                         currency: 'THB', // ส่งหน่วยเงินตรา
                         fbPageId: fbPageId, // ส่ง Facebook Page ID สำหรับสร้างโฆษณา
                         platform: platform, // ส่ง platform (instagram/facebook)
@@ -3739,6 +3978,154 @@
             return null;
         }
 
+        let currentSortColumn = 'spent';
+
+        let currentSortDirection = 'desc';
+
+        let currentStatusFilter = '';
+
+        // Sort posts function
+
+        function sortPosts(posts, column, direction) {
+
+            return posts.sort((a, b) => {
+
+                if (column === 'status') {
+
+                    const getStatusPriority = (status) => {
+
+                        const statusUpper = (status || '').toUpperCase();
+
+                        if (statusUpper === 'ACTIVE') return 1;
+
+                        if (statusUpper === 'INACTIVE') return 2;
+
+                        if (statusUpper === 'COMPLETE') return 3;
+
+                        if (statusUpper === 'PAUSE') return 4;
+
+                        return 5;
+
+                    };
+
+                    const aPriority = getStatusPriority(a.status);
+
+                    const bPriority = getStatusPriority(b.status);
+
+                    if (direction === 'asc') {
+
+                        return aPriority - bPriority;
+
+                    } else {
+
+                        return bPriority - aPriority;
+
+                    }
+
+                } else {
+
+                    const aVal = parseFloat(a[column] || 0);
+
+                    const bVal = parseFloat(b[column] || 0);
+
+                    if (direction === 'asc') {
+
+                        return aVal - bVal;
+
+                    } else {
+
+                        return bVal - aVal;
+
+                    }
+
+                }
+
+            });
+
+        }
+
+        // Filter posts by status
+
+        function filterPosts(posts, statusFilter) {
+
+            if (!statusFilter) return posts;
+
+            return posts.filter(post => (post.status || '').toUpperCase() === statusFilter);
+
+        }
+
+        // Handle sort button click
+
+        function handleSort(column) {
+
+            if (currentSortColumn === column) {
+
+                currentSortDirection = currentSortDirection === 'asc' ? 'desc' : 'asc';
+
+            } else {
+
+                currentSortColumn = column;
+
+                currentSortDirection = 'desc'; // default to desc for numbers
+
+            }
+
+            // Update button icons
+
+            document.querySelectorAll('.sort-btn').forEach(btn => {
+
+                btn.classList.remove('sorted-asc', 'sorted-desc');
+
+                if (btn.dataset.column === column) {
+
+                    btn.classList.add(currentSortDirection === 'asc' ? 'sorted-asc' : 'sorted-desc');
+
+                }
+
+            });
+
+            // Re-render with new sort
+
+            renderBoostedPostsTable();
+
+        }
+
+        // Add event listeners for sort buttons
+
+        document.addEventListener('DOMContentLoaded', () => {
+
+            document.querySelectorAll('.sort-btn').forEach(btn => {
+
+                btn.addEventListener('click', () => {
+
+                    handleSort(btn.dataset.column);
+
+                });
+
+            });
+
+            // Set initial sort button state
+
+            const initialBtn = document.querySelector('.sort-btn[data-column="spent"]');
+
+            if (initialBtn) {
+
+                initialBtn.classList.add('sorted-desc');
+
+            }
+
+            // Status filter event listener
+
+            document.querySelector('.status-filter').addEventListener('change', (e) => {
+
+                currentStatusFilter = e.target.value;
+
+                renderBoostedPostsTable();
+
+            });
+
+        });
+
         // Render Boosted Posts Table
         // Render Boosted Posts Table
         async function renderBoostedPostsTable() {
@@ -3775,26 +4162,9 @@
                     post.region = accountRegionMap[post.ad_account_id] || 'unknown';
                 });
 
-                // Sort by status priority (Active first, then Completed, then others) then by spent descending
-                const getStatusPriority = (status) => {
-                    const statusUpper = (status || '').toUpperCase();
-                    if (statusUpper === 'ACTIVE') return 1;
-                    if (statusUpper === 'COMPLETED') return 2;
-                    return 3; // Other statuses
-                };
-                
-                const sortedPosts = (boostedPosts || []).sort((a, b) => {
-                    const aPriority = getStatusPriority(a.status);
-                    const bPriority = getStatusPriority(b.status);
-                    
-                    // Sort by status priority first
-                    if (aPriority !== bPriority) {
-                        return aPriority - bPriority;
-                    }
-                    
-                    // If same status, sort by spent descending
-                    return (b.spent || 0) - (a.spent || 0);
-                });
+                const filteredPosts = filterPosts(boostedPosts, currentStatusFilter);
+
+                const sortedPosts = sortPosts(filteredPosts, currentSortColumn, currentSortDirection);
 
                 tableBody.innerHTML = '';
 
@@ -3809,7 +4179,7 @@
                     row.innerHTML = `
                         <td >
                             <div style="display: flex; align-items: center; gap: 4px;">
-                                ${post.media_url ? `<img src="${post.media_url}" alt="Post image" style="width: 56px; height: 56px; object-fit: cover; border-radius: 4px; cursor: pointer;" onclick="window.open('${postUrl || '#'}', '_blank')">` : '<div style="width: 56px; height: 56px; background: #f0f0f0; border-radius: 4px; display: flex; align-items: center; justify-content: center;"><i class="fas fa-image" style="color: #ccc;"></i></div>'}
+                                ${post.media_url ? `<img src="${post.media_url}" alt="Post image" style="width: 56px; height: 56px; object-fit: cover; border-radius: 4px; cursor: pointer;" onclick="window.open('${postUrl || '#'}', '_blank')" onerror="this.src='https://placehold.co/56x56?text=Error';">` : '<div style="width: 56px; height: 56px; background: #f0f0f0; border-radius: 4px; display: flex; align-items: center; justify-content: center;"><i class="fas fa-image" style="color: #ccc;"></i></div>'}
                                 <div style="flex: 1;">
                                     <div style="font-weight: 600; ${postUrl ? 'cursor: pointer; color: var(--primary);' : ''}" ${postUrl ? `onclick="window.open('${postUrl}', '_blank')"` : ''}>${post.account_name || 'Unknown'}</div>
                                     <div style="font-size: 12px; color: #666; margin-bottom: 4px;">${new Date(post.updated_at).toLocaleDateString()}</div>
@@ -3826,48 +4196,57 @@
                         <td>${formatNumber(post.engagements || 0)}</td>
                         <td>${formatNumber(post.conversions || 0)}</td>
                         <td><span class="status-active">${post.status || 'Active'}</span></td>
+                        <td>${post.start_date ? new Date(post.start_date).toLocaleDateString('en-GB') : '-'}</td>
+                        <td>${post.end_date ? new Date(post.end_date).toLocaleDateString('en-GB') : '-'}</td>
                     `;
                     tableBody.appendChild(row);
                 });
 
             } catch (error) {
                 console.error('Error rendering boosted posts table:', error);
-                tableBody.innerHTML = '<tr><td colspan="8" style="text-align: center; color: #666;">Error loading boosted posts</td></tr>';
+                tableBody.innerHTML = '<tr><td colspan="10" style="text-align: center; color: #666;">Error loading boosted posts</td></tr>';
             }
         }
 
         // Follower Growth Chart
         async function updateFollowerGrowthChart() {
             try {
-                const { data: snapshots, error } = await supabase
-                    .from('daily_snapshots')
-                    .select('account_id, recorded_at, followers_count')
-                    .order('recorded_at', { ascending: true });
-
-                if (error) throw error;
+                const snapshots = rawData.snapshots; 
+                if (!snapshots || snapshots.length === 0 || !window.followerChart) return;
 
                 const dailyData = {};
-                const accountFollowers = {}; // Store latest follower count for each account
+                const accountFollowers = {};
+                
+                // เรียงจากเก่าไปใหม่เพื่อคำนวณยอดสะสม (แสดงข้อมูลสะสมทั้งหมดตั้งแต่เริ่มเก็บ)
+                const sortedSnaps = [...snapshots].sort((a, b) => new Date(a.recorded_at) - new Date(b.recorded_at));
 
-                snapshots.forEach(snap => {
+                // คำนวณยอดสะสมรายวัน (cumulative data)
+                sortedSnaps.forEach(snap => {
                     const date = snap.recorded_at.split('T')[0];
+                    // อัปเดต followers สำหรับแต่ละบัญชี
                     accountFollowers[snap.account_id] = snap.followers_count || 0;
-
-                    if (!dailyData[date]) {
-                        dailyData[date] = 0;
-                    }
-                    // Sum of latest values for all accounts on this date
+                    // รวมยอดสะสมของทุกบัญชี
                     dailyData[date] = Object.values(accountFollowers).reduce((a, b) => a + b, 0);
                 });
 
                 const labels = Object.keys(dailyData).sort();
                 const data = labels.map(date => dailyData[date]);
 
-                const limitedLabels = labels.slice(-30).map(date => {
-                    const d = new Date(date);
+                // เลือกแสดงผลสำหรับกราฟ (ใช้ช่วงเวลาที่ผู้ใช้เลือก)
+                const displayDays = Math.min(currentChartPeriod, labels.length);
+                const limitedLabels = labels.slice(-displayDays).map(date => {
+                    const d = new Date(date + 'T00:00:00Z');
                     return d.toLocaleDateString('en-US', { month: 'short', day: 'numeric' });
                 });
-                const limitedData = data.slice(-30);
+                const limitedData = data.slice(-displayDays);
+                
+                console.log('📈 Follower Chart Data:', {
+                    totalDataPoints: labels.length,
+                    displayingDays: displayDays,
+                    selectedPeriod: currentChartPeriod,
+                    dateRange: labels.length > 0 ? `${labels[0]} to ${labels[labels.length-1]}` : 'No data',
+                    displayRange: limitedLabels.length > 0 ? `${limitedLabels[0]} to ${limitedLabels[limitedLabels.length-1]}` : 'No data'
+                });
 
                 window.followerChart.data.labels = limitedLabels;
                 window.followerChart.data.datasets[0].data = limitedData;
@@ -3913,82 +4292,73 @@
 
         // Platform Engagement Comparison Chart
         async function updatePlatformComparisonChart() {
-    try {
-        // Fetch snapshots data with account information
-        const { data: snapshots, error } = await supabase
-            .from('daily_snapshots')
-            .select(`
-                recorded_at,
-                engagement,
-                account_id,
-                social_accounts(platform)
-            `)
-            .order('recorded_at', { ascending: true });
+            try {
+                // ✅ เปลี่ยนมาใช้ข้อมูลจาก rawData.snapshots แทนการ fetch ใหม่
+                const snapshots = rawData.snapshots; 
+                if (!snapshots || snapshots.length === 0) {
+                    console.warn('No snapshot data for platform chart');
+                    return;
+                }
 
-        if (error) throw error;
-        if (!snapshots || snapshots.length === 0) {
-            console.warn('No snapshot data for platform chart');
-            return;
-        }
+                // ตรวจสอบความพร้อมของตัวแปรกราฟ
+                if (!window.platformChart || !window.platformChart.data) return;
 
-        // Group data by platform and date
-        const platformData = {
-            instagram: {},
-            facebook: {},
-            tiktok: {},
-            youtube: {},
-            twitter: {}
-        };
+                // จัดกลุ่มข้อมูลตาม Platform และ วันที่
+                const platformDataMap = {
+                    instagram: {},
+                    facebook: {},
+                    tiktok: {},
+                    youtube: {},
+                    twitter: {}
+                };
 
-        snapshots.forEach(snap => {
-            if (!snap.social_accounts || !snap.social_accounts.platform) return;
-            
-            const platform = snap.social_accounts.platform.toLowerCase();
-            const date = snap.recorded_at.split('T')[0];
-            
-            if (!platformData[platform]) return;
+                snapshots.forEach(snap => {
+                    if (!snap.social_accounts || !snap.social_accounts.platform) return;
+                    
+                    const platform = snap.social_accounts.platform.toLowerCase();
+                    const date = snap.recorded_at.split('T')[0];
+                    
+                    if (platformDataMap[platform] !== undefined) {
+                        if (!platformDataMap[platform][date]) {
+                            platformDataMap[platform][date] = 0;
+                        }
+                        platformDataMap[platform][date] += snap.engagement || 0;
+                    }
+                });
+                
+                // ดึงวันที่ทั้งหมดและเลือกสำหรับแสดงผล (ใช้ช่วงเวลาที่ผู้ใช้เลือก หรือข้อมูลทั้งหมดถ้าน้อยกว่า)
+                const allDates = [...new Set(snapshots.map(s => s.recorded_at.split('T')[0]))].sort();
+                const displayDays = Math.min(currentChartPeriod, allDates.length);
+                const limitedDates = allDates.slice(-displayDays);
 
-            if (!platformData[platform][date]) {
-                platformData[platform][date] = 0;
+                // แปลงรูปแบบวันที่สำหรับแกน X (เช่น "Dec 23")
+                const formattedLabels = limitedDates.map(date => {
+                    const d = new Date(date + 'T00:00:00Z');
+                    return d.toLocaleDateString('en-US', { month: 'short', day: 'numeric' });
+                });
+                
+                console.log('📊 Platform Chart Data:', {
+                    totalUniqueDates: allDates.length,
+                    displayingDays: displayDays,
+                    selectedPeriod: currentChartPeriod,
+                    dateRange: allDates.length > 0 ? `${allDates[0]} to ${allDates[allDates.length-1]}` : 'No data',
+                    displayRange: limitedDates.length > 0 ? `${limitedDates[0]} to ${limitedDates[limitedDates.length-1]}` : 'No data'
+                });
+
+                // อัปเดตข้อมูลรายแพลตฟอร์มลงใน Datasets
+                const platforms = ['instagram', 'facebook', 'tiktok', 'youtube', 'twitter'];
+                platforms.forEach((platform, index) => {
+                    const dataPoints = limitedDates.map(date => platformDataMap[platform][date] || 0);
+                    window.platformChart.data.datasets[index].data = dataPoints;
+                });
+
+                window.platformChart.data.labels = formattedLabels;
+                window.platformChart.update();
+                
+            } catch (error) {
+                console.error('Error updating platform comparison chart:', error);
             }
-            
-            platformData[platform][date] += snap.engagement || 0;
-        });
-        
-        // Create labels from all dates (last 30 days)
-        const allDates = new Set();
-        Object.values(platformData).forEach(data => {
-            Object.keys(data).forEach(date => allDates.add(date));
-        });
-        
-        const labels = Array.from(allDates).sort().slice(-30);
-
-        if (labels.length === 0) {
-            console.warn('No date labels found for platform chart');
-            return;
         }
-
-        // Convert labels to readable format
-        const formattedLabels = labels.map(date => {
-            const d = new Date(date + 'T00:00:00Z');
-            return d.toLocaleDateString('en-US', { month: 'short', day: 'numeric' });
-        });
-
-        // Update data for each platform
-        const platforms = ['instagram', 'facebook', 'tiktok', 'youtube', 'twitter'];
-        platforms.forEach((platform, index) => {
-            const data = labels.map(date => platformData[platform][date] || 0);
-            window.platformChart.data.datasets[index].data = data;
-        });
-
-        window.platformChart.data.labels = formattedLabels;
-        window.platformChart.update();
-        console.log('Platform chart updated successfully');
-        
-    } catch (error) {
-        console.error('Error updating platform comparison chart:', error);
-    }
-}
 
         // ==========================================
         // REGION STATS FUNCTION
@@ -4118,15 +4488,19 @@
                     </div>
                     <div class="comparison-metrics">
                         <div class="comparison-metric-row">
-                            <span class="comparison-metric-name">Total Posts</span>
+                            <span class="comparison-metric-name">Total Posts (All-time)</span>
                             <span class="comparison-metric-value">${formatNumber(s.count)}</span>
                         </div>
                         <div class="comparison-metric-row">
-                            <span class="comparison-metric-name">Avg Engagement</span>
-                            <span class="comparison-metric-value">${formatNumber(avgEng)}</span>
+                            <span class="comparison-metric-name">Total Engagement (All-time)</span>
+                            <span class="comparison-metric-value">${formatNumber(s.totalEng)}</span>
                         </div>
                         <div class="comparison-metric-row">
-                            <span class="comparison-metric-name">Total Followers</span>
+                            <span class="comparison-metric-name">Total Reach (All-time)</span>
+                            <span class="comparison-metric-value">${formatNumber(s.totalReach)}</span>
+                        </div>
+                        <div class="comparison-metric-row">
+                            <span class="comparison-metric-name">Total Followers (Current)</span>
                             <span class="comparison-metric-value">${formatNumber(s.followers)}</span>
                         </div>
                         <div class="comparison-metric-row">
@@ -4160,8 +4534,20 @@
                 day: 'numeric' 
             });
 
-            const label = `Data Period: ${formatDate(firstDate)} - ${formatDate(lastDate)}`;
-            document.getElementById('data-period-label').innerHTML = `<i class="fas fa-calendar-alt"></i> ${label}`;
+            const totalDays = Math.ceil((lastDate - firstDate) / (1000 * 60 * 60 * 24)) + 1;
+            const uniqueDates = [...new Set(snapshots.map(s => s.recorded_at.split('T')[0]))].length;
+            
+            const label = `Data collected since: ${formatDate(firstDate)} | Total data period: ${totalDays} days (${uniqueDates} days with data)`;
+            document.getElementById('data-period-label').innerHTML = `<i class="fas fa-database"></i> ${label}`;
+            
+            // Log สำหรับการ debug
+            console.log('📅 Data period info:', {
+                firstDate: formatDate(firstDate),
+                lastDate: formatDate(lastDate),
+                totalDays: totalDays,
+                uniqueDates: uniqueDates,
+                snapshotCount: snapshots.length
+            });
         }
 
 
@@ -4293,11 +4679,11 @@
                                 <span style="font-weight: 600; text-transform: capitalize;">${platform}</span>
                             </div>
                         </td>
-                        <td>${formatNumber(stats.followers)}</td>
-                        <td>${stats.posts}</td>
-                        <td>${formatNumber(stats.engagement)}</td>
+                        <td>${formatNumber(stats.followers)} (Current)</td>
+                        <td>${stats.posts} (All-time)</td>
+                        <td>${formatNumber(stats.engagement)} (All-time)</td>
                         <td>${rate}%</td>
-                        <td>${formatNumber(stats.reach)}</td>
+                        <td>${formatNumber(stats.reach)} (All-time)</td>
                         <td>
                             <span class="metric-trend ${growth >= 0 ? 'up' : 'down'}">
                                 <i class="fas fa-arrow-${growth >= 0 ? 'up' : 'down'}"></i>
@@ -4409,11 +4795,21 @@
         }
 
         function dateKey(recordedAt) {
-        // รองรับทั้ง "2025-12-22T..." และ "2025-12-22 15:26:11.528"
-        if (!recordedAt) return '';
         const m = String(recordedAt).match(/^(\d{4}-\d{2}-\d{2})/);
         return m ? m[1] : '';
         }
+
+        let allHistoryMap = {};
+        rawData.snapshots.forEach(snap => {
+        const snapDate = dateKey(snap.recorded_at);
+        if (snapDate >= pastDateStr) {
+            const prev = allHistoryMap[snap.account_id];
+            // เลือกอันที่ recorded_at ใหม่กว่าเสมอ
+            if (!prev || new Date(snap.recorded_at) > new Date(prev.recorded_at)) {
+            allHistoryMap[snap.account_id] = snap;
+            }
+        }
+        });
 
         function localDateKey(d = new Date()) {
         // YYYY-MM-DD แบบ local (ไม่โดน UTC shift ของ toISOString)
