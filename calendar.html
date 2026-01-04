@@ -130,7 +130,7 @@
       box-shadow: 0 2px 4px rgba(0,0,0,0.05);
     }
 
-    /* ===== Post preview media (fake placeholders) ===== */
+    
     .preview-block { margin-bottom: 24px; }
     .media-preview { margin-top: 10px; margin-bottom: 14px; }
     .media-frame {
@@ -204,7 +204,6 @@
     .fa-youtube { color: #FF0000; }
     .fa-google { color: #4285F4; }
 
-
     .legend { display:flex; justify-content:center; flex-wrap:wrap; gap:15px; margin-top:20px; }
     .legend-item { display:flex; align-items:center; gap:5px; }
     .legend-color { width:20px; height:20px; border-radius:4px; }
@@ -254,7 +253,7 @@
       display:none; z-index:1001;
     }
 
-    /* Carousel video section */
+    
     .carousel-video-section {
       margin-top: 15px;
       background: #f8f9fa;
@@ -293,7 +292,7 @@
       gap: 5px;
     }
 
-    /* Carousel images preview */
+    
     .carousel-images-preview {
       margin-top: 10px;
     }
@@ -318,7 +317,7 @@
       object-fit: cover;
     }
 
-    /* Generate Video button for carousel images */
+    
     .generate-video-btn {
       position: absolute;
       bottom: 0;
@@ -361,7 +360,7 @@
       100% { transform: rotate(360deg); }
     }
 
-    /* Video generation status */
+    
     .video-generation-status {
       margin-top: 10px;
       padding: 10px;
@@ -381,7 +380,168 @@
       gap: 8px;
     }
 
-    /* ====== Tablet tweaks ====== */
+    
+    #video-translation-upload-box:hover {
+      background: #eef0ff;
+      border-color: #764ba2;
+    }
+
+    .translation-lang-option:hover {
+      background: #e9ecef;
+    }
+
+    .translation-lang-option input:checked {
+      accent-color: var(--primary);
+    }
+
+    .translation-progress-item {
+      background: #f8f9ff;
+      border-radius: 8px;
+      padding: 15px;
+      margin-bottom: 12px;
+      border-left: 4px solid #667eea;
+    }
+
+    .translation-progress-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 10px;
+    }
+
+    .translation-progress-lang {
+      font-weight: 600;
+      font-size: 1.05rem;
+      color: #333;
+    }
+
+    .translation-status-badge {
+      padding: 5px 12px;
+      border-radius: 20px;
+      font-size: 0.85rem;
+      font-weight: 600;
+    }
+
+    .translation-status-processing {
+      background: #fff3cd;
+      color: #856404;
+    }
+
+    .translation-status-success {
+      background: #d4edda;
+      color: #155724;
+    }
+
+    .translation-status-error {
+      background: #f8d7da;
+      color: #721c24;
+    }
+
+    .translation-progress-bar {
+      height: 6px;
+      background: #e0e0e0;
+      border-radius: 10px;
+      overflow: hidden;
+    }
+
+    .translation-progress-bar-fill {
+      height: 100%;
+      background: linear-gradient(90deg, #667eea 0%, #764ba2 100%);
+      transition: width 0.3s ease;
+      animation: progress-pulse 1.5s ease-in-out infinite;
+    }
+
+    @keyframes progress-pulse {
+      0%, 100% { opacity: 0.6; }
+      50% { opacity: 1; }
+    }
+
+    .translation-result-card {
+      background: white;
+      border-radius: 10px;
+      overflow: hidden;
+      box-shadow: 0 3px 10px rgba(0,0,0,0.1);
+      transition: all 0.3s ease;
+    }
+
+    .translation-result-card:hover {
+      transform: translateY(-3px);
+      box-shadow: 0 5px 20px rgba(0,0,0,0.15);
+    }
+
+    .translation-result-header {
+      background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+      color: white;
+      padding: 12px 15px;
+      font-weight: 600;
+      font-size: 1.1rem;
+    }
+
+    .translation-result-body {
+      padding: 15px;
+    }
+
+    .translation-result-video {
+      width: 100%;
+      border-radius: 8px;
+      margin-bottom: 12px;
+      background: #000;
+    }
+
+    .translation-result-actions {
+      display: flex;
+      gap: 8px;
+    }
+
+    .translation-result-btn {
+      flex: 1;
+      padding: 10px;
+      border: none;
+      border-radius: 6px;
+      cursor: pointer;
+      font-weight: 600;
+      transition: all 0.2s ease;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 6px;
+    }
+
+    .translation-regenerate-btn {
+      background: #f8f9ff;
+      color: #667eea;
+      border: 2px solid #667eea;
+    }
+
+    .translation-regenerate-btn:hover {
+      background: #667eea;
+      color: white;
+    }
+
+    .translation-download-btn {
+      background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+      color: white;
+    }
+
+    .translation-download-btn:hover {
+      opacity: 0.9;
+    }
+
+    .translation-delete-btn {
+      background: #dc3545 !important;
+      color: white;
+    }
+
+    .translation-delete-btn:hover {
+      background: #c82333 !important;
+      transform: scale(1.05);
+    }
+
+    .translation-result-card {
+      transition: all 0.3s ease;
+    }
+
+    
     @media (max-width:768px) {
       header { flex-direction:column; align-items:flex-start; }
       .dashboard { grid-template-columns:1fr; }
@@ -412,7 +572,7 @@
     .global-view .market-tags { display:none; }
     .individual-view .market-tags { display:flex; }
 
-    /* Post status indicator */
+    
     .post-status {
       display: inline-block;
       background: #28a745;
@@ -437,7 +597,7 @@
       position: relative;
     }
 
-    /* ====== MOBILE: real single-column list ====== */
+    
     @media (max-width:600px){
       .calendar-header { display: none !important; }
       .calendar-inner { min-width: 0; }
@@ -714,7 +874,7 @@
           </div>
         </div>
 
-        <!-- Video Generation Status -->
+        
         <div class="video-generation-status" id="video-generation-status">
           <div class="status-text">
             <span id="video-generation-text">Generating video from selected image...</span>
@@ -787,7 +947,7 @@
             <input type="checkbox" id="platform-yt" value="youtube">
             <label for="platform-yt"><i class="fa-brands fa-youtube"></i> YouTube</label>
 
-             <input type="checkbox" id="platform-gg" value="google">
+            <input type="checkbox" id="platform-gg" value="google">
             <label for="platform-gg"><i class="fa-brands fa-google"></i> Google</label>
           </div>
         </div>
@@ -798,6 +958,130 @@
             <button type="button" id="select-all-markets" style="background: none; border: none; color: var(--primary); font-size: 0.85rem; cursor: pointer; text-decoration: underline; padding: 0;">Select All</button>
           </div>
           <div class="market-checkboxes" id="market-checkboxes"></div>
+        </div>
+
+        <div class="form-group">
+          <label><i class="fas fa-language"></i> Video Translation</label>
+          <div style="margin-bottom: 10px;">
+            <label style="display: flex; align-items: center; gap: 8px;">
+              <input type="checkbox" id="enable-video-translation" style="margin: 0;">
+              <span>Translate video to other languages</span>
+            </label>
+          </div>
+          
+          <!-- Video Translation Section -->
+          <div class="video-translation-section" id="video-translation-section" style="display: none; margin-top: 10px; padding: 15px; background: #fff; border-radius: 8px; border: 1px solid #e9ecef;">
+            
+            <!-- Video Source Info -->
+            <div class="form-group">
+              <div style="padding: 15px; background: #f8f9ff; border-radius: 8px; border: 2px solid #667eea;">
+                <div style="display: flex; align-items: center; gap: 10px; margin-bottom: 10px;">
+                  <i class="fas fa-info-circle" style="color: #667eea; font-size: 1.2rem;"></i>
+                  <strong style="color: var(--primary);">Video to Translate</strong>
+                </div>
+                <p style="margin: 0; color: #555; font-size: 0.9rem;">
+                  The video selected in <strong>"Selected Video"</strong> section above will be used for translation.
+                </p>
+                <div id="video-translation-source-info" style="margin-top: 10px; padding: 10px; background: white; border-radius: 6px; display: none;">
+                  <div style="display: flex; align-items: center; gap: 10px;">
+                    <i class="fas fa-video" style="color: #667eea;"></i>
+                    <span id="video-translation-source-name" style="font-weight: 600; color: #333;"></span>
+                  </div>
+                </div>
+                <div id="video-translation-no-video-warning" style="margin-top: 10px; padding: 10px; background: #fff3cd; border-radius: 6px; border-left: 4px solid #ffc107; display: none;">
+                  <div style="display: flex; align-items: center; gap: 10px;">
+                    <i class="fas fa-exclamation-triangle" style="color: #856404;"></i>
+                    <span style="color: #856404; font-size: 0.9rem;">Please select a video in the "Selected Video" section first.</span>
+                  </div>
+                </div>
+              </div>
+            </div>
+
+            <!-- Email Input -->
+            <div class="form-group">
+              <label style="font-weight: 600; color: var(--primary);"><i class="fas fa-envelope"></i> Email for Results <span style="font-weight: 400; color: #6c757d;">(Optional)</span></label>
+              <input type="email" class="form-control" id="video-translation-email" placeholder="your.email@example.com">
+            </div>
+
+            <!-- Language Selection -->
+            <div class="form-group">
+              <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 8px;">
+                <label style="font-weight: 600; color: var(--primary);"><i class="fas fa-globe"></i> Select Target Languages:</label>
+                <button type="button" id="select-all-translation-languages" style="background: none; border: none; color: var(--primary); font-size: 0.85rem; cursor: pointer; text-decoration: underline; padding: 0;">Select All</button>
+              </div>
+              <div class="language-checkboxes" id="translation-language-checkboxes" style="display: grid; grid-template-columns: repeat(auto-fit, minmax(140px, 1fr)); gap: 8px; max-height: 200px; overflow-y: auto; padding: 10px; background: #f8f9fa; border-radius: 6px;">
+                <label style="display: flex; align-items: center; gap: 6px; padding: 6px; cursor: pointer; border-radius: 4px; transition: all 0.2s;" class="translation-lang-option">
+                  <input type="checkbox" value="English" style="margin: 0;">
+                  <span>🇺🇸 English</span>
+                </label>
+                <label style="display: flex; align-items: center; gap: 6px; padding: 6px; cursor: pointer; border-radius: 4px; transition: all 0.2s;" class="translation-lang-option">
+                  <input type="checkbox" value="Japanese" style="margin: 0;">
+                  <span>🇯🇵 Japanese</span>
+                </label>
+                <label style="display: flex; align-items: center; gap: 6px; padding: 6px; cursor: pointer; border-radius: 4px; transition: all 0.2s;" class="translation-lang-option">
+                  <input type="checkbox" value="Tamil" style="margin: 0;">
+                  <span>🇮🇳 Tamil</span>
+                </label>
+                <label style="display: flex; align-items: center; gap: 6px; padding: 6px; cursor: pointer; border-radius: 4px; transition: all 0.2s;" class="translation-lang-option">
+                  <input type="checkbox" value="Chinese" style="margin: 0;">
+                  <span>🇨🇳 Chinese</span>
+                </label>
+                <label style="display: flex; align-items: center; gap: 6px; padding: 6px; cursor: pointer; border-radius: 4px; transition: all 0.2s;" class="translation-lang-option">
+                  <input type="checkbox" value="Korean" style="margin: 0;">
+                  <span>🇰🇷 Korean</span>
+                </label>
+                <label style="display: flex; align-items: center; gap: 6px; padding: 6px; cursor: pointer; border-radius: 4px; transition: all 0.2s;" class="translation-lang-option">
+                  <input type="checkbox" value="Hindi" style="margin: 0;">
+                  <span>🇮🇳 Hindi</span>
+                </label>
+                <label style="display: flex; align-items: center; gap: 6px; padding: 6px; cursor: pointer; border-radius: 4px; transition: all 0.2s;" class="translation-lang-option">
+                  <input type="checkbox" value="Arabic" style="margin: 0;">
+                  <span>🇸🇦 Arabic</span>
+                </label>
+                <label style="display: flex; align-items: center; gap: 6px; padding: 6px; cursor: pointer; border-radius: 4px; transition: all 0.2s;" class="translation-lang-option">
+                  <input type="checkbox" value="Bengali" style="margin: 0;">
+                  <span>🇧🇩 Bengali</span>
+                </label>
+                <label style="display: flex; align-items: center; gap: 6px; padding: 6px; cursor: pointer; border-radius: 4px; transition: all 0.2s;" class="translation-lang-option">
+                  <input type="checkbox" value="Russian" style="margin: 0;">
+                  <span>🇷🇺 Russian</span>
+                </label>
+                <label style="display: flex; align-items: center; gap: 6px; padding: 6px; cursor: pointer; border-radius: 4px; transition: all 0.2s;" class="translation-lang-option">
+                  <input type="checkbox" value="Marathi" style="margin: 0;">
+                  <span>🇮🇳 Marathi</span>
+                </label>
+                <label style="display: flex; align-items: center; gap: 6px; padding: 6px; cursor: pointer; border-radius: 4px; transition: all 0.2s;" class="translation-lang-option">
+                  <input type="checkbox" value="French" style="margin: 0;">
+                  <span>🇫🇷 French</span>
+                </label>
+                <label style="display: flex; align-items: center; gap: 6px; padding: 6px; cursor: pointer; border-radius: 4px; transition: all 0.2s;" class="translation-lang-option">
+                  <input type="checkbox" value="German" style="margin: 0;">
+                  <span>🇩🇪 German</span>
+                </label>
+                <label style="display: flex; align-items: center; gap: 6px; padding: 6px; cursor: pointer; border-radius: 4px; transition: all 0.2s;" class="translation-lang-option">
+                  <input type="checkbox" value="Portuguese" style="margin: 0;">
+                  <span>🇧🇷 Portuguese</span>
+                </label>
+              </div>
+            </div>
+
+            <!-- Start Translation Button -->
+            <button type="button" class="btn btn-primary" id="start-video-translation" disabled style="width: 100%; margin-top: 10px; padding: 12px; font-size: 1.1rem;">
+              <i class="fas fa-language"></i> Start Translation
+            </button>
+
+            <!-- Translation Progress -->
+            <div id="video-translation-progress" style="display: none; margin-top: 20px;">
+              <h4 style="color: var(--primary); margin-bottom: 15px;"><i class="fas fa-spinner fa-spin"></i> Translation Progress</h4>
+              <div id="video-translation-progress-container"></div>
+            </div>
+
+            <!-- Translation Results -->
+            <div id="video-translation-results" style="display: none; margin-top: 20px;">
+              <h4 style="color: var(--primary); margin-bottom: 15px;"><i class="fas fa-check-circle"></i> Translated Videos</h4>
+              <div id="video-translation-results-grid" style="display: grid; grid-template-columns: repeat(auto-fill, minmax(300px, 1fr)); gap: 15px;"></div>
+            </div>
+          </div>
         </div>
 
         <div class="form-actions">
@@ -901,6 +1185,7 @@
   const SUPABASE_ANON_KEY = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Im1lcnBzdmtmbWpidWdyZ253d2xxIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NjE4NzcyMDksImV4cCI6MjA3NzQ1MzIwOX0.HYqgv5VFQxQ0E1QsxXYLLXu_r6LguyAEaErDSkHUc88";
   const GENERATE_CAROUSEL_WEBHOOK_URL = "https://saschag.app.n8n.cloud/webhook/calendar-carousel";
   const GENERATE_VIDEO_FROM_IMAGE_WEBHOOK_URL = "https://saschag.app.n8n.cloud/webhook/generate-video-from-image";
+  const GOOGLE_BUSINESS_WEBHOOK_URL = "https://saschag.app.n8n.cloud/webhook/google-business-post";
   
   const LIST_VIDEOS_WEBHOOK_URL = 'https://merpsvkfmjbugrgnwwlq.supabase.co/functions/v1/list-files';
   // === Canto API Config ===
@@ -910,10 +1195,10 @@
     //shortform: 'shorts',
     //longform: 'Long form',
     shortform: 'KJP07',
-    longform: 'QGKKN'
+    longform: 'QGKKN',
+    videotranslation: 'KJGAJ'  // Folder for translated videos
   };
-// Add this near your other constants
-  const GOOGLE_BUSINESS_WEBHOOK_URL = "https://saschag.app.n8n.cloud/webhook/google-business-post";
+
   const STORAGE_BASE_URL = "https://merpsvkfmjbugrgnwwlq.supabase.co/storage/v1/object/public";
 
   const BUCKET_SHORTFORM = "ShortForm";
@@ -930,7 +1215,7 @@
   const dedupeMarketsCI = (arr) => { const seen=new Set(); const out=[]; for (const m of arr||[]) { const k=norm(m); if(!seen.has(k)){seen.add(k); out.push(m);} } return out; };
   const toCanonicalMarket = (m) => MARKETS.find(mm => norm(mm) === norm(m)) || m;
 
-  let currentDate = new Date(2025, 10, 1); // Nov 2025
+  let currentDate = new Date(); // Always start with current month
   let isEditMode = false;
   let currentView = 'global';
   let currentMarket = 'US';
@@ -954,17 +1239,28 @@
 
   async function fetchCantoVideos(folder) {
     try {
-      console.log(`Fetching Canto videos for folder: ${folder}`);
-      const res = await fetch(`${LIST_CANTO_WEBHOOK_URL}?folder=${encodeURIComponent(folder)}`);
+      // Only allow 'videotranslation' to map to KJGAJ
+      let folderCode = folder;
+      if (folder === 'videotranslation') {
+        folderCode = CANTO_FOLDER_MAP['videotranslation']; // always KJGAJ
+      } else if (CANTO_FOLDER_MAP[folder] && folder !== 'videotranslation') {
+        // Prevent accidental mapping to KJGAJ from other keys
+        folderCode = CANTO_FOLDER_MAP[folder];
+        if (folderCode === CANTO_FOLDER_MAP['videotranslation']) {
+          throw new Error('Access to KJGAJ is only allowed via videotranslation key');
+        }
+      }
+      console.log(`Fetching Canto videos for folder: ${folder} (resolved: ${folderCode})`);
+      const res = await fetch(`${LIST_CANTO_WEBHOOK_URL}?folder=${encodeURIComponent(folderCode)}`);
       if (!res.ok) throw new Error(`Canto proxy error: ${res.status}`);
       const data = await res.json();
-      console.log(`Canto response for ${folder}:`, data);
+      console.log(`Canto response for ${folderCode}:`, data);
       console.log(`First few files:`, data.slice(0, 3));
       if (data.length > 0) {
         console.log(`Fields in first file:`, Object.keys(data[0]));
         console.log(`Sample file data:`, data[0]);
       }
-      return data; // ❌ Webhook ยังไม่ส่ง directUrlOriginal - ต้องอัพเดท webhook ให้ส่ง: [{name,size,url,contentType,id,directUrlOriginal}]
+      return data;
     } catch (err) {
       console.error('Error fetching Canto videos:', err);
       return [];
@@ -1523,27 +1819,27 @@
     renderCalendar(dateObj);
     updateFolderCounts();
 
-    // Replace realtime subscription with polling
-    pollingInterval = setInterval(async () => {
-      try {
-        const { data: pollData, error: pollError } = await supabase
-          .from(table)
-          .select('days')
-          .eq('id', id)
-          .maybeSingle();
+    // Disabled auto-polling - user must manually refresh to see updates
+    // pollingInterval = setInterval(async () => {
+    //   try {
+    //     const { data: pollData, error: pollError } = await supabase
+    //       .from(table)
+    //       .select('days')
+    //       .eq('id', id)
+    //       .maybeSingle();
 
-        if (!pollError && pollData && pollData.days) {
-          const newDays = pollData.days;
-          if (JSON.stringify(newDays) !== JSON.stringify(monthDataCache)) {
-            monthDataCache = newDays;
-            renderCalendar(dateObj);
-            updateFolderCounts();
-          }
-        }
-      } catch (e) {
-        console.warn("Polling failed:", e);
-      }
-    }, 30000); // Poll every 30 seconds
+    //     if (!pollError && pollData && pollData.days) {
+    //       const newDays = pollData.days;
+    //       if (JSON.stringify(newDays) !== JSON.stringify(monthDataCache)) {
+    //         monthDataCache = newDays;
+    //         renderCalendar(dateObj);
+    //         updateFolderCounts();
+    //       }
+    //     }
+    //   } catch (e) {
+    //     console.warn("Polling failed:", e);
+    //   }
+    // }, 30000); // Poll every 30 seconds
   }
 
   async function writeDay(dateObj, day, payload) {
@@ -1614,8 +1910,13 @@
     const base = 'https://placehold.co';
 
     if (content && content.mediaUrl) {
+      let url = content.mediaUrl;
+      // Proxy external images to avoid CORS/restriction issues
+      if (url.includes('fbcdn.net') || url.includes('cdninstagram.com')) {
+        url = `http://localhost:3000/proxy-image?url=${encodeURIComponent(url)}`;
+      }
       return {
-        url: content.mediaUrl,
+        url: url,
         label: 'Linked asset',
         alt: `${getContentTypeName(type)} media`,
         shape:
@@ -1800,13 +2101,62 @@
               <div class="preview-block">
                 <div class="media-preview">
                   <div class="media-frame ${media.shape}">
-                    <img src="${media.url}" alt="${media.alt}" loading="lazy" />
+                    <img src="${media.url}" alt="${media.alt}" loading="lazy" onerror="this.src='https://placehold.co/100x100?text=Error';" />
                   </div>
                   <div class="media-label"><i class="fa-solid fa-photo-film"></i> <span>${media.label}</span></div>
                 </div>
               </div>`;
         }
   
+        // Check for translated videos (support both new and legacy field names)
+        let translatedVideosHtml = '';
+        const translatedVideosData = content.translatedVideos || content.videoTranslations;
+        
+        console.log(`[View Modal] Content for activity ${index + 1}:`, {
+          hasTranslatedVideos: !!content.translatedVideos,
+          hasVideoTranslations: !!content.videoTranslations,
+          data: translatedVideosData
+        });
+        
+        if (translatedVideosData && typeof translatedVideosData === 'object' && Object.keys(translatedVideosData).length > 0) {
+          console.log(`[View Modal] Rendering ${Object.keys(translatedVideosData).length} translated videos`);
+          
+          const translatedItems = Object.entries(translatedVideosData)
+            .map(([lang, videoInfo]) => {
+              const videoUrl = videoInfo?.url || videoInfo || '';
+              const markets = videoInfo?.markets || [];
+              const langFlag = getLangFlag(lang);
+              const marketsDisplay = markets.length > 0 
+                ? `<div style="margin-top: 8px; font-size: 0.85rem; color: #6c757d;">
+                     <i class="fas fa-globe"></i> ${markets.join(', ')}
+                   </div>`
+                : '';
+              console.log(`[View Modal] ${lang}: ${videoUrl}, Markets:`, markets);
+              return `
+                <div style="background: #f8f9fa; padding: 10px; border-radius: 8px; margin: 5px 0;">
+                  <div style="display: flex; align-items: center; gap: 10px; margin-bottom: 8px;">
+                    <span style="font-size: 1.2rem;">${langFlag}</span>
+                    <strong>${lang}</strong>
+                  </div>
+                  <video controls style="width: 100%; max-width: 300px; border-radius: 6px; background: black;">
+                    <source src="${videoUrl}" type="video/mp4">
+                    Your browser does not support the video tag.
+                  </video>
+                  ${marketsDisplay}
+                </div>
+              `;
+            }).join('');
+          
+          translatedVideosHtml = `
+            <div class="form-group" style="margin-top: 15px;">
+              <label><i class="fas fa-language"></i> Translated Videos</label>
+              <div style="display: grid; grid-template-columns: repeat(auto-fill, minmax(280px, 1fr)); gap: 10px;">
+                ${translatedItems}
+              </div>
+            </div>
+          `;
+        }
+
         const aiBlock = (content.type === 'ai-carousel' && content.aiPrompt) 
             ? `<div class="form-group" style="margin-top:10px;"><label>AI Prompt</label><div class="form-control" style="background:#f9f9f9;">${content.aiPrompt}</div></div>` 
             : '';
@@ -1826,6 +2176,16 @@
 
         const timeDisplay = content.postTime ? `<span class="preview-meta-pill"><i class="far fa-clock"></i> <strong>Time:</strong> ${content.postTime}</span>` : '';
 
+        // Caption display with AI indicator
+        let captionHtml = '';
+        if (content.caption) {
+          const captionMode = content.captionMode || 'manual';
+          const captionLabel = captionMode === 'ai' 
+            ? '<i class="fas fa-robot"></i> Caption (AI Generated)' 
+            : '<i class="fas fa-comment"></i> Caption';
+          captionHtml = `<div class="form-group"><label>${captionLabel}</label><div class="form-control" style="background:#f9f9f9; white-space: pre-wrap;">${content.caption}</div></div>`;
+        }
+
         body.innerHTML += `
           ${index > 0 ? '<hr style="margin: 20px 0; border-top: 1px solid #eee;">' : ''}
           <h3 class="preview-title-activity" style="display: flex; align-items: center; flex-wrap: wrap;">
@@ -1834,12 +2194,14 @@
           </h3>
           ${mediaHtml}
           <div class="form-group"><label>Theme</label><div class="form-control preview-theme">${content.theme || '-'}</div></div>
-          ${aiBlock}
+          ${captionHtml}
           <div class="preview-meta-row">
              <div class="preview-meta-pill"><i class="fa-solid fa-globe"></i> <strong>Markets:</strong> ${markets}</div>
              <div class="preview-meta-pill"><i class="fa-solid fa-share-nodes"></i> <strong>Platforms:</strong> ${platformIcons || '-'}</div>
              ${timeDisplay}
           </div>
+          ${aiBlock}
+          ${translatedVideosHtml}
         `;
       
       
@@ -1856,12 +2218,17 @@
     }
 
     const close = () => { modal.style.display = 'none'; };
-    
+
     const closeBtn = document.getElementById('close-view');
     const okBtn = document.getElementById('view-ok');
-    
+
     if(closeBtn) closeBtn.onclick = close;
     if(okBtn) okBtn.onclick = close;
+
+    // Close modal when clicking outside modal-content
+    modal.onclick = function(e) {
+      if (e.target === modal) close();
+    };
   }
 
   // Function to toggle post status of each activity
@@ -1945,6 +2312,7 @@
     applyHashRoute();
     await bindMonth(currentDate);
     setupEventListeners();
+    initVideoTranslation();
   });
 
   function setupEventListeners() {
@@ -2063,6 +2431,31 @@
     const mq = window.matchMedia('(max-width: 600px)');
     mq.addEventListener?.('change', () => renderCalendar(currentDate));
   }
+
+  // Check if all translations are complete and update the progress header
+function updateOverallTranslationProgressStatus() {
+  const selected = videoTranslationState.selectedLanguages || [];
+  let allComplete = true;
+  selected.forEach(lang => {
+    const progressItem = document.getElementById(`translation-progress-${lang}`);
+    if (progressItem) {
+      const badge = progressItem.querySelector('.translation-status-badge');
+      if (!badge || !badge.classList.contains('translation-status-success')) {
+        allComplete = false;
+      }
+    } else {
+      allComplete = false;
+    }
+  });
+  const header = document.querySelector('#video-translation-progress h4');
+  if (header) {
+    if (allComplete && selected.length > 0) {
+      header.innerHTML = `<i class="fas fa-check-circle" style="color:#28a745"></i> Translation Progress <span style='color:#28a745;font-weight:600;font-size:1rem;margin-left:8px;'>All Complete</span>`;
+    } else {
+      header.innerHTML = `<i class="fas fa-spinner fa-spin"></i> Translation Progress`;
+    }
+  }
+}
 
   function setView(view) {
     currentView = view;
@@ -2197,7 +2590,39 @@
       setCheck('platform-ig', platformSet.has('instagram'));
       setCheck('platform-tt', platformSet.has('tiktok'));
       setCheck('platform-yt', platformSet.has('youtube'));
-      setCheck('platform-gg', platformSet.has('google'))
+      setCheck('platform-gg', platformSet.has('google'));
+
+      // Load Translation Settings (Old text translation - keeping for backward compatibility)
+      const enableTranslationElem = document.getElementById('enable-translation');
+      if (enableTranslationElem && content.translation) {
+        setCheck('enable-translation', content.translation.enabled || false);
+        
+        // Handle both old single language format and new multiple languages format
+        const languages = content.translation.languages || 
+                         (content.translation.language ? [content.translation.language] : []);
+        
+        // Reset all language checkboxes first
+        const langCheckboxes = document.querySelectorAll('#language-checkboxes input[type="checkbox"]');
+        if (langCheckboxes.length > 0) {
+          langCheckboxes.forEach(cb => {
+            cb.checked = languages.includes(cb.value);
+          });
+        }
+      } else if (enableTranslationElem) {
+        setCheck('enable-translation', false);
+        // Reset all language checkboxes
+        const langCheckboxes = document.querySelectorAll('#language-checkboxes input[type="checkbox"]');
+        if (langCheckboxes.length > 0) {
+          langCheckboxes.forEach(cb => {
+            cb.checked = false;
+          });
+        }
+      }
+      // Update translation section visibility and select all button (only if elements exist)
+      if (enableTranslationElem) {
+        toggleTranslationSection();
+        updateSelectAllLanguagesButton();
+      }
 
       // --- Carousel Video ---
       if ((content.type === 'ai-carousel' || content.type === 'real-carousel') && content.carouselVideo) {
@@ -2336,7 +2761,21 @@
       setCheck('platform-ig', false);
       setCheck('platform-tt', false);
       setCheck('platform-yt', false);
-      setCheck('platfrom-gg', false);
+      setCheck('platform-gg', false);
+
+      // Reset Translation Settings for new content (only if elements exist)
+      const enableTranslationElem = document.getElementById('enable-translation');
+      if (enableTranslationElem) {
+        setCheck('enable-translation', false);
+        const langCheckboxes = document.querySelectorAll('#language-checkboxes input[type="checkbox"]');
+        if (langCheckboxes.length > 0) {
+          langCheckboxes.forEach(cb => {
+            cb.checked = false;
+          });
+        }
+        toggleTranslationSection();
+        updateSelectAllLanguagesButton();
+      }
 
       const delBtn = document.getElementById('delete-content');
       if(delBtn) delBtn.style.display = 'none';
@@ -2365,7 +2804,12 @@
     // Hide video generation status
     document.getElementById('video-generation-status').classList.remove('active');
 
-    document.getElementById('edit-modal').style.display = 'flex';
+    const editModal = document.getElementById('edit-modal');
+    editModal.style.display = 'flex';
+    // Close modal when clicking outside modal-content
+    editModal.onclick = function(e) {
+      if (e.target === editModal) closeModal();
+    };
 
     // Handle Manual Video (Non-Carousel)
     if (manualVidSec && content && content.type && (content.type.includes('shortform') || content.type === 'longform')) {
@@ -2443,7 +2887,7 @@
                         console.log('Available fields in matching file:', matchingFile ? Object.keys(matchingFile) : 'no matching file');
                         if (matchingFile) {
                             console.log('Matching file data:', matchingFile);
-                            console.error('❌ Webhook ไม่ส่ง directUrlOriginal - ต้องอัพเดท webhook ให้ส่ง directUrlOriginal');
+                            console.error('❌ Webhook did not send directUrlOriginal - Please update the webhook to send directUrlOriginal');
                             console.log('Expected format:', {name: 'filename.mp4', directUrlOriginal: 'https://...'});
                         }
                         const fallbackUrl = videoUrl || getFileUrl(fName, content.type);
@@ -2495,6 +2939,98 @@
         if (errorMsg) errorMsg.style.display = 'none';
         if (loadingIndicator) loadingIndicator.style.display = 'none';
     }
+
+    // Restore saved video translations if they exist
+    videoTranslationState.translationResults = {};
+    const resultsGrid = document.getElementById('video-translation-results-grid');
+    if (resultsGrid) resultsGrid.innerHTML = '';
+    const resultsSection = document.getElementById('video-translation-results');
+    if (resultsSection) resultsSection.style.display = 'none';
+
+    // Check for translatedVideos (new name) or videoTranslations (legacy name)
+    const translatedVideosData = content?.translatedVideos || content?.videoTranslations || {};
+    
+    if (content && Object.keys(translatedVideosData).length > 0) {
+      console.log('🔄 Restoring video translations:', translatedVideosData);
+      
+      // Enable video translation checkbox
+      const enableVideoTranslationCheckbox = document.getElementById('enable-video-translation');
+      if (enableVideoTranslationCheckbox) {
+        enableVideoTranslationCheckbox.checked = true;
+        // Show the video translation section
+        const videoTranslationSection = document.getElementById('video-translation-section');
+        if (videoTranslationSection) {
+          videoTranslationSection.style.display = 'block';
+        }
+      }
+
+      // Check the Select Video checkbox (if not already checked)
+      const selectVideoCheckbox = document.getElementById('select-canto-video-checkbox');
+      if (selectVideoCheckbox && !selectVideoCheckbox.checked && content.fileName) {
+        selectVideoCheckbox.checked = true;
+        // Trigger the change event to show the video picker section
+        selectVideoCheckbox.dispatchEvent(new Event('change'));
+      }
+
+      // Update video translation source info
+      if (typeof updateVideoTranslationSource === 'function') {
+        updateVideoTranslationSource();
+      }
+
+      // Restore each translated video
+      Object.entries(translatedVideosData).forEach(([lang, videoData]) => {
+        // Extract URL and markets from videoData (could be string or object)
+        let videoUrl = '';
+        let filename = '';
+        let markets = [];
+        if (typeof videoData === 'string') {
+          videoUrl = videoData;
+        } else if (videoData && typeof videoData === 'object') {
+          videoUrl = videoData.url || videoData.directUrlOriginal || videoData.directUrl || '';
+          filename = videoData.filename || '';
+          markets = videoData.markets || [];
+        }
+        
+        if (videoUrl) {
+          console.log(`✅ Restoring ${lang}:`, videoUrl, 'Markets:', markets);
+          videoTranslationState.translationResults[lang] = {
+            url: videoUrl,
+            filename: filename,
+            markets: markets
+          };
+            
+          // Check the language checkbox
+          const langCheckboxes = document.querySelectorAll('#translation-language-checkboxes input[type="checkbox"]');
+          langCheckboxes.forEach(cb => {
+            if (cb.value === lang) {
+              cb.checked = true;
+              videoTranslationState.selectedLanguages.add(lang);
+            }
+          });
+        
+          addVideoTranslationResultCard(lang, videoUrl);
+          
+          // Restore market selections after card is added
+          if (markets.length > 0) {
+            setTimeout(() => {
+              const marketsContainer = document.getElementById(`markets-${lang}`);
+              if (marketsContainer) {
+                marketsContainer.querySelectorAll('input[type="checkbox"]').forEach(cb => {
+                  cb.checked = markets.includes(cb.value);
+                });
+              }
+            }, 100);
+          }
+        } else {
+          console.warn(`⚠️ No URL found for ${lang}:`, videoData);
+        }
+      });
+
+      // Update the start translation button state
+      if (typeof updateStartTranslationButton === 'function') {
+        updateStartTranslationButton();
+      }
+    }
   }
   function closeModal() {
     document.getElementById('edit-modal').style.display = 'none';
@@ -2538,7 +3074,7 @@
       allFiles = [];
     }
 
-    const usedFilenames = getUsedFilenames(currentActivityId);
+    const usedFilenames = await getUsedFilenames(currentActivityId);
     const availableFiles = allFiles.filter(file => !usedFilenames.has(file.name));
   
     renderCarouselVideoList(availableFiles);
@@ -2751,7 +3287,6 @@
       }
     }
 
-// 1. Gather selected platforms
     const selectedPlatforms = [];
     if (getCheck('platform-fb')) selectedPlatforms.push('facebook');
     if (getCheck('platform-ig')) selectedPlatforms.push('instagram');
@@ -2759,21 +3294,39 @@
     if (getCheck('platform-yt')) selectedPlatforms.push('youtube');
     if (getCheck('platform-gg')) selectedPlatforms.push('google');
 
-    // 2. Build the payload object FIRST
+// Translation data - collect multiple selected languages
+    const enableTranslation = getCheck('enable-translation');
+    let selectedLanguages = [];
+    if (enableTranslation) {
+      document.querySelectorAll('#language-checkboxes input[type="checkbox"]:checked').forEach(cb => {
+        selectedLanguages.push(cb.value);
+      });
+    }
+
+    // Get video translation results
+    const videoTranslationResults = {};
+    if (videoTranslationState.translationResults && Object.keys(videoTranslationState.translationResults).length > 0) {
+      Object.assign(videoTranslationResults, videoTranslationState.translationResults);
+    }
+
     const payload = {
       id: (activityId && !activityId.startsWith('legacy_')) ? activityId : newActivityId(),
       type,
       theme,
       caption,
-      captionMode: isManualCaption ? 'manual' : 'ai',
+      captionMode: isManualCaption ? 'manual' : 'ai', // Track caption mode
       platform: selectedPlatforms,
       fileName: manualFileName,
       videoUrl: getVal('edit-video-url') || null,
       markets: selectedMarketsList,
-      postTime: postTime 
+      postTime: postTime,
+      translation: {
+        enabled: enableTranslation,
+        languages: selectedLanguages
+      },
+      translatedVideos: videoTranslationResults // Changed from videoTranslations to translatedVideos
     };
 
-    // 3. Attach carousel data to payload if applicable
     if ((type === 'ai-carousel' || type === 'real-carousel') && carouselVideo) {
       payload.carouselVideo = carouselVideo;
     }
@@ -2791,7 +3344,7 @@
       }
     }
 
-    // 4. NOW trigger the Google Webhook (because 'payload' is now fully defined)
+    // Trigger the Google Webhook (because 'payload' is now fully defined)
     if (getCheck('platform-gg')) {
         let googleImageUrl = null;
         
@@ -2825,7 +3378,6 @@ const googlePayload = {
           .catch(err => console.error('Google automation failed', err));
     }
 
-    // 5. Update the local array for Supabase
     if (activityId) {
       const index = currentDayArray.findIndex(item => item.id === activityId);
       if (index > -1) currentDayArray[index] = payload;
@@ -3035,8 +3587,6 @@ const googlePayload = {
       if (platformSet.has('instagram')) platformIcons += `<i class="fa-brands fa-instagram" style="color:#E4405F; ${iconStyle}"></i>`;
       if (platformSet.has('tiktok')) platformIcons += `<i class="fa-brands fa-tiktok" style="color:#000000; ${iconStyle}"></i>`;
       if (platformSet.has('youtube')) platformIcons += `<i class="fa-brands fa-youtube" style="color:#FF0000; ${iconStyle}"></i>`;
-      if (platformSet.has('google')) platformIcons += `<i class="fa-brands fa-google" style="color:#4285F4; ${iconStyle}"></i>`;
-
 
       const videoIndicator = (dayData.carouselVideo) ? ' <i class="fas fa-film" style="font-size:0.7rem; margin-left:3px;"></i>' : '';
 
@@ -3254,6 +3804,15 @@ const googlePayload = {
     });
   }
 
+  // Cache for video count to reduce API calls
+  let videoCountCache = {
+    count: null,
+    timestamp: null,
+    cacheDuration: 600000 // Cache for 10 minutes
+  };
+
+  let updateFolderCountsDebounce = null;
+
   async function updateFolderCounts() {
     const month = currentDate.getMonth();
     if (month === 10) {
@@ -3270,6 +3829,15 @@ const googlePayload = {
   }
 
   async function getRealtimeVideoCount() {
+    // Check cache first
+    const now = Date.now();
+    if (videoCountCache.count !== null && 
+        videoCountCache.timestamp && 
+        (now - videoCountCache.timestamp) < videoCountCache.cacheDuration) {
+      console.log(`Using cached video count: ${videoCountCache.count} (cached ${Math.round((now - videoCountCache.timestamp) / 1000)}s ago)`);
+      return videoCountCache.count;
+    }
+
     console.log("Fetching real-time inventory from Storage...");
     const { data: videos, error } = await supabase
       .storage
@@ -3279,7 +3847,7 @@ const googlePayload = {
     if (error) {
       console.error('Error fetching storage list:', error);
       showNotification('❌ Error: Could not read Storage list (RLS?)', 'error');
-      return 0;
+      return videoCountCache.count || 0; // Return cached value if available
     }
 
     const videoFiles = (videos || []).filter(file => {
@@ -3287,8 +3855,14 @@ const googlePayload = {
       return name !== '.emptyfolderplaceholder';
     });
 
-    console.log(`Real-time count is: ${videoFiles.length}`);
-    return videoFiles.length;
+    const count = videoFiles.length;
+    console.log(`Real-time count is: ${count}`);
+    
+    // Update cache
+    videoCountCache.count = count;
+    videoCountCache.timestamp = now;
+    
+    return count;
   }
 
   function updateAvailableVideoCountUI(count) {
@@ -3308,25 +3882,61 @@ const googlePayload = {
     }
   }
 
-  function getUsedFilenames(currentActivityId) {
+  async function getUsedFilenames(currentActivityId) {
     const used = new Set();
     
-    Object.values(monthDataCache || {}).forEach(dayData => {
-        const activities = Array.isArray(dayData) ? dayData : (dayData ? [dayData] : []);
-        
-        activities.forEach(act => {
-           
+    try {
+      // Get all months from the database to check ALL scheduled content
+      const { data: allMonths, error } = await supabase
+        .from(table)
+        .select('id, days');
+
+      if (error) {
+        console.error('Error fetching all months for filtering:', error);
+        // Fallback to current month only if database query fails
+        Object.values(monthDataCache || {}).forEach(dayData => {
+          const activities = Array.isArray(dayData) ? dayData : (dayData ? [dayData] : []);
+          activities.forEach(act => {
+            if (act.id === currentActivityId) return;
+            if (act.fileName) used.add(act.fileName);
+            if (act.carouselVideo) used.add(act.carouselVideo);
+          });
+        });
+        return used;
+      }
+
+      // Check all months for used filenames
+      (allMonths || []).forEach(monthData => {
+        const days = monthData.days || {};
+        Object.values(days).forEach(dayData => {
+          const activities = Array.isArray(dayData) ? dayData : (dayData ? [dayData] : []);
+          
+          activities.forEach(act => {
             if (act.id === currentActivityId) return;
 
             if (act.fileName) {
-                used.add(act.fileName);
+              used.add(act.fileName);
             }
 
             if (act.carouselVideo) {
-                used.add(act.carouselVideo);
+              used.add(act.carouselVideo);
             }
+          });
         });
-    });
+      });
+      
+    } catch (err) {
+      console.error('Error in getUsedFilenames:', err);
+      // Fallback to current month only
+      Object.values(monthDataCache || {}).forEach(dayData => {
+        const activities = Array.isArray(dayData) ? dayData : (dayData ? [dayData] : []);
+        activities.forEach(act => {
+          if (act.id === currentActivityId) return;
+          if (act.fileName) used.add(act.fileName);
+          if (act.carouselVideo) used.add(act.carouselVideo);
+        });
+      });
+    }
     
     return used;
   }
@@ -3369,7 +3979,7 @@ const googlePayload = {
         }
       }
 
-      const usedFilenames = getUsedFilenames(currentActivityId);
+      const usedFilenames = await getUsedFilenames(currentActivityId);
       const availableFiles = allFiles.filter(file => !usedFilenames.has(file.name));
 
       renderVideoList(availableFiles);
@@ -3458,6 +4068,11 @@ const googlePayload = {
     // Close the video picker modal immediately after selection
     document.getElementById('video-picker-modal').style.display = 'none';
     
+    // Update video translation source if video translation is enabled
+    if (typeof updateVideoTranslationSource === 'function') {
+      updateVideoTranslationSource();
+    }
+    
     // Handle loading
     player.onloadedmetadata = () => {
       console.log('Video loaded successfully:', fullUrl);
@@ -3490,6 +4105,11 @@ const googlePayload = {
     if (errorMsg) errorMsg.style.display = 'none';
     if (loadingIndicator) loadingIndicator.style.display = 'none';
     document.getElementById('preview-container').style.display = 'none';
+    
+    // Update video translation source when video is cleared
+    if (typeof updateVideoTranslationSource === 'function') {
+      updateVideoTranslationSource();
+    }
   });
 
   // Caption mode toggle functionality
@@ -3507,6 +4127,68 @@ const googlePayload = {
   // Add event listeners for caption mode radio buttons
   document.getElementById('caption-manual').addEventListener('change', toggleCaptionField);
   document.getElementById('caption-ai').addEventListener('change', toggleCaptionField);
+
+  // Translation feature functionality (Old text translation - now replaced by video translation)
+  // Keeping this for backward compatibility but checking if element exists
+  function toggleTranslationSection() {
+    const translationCheckbox = document.getElementById('enable-translation');
+    const translationSection = document.getElementById('translation-language-section');
+    
+    // Only run if elements exist (backward compatibility)
+    if (!translationCheckbox || !translationSection) return;
+    
+    if (translationCheckbox.checked) {
+      translationSection.style.display = 'block';
+    } else {
+      translationSection.style.display = 'none';
+      // Reset language selections when unchecked
+      const checkboxes = document.querySelectorAll('#language-checkboxes input[type="checkbox"]');
+      if (checkboxes) {
+        checkboxes.forEach(cb => {
+          cb.checked = false;
+        });
+      }
+    }
+  }
+
+  // Select all languages functionality
+  function updateSelectAllLanguagesButton() {
+    const languageCheckboxes = document.querySelectorAll('#language-checkboxes input[type="checkbox"]');
+    const checkedLanguages = document.querySelectorAll('#language-checkboxes input[type="checkbox"]:checked');
+    const allChecked = languageCheckboxes.length > 0 && checkedLanguages.length === languageCheckboxes.length;
+    const button = document.getElementById('select-all-languages');
+    if (button) {
+      button.textContent = allChecked ? 'Deselect All' : 'Select All';
+    }
+  }
+
+  // Add event listeners for translation functionality (only if element exists)
+  const enableTranslationCheckbox = document.getElementById('enable-translation');
+  if (enableTranslationCheckbox) {
+    enableTranslationCheckbox.addEventListener('change', toggleTranslationSection);
+  }
+  
+  // Select All Languages button functionality
+  document.addEventListener('click', function(e) {
+    if (e.target.id === 'select-all-languages') {
+      const languageCheckboxes = document.querySelectorAll('#language-checkboxes input[type="checkbox"]');
+      const checkedLanguages = document.querySelectorAll('#language-checkboxes input[type="checkbox"]:checked');
+      const allChecked = languageCheckboxes.length > 0 && checkedLanguages.length === languageCheckboxes.length;
+      
+      languageCheckboxes.forEach(cb => {
+        cb.checked = !allChecked;
+      });
+      
+      updateSelectAllLanguagesButton();
+    }
+  });
+
+  // Update select all button when individual language checkboxes change
+  document.addEventListener('change', function(e) {
+    if (e.target.closest('#language-checkboxes')) {
+      updateSelectAllLanguagesButton();
+    }
+  });
 
   // Add the missing waitForAIImages function
   async function waitForAIImages(scheduleId, day, payloadId) {
@@ -3590,6 +4272,1002 @@ const googlePayload = {
       document.getElementById('analytics-view').style.display = 'block';
     }
   };
+
+  // ==================== VIDEO TRANSLATION FEATURE ====================
+  
+  // Configuration - ⚠️ IMPORTANT: Replace with your actual n8n webhook URL
+  const VIDEO_TRANSLATION_CONFIG = {
+    webhookUrl: 'https://saschag.app.n8n.cloud/webhook/VIDEO_TRANSLATION_CONFIG',
+    pollInterval: 5000, // 5 seconds
+    maxPollAttempts: 360, // 30 minutes max
+  };
+
+  // State management
+  let videoTranslationState = {
+    selectedVideoUrl: null,
+    selectedVideoFilename: null,
+    selectedLanguages: new Set(),
+    translationResults: {},
+    pollingIntervals: {}
+  };
+
+  // Initialize video translation feature
+  function initVideoTranslation() {
+    // Enable/disable video translation section
+    const enableVideoTranslation = document.getElementById('enable-video-translation');
+    const videoTranslationSection = document.getElementById('video-translation-section');
+    
+    if (enableVideoTranslation) {
+      enableVideoTranslation.addEventListener('change', function() {
+        if (this.checked) {
+          videoTranslationSection.style.display = 'block';
+          updateVideoTranslationSource();
+        } else {
+          videoTranslationSection.style.display = 'none';
+          resetVideoTranslation();
+        }
+      });
+    }
+
+    // Language selection
+    const languageCheckboxes = document.querySelectorAll('#translation-language-checkboxes input[type="checkbox"]');
+    languageCheckboxes.forEach(checkbox => {
+      checkbox.addEventListener('change', (e) => {
+        if (e.target.checked) {
+          videoTranslationState.selectedLanguages.add(e.target.value);
+        } else {
+          videoTranslationState.selectedLanguages.delete(e.target.value);
+        }
+        updateStartTranslationButton();
+      });
+    });
+
+    // Select all languages
+    const selectAllBtn = document.getElementById('select-all-translation-languages');
+    if (selectAllBtn) {
+      selectAllBtn.addEventListener('click', () => {
+        const checkboxes = document.querySelectorAll('#translation-language-checkboxes input[type="checkbox"]');
+        const allChecked = Array.from(checkboxes).every(cb => cb.checked);
+        
+        checkboxes.forEach(cb => {
+          cb.checked = !allChecked;
+          if (cb.checked) {
+            videoTranslationState.selectedLanguages.add(cb.value);
+          } else {
+            videoTranslationState.selectedLanguages.delete(cb.value);
+          }
+        });
+        
+        selectAllBtn.textContent = allChecked ? 'Select All' : 'Deselect All';
+        updateStartTranslationButton();
+      });
+    }
+
+    // Email input
+    const emailInput = document.getElementById('video-translation-email');
+    if (emailInput) {
+      emailInput.addEventListener('input', updateStartTranslationButton);
+    }
+
+    // Start translation button
+    const startBtn = document.getElementById('start-video-translation');
+    if (startBtn) {
+      startBtn.addEventListener('click', handleStartVideoTranslation);
+    }
+  }
+
+  // Update video translation source from Selected Video
+  function updateVideoTranslationSource() {
+    const videoUrl = document.getElementById('edit-video-url')?.value;
+    const videoFilename = document.getElementById('selected-filename')?.value;
+    const sourceInfo = document.getElementById('video-translation-source-info');
+    const sourceName = document.getElementById('video-translation-source-name');
+    const noVideoWarning = document.getElementById('video-translation-no-video-warning');
+
+    if (videoUrl && videoFilename) {
+      videoTranslationState.selectedVideoUrl = videoUrl;
+      videoTranslationState.selectedVideoFilename = videoFilename;
+      
+      if (sourceInfo && sourceName) {
+        sourceName.textContent = videoFilename;
+        sourceInfo.style.display = 'block';
+      }
+      if (noVideoWarning) {
+        noVideoWarning.style.display = 'none';
+      }
+    } else {
+      videoTranslationState.selectedVideoUrl = null;
+      videoTranslationState.selectedVideoFilename = null;
+      
+      if (sourceInfo) {
+        sourceInfo.style.display = 'none';
+      }
+      if (noVideoWarning) {
+        noVideoWarning.style.display = 'block';
+      }
+    }
+    
+    updateStartTranslationButton();
+  }
+
+  function updateStartTranslationButton() {
+    const startBtn = document.getElementById('start-video-translation');
+    const emailInput = document.getElementById('video-translation-email');
+    
+    if (startBtn && emailInput) {
+      const hasVideo = videoTranslationState.selectedVideoUrl !== null;
+      const hasLanguages = videoTranslationState.selectedLanguages.size > 0;
+      // Email is now optional, so we don't check it
+
+      startBtn.disabled = !(hasVideo && hasLanguages);
+    }
+  }
+
+  async function handleStartVideoTranslation() {
+    const emailInput = document.getElementById('video-translation-email');
+    if (!videoTranslationState.selectedVideoUrl || videoTranslationState.selectedLanguages.size === 0) {
+      alert('Please select a video in the "Selected Video" section first.');
+      return;
+    }
+
+    const startBtn = document.getElementById('start-video-translation');
+    if (startBtn) {
+      startBtn.disabled = true;
+      startBtn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Checking...';
+    }
+
+    try {
+      // 1. Check if translated videos already exist in Canto for each selected language
+      const cantoFiles = await fetchCantoVideos('videotranslation');
+      const originalFilename = videoTranslationState.selectedVideoFilename || '';
+      const baseFilename = originalFilename.replace(/\.[^/.]+$/, '');
+      const missingLanguages = [];
+      const foundLanguages = [];
+      const foundFiles = {};
+
+      videoTranslationState.selectedLanguages.forEach(lang => {
+        // Try to find a file for this language
+        const matchedFile = cantoFiles.find(file => {
+          const filename = file.name;
+          const filenameLower = filename.toLowerCase();
+          const langLower = lang.toLowerCase();
+          // Pattern: BaseFilename_Language.ext
+          if (filename.startsWith(baseFilename + '_')) {
+            const afterUnderscore = filename.substring(baseFilename.length + 1);
+            const langPart = afterUnderscore.split('.')[0];
+            if (langPart.toLowerCase() === langLower) return true;
+          }
+          // Pattern: Contains both base filename and language
+          const baseFilenameLower = baseFilename.toLowerCase();
+          if (filenameLower.includes(baseFilenameLower) && filenameLower.includes(`_${langLower}`)) {
+            return true;
+          }
+          // Pattern: Try with language code
+          const langCode = getLangCode(lang);
+          if (filename.startsWith(baseFilename + '_')) {
+            const afterUnderscore = filename.substring(baseFilename.length + 1);
+            const langPart = afterUnderscore.split('.')[0];
+            if (langPart.toLowerCase() === langCode.toLowerCase()) return true;
+          }
+          return false;
+        });
+        if (matchedFile) {
+          foundLanguages.push(lang);
+          foundFiles[lang] = matchedFile;
+        } else {
+          missingLanguages.push(lang);
+        }
+      });
+
+      // 2. Show progress section and initialize progress for all
+      showVideoTranslationProgress();
+      initializeVideoTranslationProgress();
+
+      // 3. For found languages, show result immediately
+      foundLanguages.forEach(lang => {
+        updateVideoTranslationProgress(lang, 'success');
+        // Pass the full file object so addVideoTranslationResult can extract the URL properly
+        addVideoTranslationResult(lang, foundFiles[lang]);
+      });
+
+      // 4. If all found, skip webhook
+      if (missingLanguages.length === 0) {
+        showNotification('All selected translations already exist!', 'success');
+        if (startBtn) {
+          startBtn.disabled = false;
+          startBtn.innerHTML = '<i class="fas fa-language"></i> Start Translation';
+        }
+        return;
+      }
+
+      // 5. If some missing, send only those to webhook
+      // Download video from URL first
+      const videoBlob = await fetch(videoTranslationState.selectedVideoUrl).then(r => r.blob());
+      // Create FormData
+      const formData = new FormData();
+      formData.append('file', videoBlob, videoTranslationState.selectedVideoFilename);
+      formData.append('filename', videoTranslationState.selectedVideoFilename);
+      formData.append('language', missingLanguages.join(', '));
+      formData.append('e-mail', emailInput ? emailInput.value.trim() : '');
+
+      // Send to n8n webhook
+      const response = await fetch(VIDEO_TRANSLATION_CONFIG.webhookUrl, {
+        method: 'POST',
+        body: formData
+      });
+
+      if (!response.ok) {
+        throw new Error('Failed to send data to webhook');
+      }
+
+      const result = await response.json();
+      console.log('Video translation webhook response:', result);
+
+      // Start polling for missing languages only
+      videoTranslationState.selectedLanguages = new Set(missingLanguages);
+      startVideoTranslationPolling();
+
+      showNotification('Video translation started for missing languages!', 'success');
+
+    } catch (error) {
+      console.error('Error starting video translation:', error);
+      alert('An error occurred while submitting data. Please try again.');
+      if (startBtn) {
+        startBtn.disabled = false;
+        startBtn.innerHTML = '<i class="fas fa-language"></i> Start Translation';
+      }
+    }
+  }
+
+  function showVideoTranslationProgress() {
+    const progressSection = document.getElementById('video-translation-progress');
+    if (progressSection) {
+      progressSection.style.display = 'block';
+    }
+  }
+
+  function initializeVideoTranslationProgress() {
+    const container = document.getElementById('video-translation-progress-container');
+    if (!container) return;
+
+    container.innerHTML = '';
+
+    videoTranslationState.selectedLanguages.forEach(lang => {
+      const progressItem = document.createElement('div');
+      progressItem.className = 'translation-progress-item';
+      progressItem.id = `translation-progress-${lang}`;
+      progressItem.innerHTML = `
+        <div class="translation-progress-header">
+          <div class="translation-progress-lang">${getLangFlag(lang)} ${lang}</div>
+          <div class="translation-status-badge translation-status-processing">
+            <i class="fas fa-spinner fa-spin"></i> Processing
+          </div>
+        </div>
+        <div class="translation-progress-bar">
+          <div class="translation-progress-bar-fill" style="width: 30%"></div>
+        </div>
+      `;
+      container.appendChild(progressItem);
+    });
+  }
+
+  function startVideoTranslationPolling() {
+    // Poll Canto folder KJGAJ for translated videos
+    const POLLING_INTERVAL = 10000; // 10 seconds
+    const MAX_ATTEMPTS = 180; // 30 minutes max (180 * 10s)
+    
+    console.log('🔍 Starting to poll Canto folder KJGAJ for translated videos...');
+    console.log('📝 Looking for languages:', Array.from(videoTranslationState.selectedLanguages));
+    console.log('📄 Original filename:', videoTranslationState.selectedVideoFilename);
+    
+    // Track polling state for each language
+    const pollingState = {};
+    videoTranslationState.selectedLanguages.forEach(lang => {
+      pollingState[lang] = {
+        attempts: 0,
+        found: false
+      };
+    });
+
+    const pollInterval = setInterval(async () => {
+      try {
+        // Fetch files from Canto folder KJGAJ
+        const cantoFiles = await fetchCantoVideos('KJGAJ');
+        console.log(`📂 Polling attempt - Found ${cantoFiles.length} files in KJGAJ`);
+        
+        // Debug: Log all filenames found
+        if (cantoFiles.length > 0) {
+          console.log('📋 Files in folder:', cantoFiles.map(f => f.name).join(', '));
+        }
+        
+        // Get base filename without extension
+        const originalFilename = videoTranslationState.selectedVideoFilename || '';
+        const baseFilename = originalFilename.replace(/\.[^/.]+$/, ''); // Remove extension
+        
+        console.log('🔎 Base filename for matching:', baseFilename);
+        
+        // Check each language
+        for (const lang of videoTranslationState.selectedLanguages) {
+          if (pollingState[lang].found) continue; // Skip if already found
+          
+          pollingState[lang].attempts++;
+          
+          // Look for file matching the language
+          // Expected pattern: {BaseFilename}_{Language}.mp4 (e.g., "A New Day_English.mp4")
+          const matchedFile = cantoFiles.find(file => {
+            const filename = file.name;
+            const filenameLower = filename.toLowerCase();
+            const langLower = lang.toLowerCase();
+            
+            console.log(`🔍 Checking "${filename}" for language "${lang}"`);
+            
+            // Pattern 1: Exact match - BaseFilename_Language.ext
+            // Example: "A New Day_English.mp4" matches language "English"
+            if (filename.startsWith(baseFilename + '_')) {
+              const afterUnderscore = filename.substring(baseFilename.length + 1);
+              const langPart = afterUnderscore.split('.')[0]; // Get part before extension
+              
+              console.log(`  → Pattern 1 check: "${langPart}" vs "${lang}"`);
+              
+              if (langPart.toLowerCase() === langLower) {
+                console.log(`  ✅ MATCH! Pattern 1`);
+                return true;
+              }
+            }
+            
+            // Pattern 2: Contains both base filename and language
+            const baseFilenameLower = baseFilename.toLowerCase();
+            if (filenameLower.includes(baseFilenameLower) && filenameLower.includes(`_${langLower}`)) {
+              console.log(`  ✅ MATCH! Pattern 2`);
+              return true;
+            }
+            
+            // Pattern 3: Try with language code
+            const langCode = getLangCode(lang);
+            if (filename.startsWith(baseFilename + '_')) {
+              const afterUnderscore = filename.substring(baseFilename.length + 1);
+              const langPart = afterUnderscore.split('.')[0];
+              
+              if (langPart.toLowerCase() === langCode.toLowerCase()) {
+                console.log(`  ✅ MATCH! Pattern 3 (code: ${langCode})`);
+                return true;
+              }
+            }
+            
+            return false;
+          });
+          
+          if (matchedFile) {
+            console.log(`✅ Found translated video for ${lang}:`, matchedFile.name);
+            pollingState[lang].found = true;
+            
+            // Update progress to success
+            updateVideoTranslationProgress(lang, 'success');
+            
+            // Pass the full file object so addVideoTranslationResult can extract the URL properly
+            addVideoTranslationResult(lang, matchedFile);
+          } else {
+            console.log(`⏳ ${lang}: Not found yet (attempt ${pollingState[lang].attempts}/${MAX_ATTEMPTS})`);
+            
+            // Update progress bar
+            const progressPercent = Math.min(30 + (pollingState[lang].attempts / MAX_ATTEMPTS * 60), 90);
+            const progressItem = document.getElementById(`translation-progress-${lang}`);
+            if (progressItem) {
+              const progressBar = progressItem.querySelector('.translation-progress-bar-fill');
+              if (progressBar) progressBar.style.width = `${progressPercent}%`;
+            }
+          }
+          
+          // Check if max attempts reached
+          if (pollingState[lang].attempts >= MAX_ATTEMPTS && !pollingState[lang].found) {
+            console.error(`❌ Timeout: ${lang} video not found after ${MAX_ATTEMPTS} attempts`);
+            updateVideoTranslationProgress(lang, 'error');
+          }
+        }
+        
+        // Check if all languages are done (found or timed out)
+        const allDone = Array.from(videoTranslationState.selectedLanguages).every(lang => 
+          pollingState[lang].found || pollingState[lang].attempts >= MAX_ATTEMPTS
+        );
+        
+        if (allDone) {
+          console.log('✅ All translations completed or timed out. Stopping polling.');
+          clearInterval(pollInterval);
+          
+          const foundCount = Array.from(videoTranslationState.selectedLanguages).filter(lang => pollingState[lang].found).length;
+          const totalCount = videoTranslationState.selectedLanguages.size;
+          
+          showNotification(`Translation complete: ${foundCount}/${totalCount} videos found`, foundCount === totalCount ? 'success' : 'error');
+        }
+        
+      } catch (error) {
+        console.error('Error polling Canto folder:', error);
+      }
+    }, POLLING_INTERVAL);
+    
+    // Store interval for cleanup
+    videoTranslationState.pollingIntervals.main = pollInterval;
+  }
+
+  // Helper function to get language code
+  function getLangCode(language) {
+    const langCodes = {
+      'English': 'en',
+      'Japanese': 'ja',
+      'Tamil': 'ta',
+      'Chinese': 'zh',
+      'Korean': 'ko',
+      'Hindi': 'hi',
+      'Arabic': 'ar',
+      'Bengali': 'bn',
+      'Russian': 'ru',
+      'Marathi': 'mr',
+      'French': 'fr',
+      'German': 'de',
+      'Portuguese': 'pt'
+    };
+    return langCodes[language] || language.substring(0, 2).toLowerCase();
+  }
+
+  function updateVideoTranslationProgress(language, status) {
+    const progressItem = document.getElementById(`translation-progress-${language}`);
+    if (!progressItem) return;
+
+    const statusBadge = progressItem.querySelector('.translation-status-badge');
+    const progressBar = progressItem.querySelector('.translation-progress-bar-fill');
+
+    if (status === 'success') {
+      statusBadge.className = 'translation-status-badge translation-status-success';
+      statusBadge.innerHTML = '<i class="fas fa-check-circle"></i> Complete';
+      if (progressBar) progressBar.style.width = '100%';
+    } else if (status === 'error') {
+      statusBadge.className = 'translation-status-badge translation-status-error';
+      statusBadge.innerHTML = '<i class="fas fa-exclamation-circle"></i> Error';
+      if (progressBar) {
+        progressBar.style.width = '100%';
+        progressBar.style.background = '#dc3545';
+      }
+    }
+  }
+
+  // Helper function to add a translation result card to the UI
+  function addVideoTranslationResultCard(language, videoUrl) {
+    const resultsSection = document.getElementById('video-translation-results');
+    const resultsGrid = document.getElementById('video-translation-results-grid');
+    
+    if (resultsSection && resultsGrid) {
+      resultsSection.style.display = 'block';
+
+      // Remove existing card if present
+      const existingCard = document.getElementById(`translation-result-${language}`);
+      if (existingCard) existingCard.remove();
+
+      // Get current markets from main form
+      const currentMarkets = Array.from(document.querySelectorAll('#market-checkboxes input[type="checkbox"]:checked'))
+        .map(cb => cb.value);
+      
+      // Generate market checkboxes for this language
+      const marketCheckboxesHtml = MARKETS.map(market => {
+        const isChecked = currentMarkets.includes(market) ? 'checked' : '';
+        return `
+          <label style="display: inline-flex; align-items: center; gap: 4px; margin: 4px 8px 4px 0; font-size: 0.85rem; cursor: pointer;">
+            <input type="checkbox" value="${market}" ${isChecked} 
+                   onchange="updateTranslatedVideoMarkets('${language}')" 
+                   style="cursor: pointer;">
+            <span>${market}</span>
+          </label>
+        `;
+      }).join('');
+
+      // Create result card
+      const resultCard = document.createElement('div');
+      resultCard.className = 'translation-result-card';
+      resultCard.id = `translation-result-${language}`;
+      resultCard.innerHTML = `
+        <div class="translation-result-header">
+          ${getLangFlag(language)} ${language}
+        </div>
+        <div class="translation-result-body">
+          <video class="translation-result-video" controls src="${videoUrl}"></video>
+          
+          <div style="margin: 12px 0; padding: 10px; background: #f8f9fa; border-radius: 6px;">
+            <label style="font-weight: 600; font-size: 0.9rem; color: #495057; display: block; margin-bottom: 8px;">
+              <i class="fas fa-globe"></i> Target Markets
+            </label>
+            <div id="markets-${language}" style="display: flex; flex-wrap: wrap;">
+              ${marketCheckboxesHtml}
+            </div>
+          </div>
+          
+          <div class="translation-result-actions">
+            <button class="translation-result-btn translation-regenerate-btn" onclick="regenerateVideoTranslation('${language}')">
+              <i class="fas fa-redo"></i> Regenerate
+            </button>
+            <button class="translation-result-btn translation-download-btn" onclick="downloadVideoTranslation('${videoUrl}', '${language}')">
+              <i class="fas fa-download"></i> Download
+            </button>
+            <button class="translation-result-btn translation-delete-btn" onclick="deleteVideoTranslation('${language}')" style="background: #dc3545;">
+              <i class="fas fa-trash"></i> Delete
+            </button>
+          </div>
+        </div>
+      `;
+
+      resultsGrid.appendChild(resultCard);
+    }
+  }
+
+  function addVideoTranslationResult(language, videoUrl) {
+    // Accept file object or string
+    let finalUrl = '';
+    let fileObj = null;
+    let fileName = '';
+    if (videoUrl && typeof videoUrl === 'object') {
+      fileObj = videoUrl;
+      finalUrl = fileObj.directUrlOriginal || fileObj.directUrl || fileObj.url || '';
+      fileName = fileObj.name || '';
+      console.log(`[addVideoTranslationResult] File object for ${language}:`, fileObj);
+      console.log(`[addVideoTranslationResult] Using finalUrl:`, finalUrl);
+    } else if (typeof videoUrl === 'string') {
+      finalUrl = videoUrl;
+      console.log(`[addVideoTranslationResult] String URL for ${language}:`, finalUrl);
+    }
+    // Fallback: try other known keys if still missing
+    if (!finalUrl && fileObj) {
+      finalUrl = fileObj['directUrl'] || fileObj['url'] || '';
+      console.log(`[addVideoTranslationResult] Fallback finalUrl:`, finalUrl);
+    }
+    if (!finalUrl) {
+      console.warn('No video URL found for language', language, videoUrl);
+      return;
+    }
+
+    // Get default markets from main form
+    const defaultMarkets = Array.from(document.querySelectorAll('#market-checkboxes input[type="checkbox"]:checked'))
+      .map(cb => cb.value);
+
+    // Save to state (including filename and markets)
+    videoTranslationState.translationResults[language] = {
+      url: finalUrl,
+      filename: fileName,
+      markets: defaultMarkets.length > 0 ? defaultMarkets : MARKETS // Default to all markets if none selected
+    };
+
+    // Add card to UI
+    addVideoTranslationResultCard(language, finalUrl);
+  }
+
+  // Function to update markets for a translated video
+  window.updateTranslatedVideoMarkets = function(language) {
+    const marketsContainer = document.getElementById(`markets-${language}`);
+    if (!marketsContainer) return;
+    
+    const selectedMarkets = Array.from(marketsContainer.querySelectorAll('input[type="checkbox"]:checked'))
+      .map(cb => cb.value);
+    
+    // Update state
+    if (videoTranslationState.translationResults[language]) {
+      videoTranslationState.translationResults[language].markets = selectedMarkets;
+      console.log(`Updated markets for ${language}:`, selectedMarkets);
+    }
+  };
+
+  window.regenerateVideoTranslation = async function(language) {
+    const resultCard = document.getElementById(`translation-result-${language}`);
+    const regenerateBtn = resultCard?.querySelector('.translation-regenerate-btn');
+    const emailInput = document.getElementById('video-translation-email');
+    
+    if (!regenerateBtn || !videoTranslationState.selectedVideoUrl) {
+      alert('Please ensure a video is selected first.');
+      return;
+    }
+
+    regenerateBtn.disabled = true;
+    regenerateBtn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Deleting old video...';
+
+    try {
+      // STEP 1: Delete the old translated video first
+      const videoInfo = videoTranslationState.translationResults[language];
+      if (videoInfo) {
+        const originalFilename = videoTranslationState.selectedVideoFilename || '';
+        const baseFilename = originalFilename.replace(/\.[^/.]+$/, '');
+        
+        let translatedFilename = '';
+        if (videoInfo.filename) {
+          translatedFilename = videoInfo.filename;
+        } else {
+          const extension = originalFilename.split('.').pop() || 'mp4';
+          translatedFilename = `${baseFilename}_${language}.${extension}`;
+        }
+
+        console.log('Deleting old translated video before regeneration:', translatedFilename);
+        
+        // Send delete request
+        const webhookUrl = 'https://saschag.app.n8n.cloud/webhook/list-videos';
+        const params = new URLSearchParams({
+          action: 'delete',
+          filename: translatedFilename,
+          folder: 'KJGAJ',
+          language: language
+        });
+        
+        try {
+          const deleteResponse = await fetch(`${webhookUrl}?${params.toString()}`, {
+            method: 'GET'
+          });
+          
+          if (deleteResponse.ok) {
+            console.log('Old video deleted successfully');
+            showNotification(`🗑️ Deleted old ${language} video`, 'success');
+          } else {
+            console.warn('Failed to delete old video, but continuing with regeneration');
+          }
+        } catch (deleteError) {
+          console.warn('Error deleting old video:', deleteError);
+          // Continue anyway even if delete fails
+        }
+        
+        // Remove from state
+        delete videoTranslationState.translationResults[language];
+        
+        // Wait a moment for the deletion to process
+        await new Promise(resolve => setTimeout(resolve, 1000));
+      }
+
+      // STEP 2: Start new translation
+      regenerateBtn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Sending translation request...';
+      
+      // Show progress update
+      const progressItem = document.getElementById(`translation-progress-${language}`);
+      if (progressItem) {
+        const statusBadge = progressItem.querySelector('.translation-status-badge');
+        const progressBar = progressItem.querySelector('.translation-progress-bar-fill');
+        
+        statusBadge.className = 'translation-status-badge translation-status-processing';
+        statusBadge.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Preparing request';
+        if (progressBar) progressBar.style.width = '10%';
+      }
+      
+      // Download video from URL first
+      const videoBlob = await fetch(videoTranslationState.selectedVideoUrl).then(r => r.blob());
+      
+      // Create FormData for single language
+      const formData = new FormData();
+      formData.append('file', videoBlob, videoTranslationState.selectedVideoFilename);
+      formData.append('filename', videoTranslationState.selectedVideoFilename);
+      formData.append('language', language);
+      formData.append('e-mail', emailInput ? emailInput.value.trim() : '');
+
+      // Send to n8n webhook - Use VIDEO_TRANSLATION_CONFIG
+      const response = await fetch(VIDEO_TRANSLATION_CONFIG.webhookUrl, {
+        method: 'POST',
+        body: formData
+      });
+
+      if (!response.ok) {
+        throw new Error(`Failed to send regeneration request: ${response.status}`);
+      }
+
+      const result = await response.json();
+      console.log('Regeneration webhook response:', result);
+
+      // Update button and progress UI
+      regenerateBtn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Waiting for translation...';
+      
+      if (progressItem) {
+        const statusBadge = progressItem.querySelector('.translation-status-badge');
+        const progressBar = progressItem.querySelector('.translation-progress-bar-fill');
+        
+        statusBadge.className = 'translation-status-badge translation-status-processing';
+        statusBadge.innerHTML = '<i class="fas fa-hourglass-half"></i> Translation in progress';
+        if (progressBar) progressBar.style.width = '20%';
+      }
+
+      // Start polling for the new translated file
+      showNotification(`🔄 ${language} translation started. Checking for result every 30 seconds...`, 'success');
+      
+      const POLLING_INTERVAL = 30000; // 30 seconds (reduced API calls)
+      const MAX_ATTEMPTS = 180; // 30 minutes max
+      let attempts = 0;
+      const originalFilename = videoTranslationState.selectedVideoFilename || '';
+      const baseFilename = originalFilename.replace(/\.[^/.]+$/, '');
+      
+      // Track the last known video to detect when a new one appears
+      const currentVideoInfo = videoTranslationState.translationResults[language];
+      const currentVideoUrl = currentVideoInfo?.url || currentVideoInfo || '';
+      
+      const pollInterval = setInterval(async () => {
+        attempts++;
+        
+        // Update status with attempt count
+        regenerateBtn.innerHTML = `<i class="fas fa-spinner fa-spin"></i> Checking... (${attempts}/${MAX_ATTEMPTS})`;
+        if (progressItem) {
+          const statusBadge = progressItem.querySelector('.translation-status-badge');
+          const progressBar = progressItem.querySelector('.translation-progress-bar-fill');
+          
+          statusBadge.innerHTML = `<i class="fas fa-search"></i> Checking for result (${attempts}/${MAX_ATTEMPTS})`;
+          const progressPercent = 20 + (attempts / MAX_ATTEMPTS * 70); // 20% to 90%
+          if (progressBar) progressBar.style.width = `${Math.min(progressPercent, 90)}%`;
+        }
+        
+        try {
+          // Fetch files from Canto folder KJGAJ (where translated videos are stored)
+          const cantoFiles = await fetchCantoVideos('KJGAJ');
+          
+          // Look for the translated file
+          const matchedFile = cantoFiles.find(file => {
+            const filename = file.name;
+            const filenameLower = filename.toLowerCase();
+            const langLower = language.toLowerCase();
+            
+            // Pattern 1: BaseFilename_Language.ext
+            if (filename.startsWith(baseFilename + '_')) {
+              const afterUnderscore = filename.substring(baseFilename.length + 1);
+              const langPart = afterUnderscore.split('.')[0];
+              if (langPart.toLowerCase() === langLower) return true;
+            }
+            
+            // Pattern 2: Contains both base filename and language
+            const baseFilenameLower = baseFilename.toLowerCase();
+            if (filenameLower.includes(baseFilenameLower) && filenameLower.includes(`_${langLower}`)) {
+              return true;
+            }
+            
+            // Pattern 3: Try with language code
+            const langCode = getLangCode(language);
+            if (filename.startsWith(baseFilename + '_')) {
+              const afterUnderscore = filename.substring(baseFilename.length + 1);
+              const langPart = afterUnderscore.split('.')[0];
+              if (langPart.toLowerCase() === langCode.toLowerCase()) return true;
+            }
+            
+            return false;
+          });
+          
+          if (matchedFile) {
+            const newVideoUrl = matchedFile.directUrlOriginal || matchedFile.directUrl || matchedFile.url || '';
+            
+            // Check if this is a different video (newer) than what we had
+            // This helps detect when regeneration completes
+            if (newVideoUrl && newVideoUrl !== currentVideoUrl) {
+              console.log(`✅ Found regenerated video for ${language}:`, matchedFile.name);
+              
+              // Clear polling
+              clearInterval(pollInterval);
+              
+              // Get current markets for this language
+              const marketsContainer = document.getElementById(`markets-${language}`);
+              const currentMarkets = marketsContainer 
+                ? Array.from(marketsContainer.querySelectorAll('input[type="checkbox"]:checked')).map(cb => cb.value)
+                : (videoTranslationState.translationResults[language]?.markets || []);
+              
+              // Update state with new video (save URL, filename, and markets)
+              videoTranslationState.translationResults[language] = {
+                url: newVideoUrl,
+                filename: matchedFile.name,
+                markets: currentMarkets
+              };
+              
+              // Update progress to success
+              updateVideoTranslationProgress(language, 'success');
+              
+              // Update button to show success
+              regenerateBtn.disabled = false;
+              regenerateBtn.innerHTML = '<i class="fas fa-redo"></i> Regenerate';
+              
+              // Update the result card with new video
+              const videoElement = resultCard.querySelector('.translation-result-video');
+              if (videoElement) {
+                videoElement.src = newVideoUrl;
+                videoElement.load(); // Reload video
+              }
+              
+              showNotification(`✅ ${language} translation regenerated successfully!`, 'success');
+            } else {
+              // Same video found, keep polling
+              console.log(`⏳ ${language}: Same video found, waiting for new version (attempt ${attempts}/${MAX_ATTEMPTS})`);
+            }
+          } else {
+            console.log(`⏳ ${language}: Video not found yet (attempt ${attempts}/${MAX_ATTEMPTS})`);
+          }
+          
+          // Check if max attempts reached
+          if (attempts >= MAX_ATTEMPTS) {
+            clearInterval(pollInterval);
+            console.warn(`⏱️ Polling timeout for ${language} after ${attempts} attempts`);
+            
+            updateVideoTranslationProgress(language, 'error');
+            
+            regenerateBtn.disabled = false;
+            regenerateBtn.innerHTML = '<i class="fas fa-redo"></i> Regenerate';
+            
+            showNotification(`⏱️ Timeout waiting for ${language} regeneration. Please check later.`, 'error');
+          }
+          
+        } catch (pollError) {
+          console.error('Polling error:', pollError);
+        }
+      }, POLLING_INTERVAL);
+
+    } catch (error) {
+      console.error('Error regenerating video:', error);
+      alert('An error occurred during translation. Please try again.\n' + error.message);
+      
+      regenerateBtn.disabled = false;
+      regenerateBtn.innerHTML = '<i class="fas fa-redo"></i> Regenerate';
+    }
+  };
+
+  window.deleteVideoTranslation = async function(language) {
+    // Confirm deletion
+    if (!confirm(`Do you want to delete the translated video for ${language}?\nThis will permanently delete the translated video.`)) {
+      return;
+    }
+
+    const resultCard = document.getElementById(`translation-result-${language}`);
+    const deleteBtn = resultCard?.querySelector('.translation-delete-btn');
+    
+    if (!deleteBtn) {
+      alert('Unable to find delete button.');
+      return;
+    }
+
+    // Check if we have the video info
+    const videoInfo = videoTranslationState.translationResults[language];
+    if (!videoInfo) {
+      alert('No video information found for this language.');
+      return;
+    }
+
+    // Get the filename - need to construct it from the original filename and language
+    const originalFilename = videoTranslationState.selectedVideoFilename || '';
+    const baseFilename = originalFilename.replace(/\.[^/.]+$/, ''); // Remove extension
+    
+    // Construct the translated filename pattern
+    // Pattern: BaseFilename_Language.mp4 (e.g., "A New Day_English.mp4")
+    let translatedFilename = '';
+    
+    if (videoInfo.filename) {
+      // If we have the filename from the file object, use it
+      translatedFilename = videoInfo.filename;
+    } else {
+      // Otherwise, construct it from the pattern
+      const extension = originalFilename.split('.').pop() || 'mp4';
+      translatedFilename = `${baseFilename}_${language}.${extension}`;
+    }
+
+    console.log('Attempting to delete translated video:', translatedFilename);
+
+    deleteBtn.disabled = true;
+    deleteBtn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Deleting...';
+
+    try {
+      // Send webhook to delete the file - Use GET method to avoid CORS preflight
+      const webhookUrl = 'https://saschag.app.n8n.cloud/webhook/list-videos';
+      const params = new URLSearchParams({
+        action: 'delete',
+        filename: translatedFilename,
+        folder: 'KJGAJ', // The folder where translated videos are stored
+        language: language
+      });
+      
+      const response = await fetch(`${webhookUrl}?${params.toString()}`, {
+        method: 'GET'
+      });
+
+      if (!response.ok) {
+        throw new Error(`Failed to delete video: ${response.status}`);
+      }
+
+      const result = await response.json();
+      console.log('Delete webhook response:', result);
+
+      // Remove from state
+      delete videoTranslationState.translationResults[language];
+
+      // Remove the result card from UI
+      if (resultCard) {
+        resultCard.style.opacity = '0';
+        resultCard.style.transform = 'scale(0.9)';
+        setTimeout(() => {
+          resultCard.remove();
+          
+          // Check if there are any remaining results
+          const resultsGrid = document.getElementById('video-translation-results-grid');
+          if (resultsGrid && resultsGrid.children.length === 0) {
+            const resultsSection = document.getElementById('video-translation-results');
+            if (resultsSection) resultsSection.style.display = 'none';
+          }
+        }, 300);
+      }
+
+      // Also remove from progress section if exists
+      const progressItem = document.getElementById(`translation-progress-${language}`);
+      if (progressItem) {
+        progressItem.remove();
+      }
+
+      showNotification(`✅ Successfully deleted ${language} video`, 'success');
+
+    } catch (error) {
+      console.error('Error deleting video:', error);
+      alert('An error occurred while deleting the video. Please try again.\n' + error.message);
+      
+      deleteBtn.disabled = false;
+      deleteBtn.innerHTML = '<i class="fas fa-trash"></i> Delete';
+    }
+  };
+
+  function updateVideoTranslationResult(language, videoUrl) {
+    videoTranslationState.translationResults[language] = videoUrl;
+    
+    const resultCard = document.getElementById(`translation-result-${language}`);
+    if (resultCard) {
+      const video = resultCard.querySelector('.translation-result-video');
+      if (video) video.src = videoUrl;
+    }
+    
+    updateVideoTranslationProgress(language, 'success');
+  }
+
+  window.downloadVideoTranslation = function(videoUrl, language) {
+    const a = document.createElement('a');
+    a.href = videoUrl;
+    const filename = videoTranslationState.selectedVideoFilename ? 
+      `${videoTranslationState.selectedVideoFilename.split('.')[0]}_${language}.mp4` :
+      `video_${language}.mp4`;
+    a.download = filename;
+    document.body.appendChild(a);
+    a.click();
+    document.body.removeChild(a);
+  };
+
+  function resetVideoTranslation() {
+    videoTranslationState = {
+      selectedVideoUrl: null,
+      selectedVideoFilename: null,
+      selectedLanguages: new Set(),
+      translationResults: {},
+      pollingIntervals: {}
+    };
+
+    // Reset UI
+    const emailInput = document.getElementById('video-translation-email');
+    const progressSection = document.getElementById('video-translation-progress');
+    const resultsSection = document.getElementById('video-translation-results');
+    const languageCheckboxes = document.querySelectorAll('#translation-language-checkboxes input[type="checkbox"]');
+    const sourceInfo = document.getElementById('video-translation-source-info');
+
+    if (emailInput) emailInput.value = '';
+    if (progressSection) progressSection.style.display = 'none';
+    if (resultsSection) resultsSection.style.display = 'none';
+    if (sourceInfo) sourceInfo.style.display = 'none';
+    
+    languageCheckboxes.forEach(cb => cb.checked = false);
+
+    updateStartTranslationButton();
+  }
+
+  function getLangFlag(language) {
+    const flags = {
+      'English': '🇺🇸',
+      'Japanese': '🇯🇵',
+      'Tamil': '🇮🇳',
+      'Chinese': '🇨🇳',
+      'Korean': '🇰🇷',
+      'Hindi': '🇮🇳',
+      'Arabic': '🇸🇦',
+      'Bengali': '🇧🇩',
+      'Russian': '🇷🇺',
+      'Marathi': '🇮🇳',
+      'French': '🇫🇷',
+      'German': '🇩🇪',
+      'Portuguese': '🇧🇷'
+    };
+    return flags[language] || '🌍';
+  }
+
+  // ==================== END VIDEO TRANSLATION FEATURE ====================
 </script>
 </body>
 </html>
