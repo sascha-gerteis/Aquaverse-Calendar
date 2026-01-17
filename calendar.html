@@ -3334,6 +3334,7 @@ function updateOverallTranslationProgressStatus() {
 
     try {
       const uploadedImages = [];
+      const failedImages = [];
       
       // Get current number of existing images for sequence numbering
       let existingImagesCount = 0;
@@ -3352,114 +3353,154 @@ function updateOverallTranslationProgressStatus() {
       for (let i = 0; i < files.length; i++) {
         const file = files[i];
         
+        console.log(`Processing file ${i + 1}/${totalFiles}: ${file.name} (${file.size} bytes, ${file.type})`);
+        
         // Validate file type
         if (!file.type.startsWith('image/')) {
           showNotification(`${file.name} is not an image file`, 'error');
+          failedImages.push(`${file.name} (not an image)`);
+          continue;
+        }
+
+        // Validate file size (max 10MB)
+        if (file.size > 10 * 1024 * 1024) {
+          showNotification(`${file.name} is too large (max 10MB)`, 'error');
+          failedImages.push(`${file.name} (too large)`);
           continue;
         }
 
         // Update progress notification
         uploadedCount++;
-        showNotification(`Uploading image ${uploadedCount}/${totalFiles}...`, 'info');
+        showNotification(`Uploading ${file.name} (${uploadedCount}/${totalFiles})...`, 'info');
 
         // Generate filename based on pattern: YYYY-MM-DD-act_XXXXX_MARKET_PLATFORM_SEQ.EXT
         const ext = file.name.split('.').pop();
         const sequenceIndex = existingImagesCount + uploadedImages.length;
         const filename = generateCarouselFilename(ext, sequenceIndex);
 
-        // Try uploading - if RLS fails, show helpful error
-        try {
-          const { data, error } = await supabase.storage
-            .from(BUCKET_CAROUSEL)
-            .upload(filename, file, {
-              cacheControl: '3600',
-              upsert: true,
-              contentType: file.type
-            });
+        console.log(`Generated filename: ${filename}`);
 
-          if (error) {
-            console.error('Upload error:', error);
-            
-            // Check if it's an RLS error
-            if (error.message && error.message.includes('row-level security')) {
-              showNotification(
-                'Storage upload permission denied. Please contact admin to enable upload permissions in Supabase Storage policies.',
-                'error'
-              );
-              console.error(`
+        // Try uploading with retry mechanism
+        let uploadSuccess = false;
+        let retryCount = 0;
+        const maxRetries = 2;
+        
+        while (!uploadSuccess && retryCount < maxRetries) {
+          try {
+            const { data, error } = await supabase.storage
+              .from(BUCKET_CAROUSEL)
+              .upload(filename, file, {
+                cacheControl: '3600',
+                upsert: true,
+                contentType: file.type
+              });
+
+            if (error) {
+              console.error(`Upload error (attempt ${retryCount + 1}):`, error);
+              
+              // Check if it's an RLS error and we should stop retrying
+              if (error.message && error.message.includes('row-level security')) {
+                console.error(`
 ═══════════════════════════════════════════════════════════════
-⚠️  STORAGE PERMISSION ERROR
+⚠️  RLS POLICY ERROR FOR: ${file.name}
 ═══════════════════════════════════════════════════════════════
-The Supabase Storage bucket "${BUCKET_CAROUSEL}" requires RLS policies.
+Fix this in Supabase Dashboard → Storage → Policies:
 
-To fix this, go to Supabase Dashboard → Storage → Policies and add:
-
-CREATE POLICY "Allow authenticated uploads"
-ON storage.objects FOR INSERT
-TO authenticated
-WITH CHECK (bucket_id = '${BUCKET_CAROUSEL}');
-
-CREATE POLICY "Allow authenticated to read"
-ON storage.objects FOR SELECT
-TO authenticated, anon
-USING (bucket_id = '${BUCKET_CAROUSEL}');
+CREATE POLICY "Allow all operations on carousel-image"
+ON storage.objects FOR ALL
+TO public
+USING (bucket_id = 'carousel-image')
+WITH CHECK (bucket_id = 'carousel-image');
 ═══════════════════════════════════════════════════════════════
-              `);
-              break; // Stop trying to upload more files
+                `);
+                failedImages.push(`${file.name} (permission error)`);
+                break; // Don't retry for RLS errors
+              } else {
+                // For other errors, try again
+                retryCount++;
+                if (retryCount < maxRetries) {
+                  console.log(`Retrying upload for ${file.name}...`);
+                  await new Promise(resolve => setTimeout(resolve, 1000)); // Wait 1 second
+                } else {
+                  failedImages.push(`${file.name} (${error.message})`);
+                }
+              }
             } else {
-              showNotification(`Failed to upload ${file.name}`, 'error');
-              continue;
+              console.log(`Successfully uploaded: ${filename}`);
+              uploadedImages.push(filename);
+              uploadSuccess = true;
+            }
+          } catch (uploadErr) {
+            console.error(`Upload exception (attempt ${retryCount + 1}):`, uploadErr);
+            retryCount++;
+            if (retryCount < maxRetries) {
+              await new Promise(resolve => setTimeout(resolve, 1000)); // Wait 1 second
+            } else {
+              failedImages.push(`${file.name} (network error)`);
             }
           }
-
-          uploadedImages.push(filename);
-        } catch (uploadErr) {
-          console.error('Upload exception:', uploadErr);
-          showNotification(`Error uploading ${file.name}`, 'error');
-          continue;
         }
       }
 
-      if (uploadedImages.length > 0) {
-        // Update calendar data with new images
-        const { data: sel } = await supabase.from('calendars').select('days').eq('id', id).maybeSingle();
-        if (sel && sel.days) {
-          const days = { ...sel.days };
-          const currentDayArr = days[day] || [];
+      // Show final results summary
+      if (uploadedImages.length > 0 || failedImages.length > 0) {
+        let summaryMessage = '';
+        
+        if (uploadedImages.length > 0) {
+          summaryMessage += `✅ Successfully uploaded: ${uploadedImages.length} image(s)`;
+        }
+        
+        if (failedImages.length > 0) {
+          summaryMessage += (summaryMessage ? '\n' : '') + `❌ Failed uploads: ${failedImages.length} image(s)`;
+          console.error('Failed uploads:', failedImages);
           
-          if (activityId) {
-            // Existing activity - update it
-            const activityIndex = currentDayArr.findIndex(item => item.id === activityId);
+          // Show detailed failure reasons
+          const failureDetails = failedImages.map(f => `• ${f}`).join('\n');
+          showNotification(`Upload completed with some failures:\n\n${summaryMessage}\n\nFailed files:\n${failureDetails}`, 'warning');
+        } else if (uploadedImages.length > 0) {
+          showNotification(summaryMessage, 'success');
+        }
+
+        // Update calendar data with successfully uploaded images
+        if (uploadedImages.length > 0) {
+          const { data: sel } = await supabase.from('calendars').select('days').eq('id', id).maybeSingle();
+          if (sel && sel.days) {
+            const days = { ...sel.days };
+            const currentDayArr = days[day] || [];
             
-            if (activityIndex > -1) {
-              const activity = currentDayArr[activityIndex];
-              activity.images = activity.images || [];
-              activity.images.push(...uploadedImages);
-              days[day] = currentDayArr;
+            if (activityId) {
+              // Existing activity - update it
+              const activityIndex = currentDayArr.findIndex(item => item.id === activityId);
               
-              await supabase.from('calendars').upsert({ id, days }, { onConflict: 'id' });
-              monthDataCache = days;
-              
-              // Update preview without refreshing modal
-              renderCarouselImagesPreview(activity.images);
-              updateCarouselImagesCount(activity.images.length);
-              showNotification(`Successfully uploaded ${uploadedImages.length} image(s)`, 'success');
+              if (activityIndex > -1) {
+                const activity = currentDayArr[activityIndex];
+                activity.images = activity.images || [];
+                activity.images.push(...uploadedImages);
+                days[day] = currentDayArr;
+                
+                await supabase.from('calendars').upsert({ id, days }, { onConflict: 'id' });
+                monthDataCache = days;
+                
+                // Update preview without refreshing modal
+                renderCarouselImagesPreview(activity.images);
+                updateCarouselImagesCount(activity.images.length);
+              } else {
+                showNotification('Activity not found. Please save the content first.', 'warning');
+              }
             } else {
-              showNotification('Activity not found. Please save the content first.', 'warning');
+              // New activity - store images temporarily in modal for saving later  
+              // Store in temporary variable for later save
+              window.tempCarouselImages = window.tempCarouselImages || [];
+              window.tempCarouselImages.push(...uploadedImages);
+              
+              // Update preview
+              renderCarouselImagesPreview(window.tempCarouselImages);
+              updateCarouselImagesCount(window.tempCarouselImages.length);
             }
-          } else {
-            // New activity - store images temporarily in modal for saving later
-            showNotification(`${uploadedImages.length} image(s) uploaded. Click "Save Content" to save them.`, 'info');
-            
-            // Store in temporary variable for later save
-            window.tempCarouselImages = window.tempCarouselImages || [];
-            window.tempCarouselImages.push(...uploadedImages);
-            
-            // Update preview
-            renderCarouselImagesPreview(window.tempCarouselImages);
-            updateCarouselImagesCount(window.tempCarouselImages.length);
           }
         }
+      } else {
+        showNotification('No files were uploaded successfully', 'error');
       }
     } catch (error) {
       console.error('Error uploading images:', error);
