@@ -5442,19 +5442,21 @@ const googlePayload = {
       }
 
       // 5. If some missing, send only those to webhook
-      // Download video from URL first
-      const videoBlob = await fetch(videoTranslationState.selectedVideoUrl).then(r => r.blob());
-      // Create FormData
-      const formData = new FormData();
-      formData.append('file', videoBlob, videoTranslationState.selectedVideoFilename);
-      formData.append('filename', videoTranslationState.selectedVideoFilename);
-      formData.append('language', missingLanguages.join(', '));
-      formData.append('e-mail', emailInput ? emailInput.value.trim() : '');
+      // Send video URL instead of file to avoid 413 error
+      const payload = {
+        videoUrl: videoTranslationState.selectedVideoUrl,
+        filename: videoTranslationState.selectedVideoFilename,
+        language: missingLanguages.join(', '),
+        email: emailInput ? emailInput.value.trim() : ''
+      };
 
       // Send to n8n webhook
       const response = await fetch(VIDEO_TRANSLATION_CONFIG.webhookUrl, {
         method: 'POST',
-        body: formData
+        headers: {
+          'Content-Type': 'application/json'
+        },
+        body: JSON.stringify(payload)
       });
 
       if (!response.ok) {
@@ -5889,20 +5891,21 @@ const googlePayload = {
         if (progressBar) progressBar.style.width = '10%';
       }
       
-      // Download video from URL first
-      const videoBlob = await fetch(videoTranslationState.selectedVideoUrl).then(r => r.blob());
-      
-      // Create FormData for single language
-      const formData = new FormData();
-      formData.append('file', videoBlob, videoTranslationState.selectedVideoFilename);
-      formData.append('filename', videoTranslationState.selectedVideoFilename);
-      formData.append('language', language);
-      formData.append('e-mail', emailInput ? emailInput.value.trim() : '');
+      // Send video URL instead of file to avoid 413 error
+      const payload = {
+        videoUrl: videoTranslationState.selectedVideoUrl,
+        filename: videoTranslationState.selectedVideoFilename,
+        language: language,
+        email: emailInput ? emailInput.value.trim() : ''
+      };
 
       // Send to n8n webhook - Use VIDEO_TRANSLATION_CONFIG
       const response = await fetch(VIDEO_TRANSLATION_CONFIG.webhookUrl, {
         method: 'POST',
-        body: formData
+        headers: {
+          'Content-Type': 'application/json'
+        },
+        body: JSON.stringify(payload)
       });
 
       if (!response.ok) {
