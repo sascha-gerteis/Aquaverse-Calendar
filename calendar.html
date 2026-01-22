@@ -4195,10 +4195,8 @@ USING (bucket_id = '${BUCKET_CAROUSEL_VIDEO}');
     if (selectedMarketsList.length === 0) { alert('Please select at least one market'); return; }
 
     if (!type) { alert('Please select a content type'); return; }
-    if (type === 'ai-carousel' && !aiPrompt.trim()) {
-      alert('AI Carousel requires an AI Generation Prompt.');
-      return;
-    }
+    
+    // AI Carousel ไม่บังคับ prompt - บันทึกได้เลย (จะเจนภาพตอนที่มี prompt)
 
     // Inventory check
     if (type === 'ai-shortform') {
