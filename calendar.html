@@ -106,6 +106,7 @@
     .content-type { font-size:.85rem; padding:4px 8px; border-radius:4px; margin-bottom:5px; color:white; font-weight:600; display:inline-block; }
     .shortform { background:#28a745; }
     .ai-shortform { background:#007bff; }
+    .single-photo { background:#20c997; }
     .ai-carousel { background:#17a2b8; }
     .real-carousel { background:#fd7e14; }
     .longform { background:#6f42c1; }
@@ -237,10 +238,121 @@
     .legend-item { display:flex; align-items:center; gap:5px; }
     .legend-color { width:20px; height:20px; border-radius:4px; }
 
-    .empty-day { background:#f8f9fa; padding:6px; border-radius:6px; display:inline-block; }
+    /* Copy Selection Modal Styles */
+    .copy-content-item {
+      transition: background-color 0.2s ease;
+    }
+    .copy-content-item:hover {
+      background-color: #f8f9fa;
+    }
+    .copy-selection-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 15px;
+      padding-bottom: 10px;
+      border-bottom: 1px solid #e9ecef;
+    }
+    .select-all-controls {
+      display: flex;
+      gap: 8px;
+    }
+    .select-all-btn, .deselect-all-btn {
+      padding: 4px 12px;
+      border: 1px solid #dee2e6;
+      background: white;
+      color: #6c757d;
+      border-radius: 4px;
+      cursor: pointer;
+      font-size: 0.8rem;
+      transition: all 0.2s ease;
+    }
+    .select-all-btn:hover {
+      background: #007bff;
+      color: white;
+      border-color: #007bff;
+    }
+    .deselect-all-btn:hover {
+      background: #dc3545;
+      color: white;
+      border-color: #dc3545;
+    }
 
-    .other-month { background:#f0f2f5; color:#adb5bd; }
-    .swipe-info { text-align:center; margin-top:15px; color:var(--gray); font-size:.9rem; }
+    /* Bulk Selection Styles */
+    .bulk-actions {
+      display: flex;
+      gap: 10px;
+      align-items: center;
+      margin-bottom: 20px;
+      padding: 15px;
+      background: white;
+      border-radius: 10px;
+      box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+    }
+    .bulk-actions.hidden { display: none; }
+    .selection-count {
+      font-weight: 600;
+      color: var(--primary);
+      margin-right: 15px;
+    }
+    .bulk-copy-btn, .bulk-paste-btn {
+      padding: 8px 16px;
+      border: none;
+      border-radius: 6px;
+      cursor: pointer;
+      font-weight: 600;
+      transition: all 0.2s ease;
+      display: flex;
+      align-items: center;
+      gap: 6px;
+    }
+    .bulk-copy-btn {
+      background: var(--primary);
+      color: white;
+    }
+    .bulk-copy-btn:hover:not(:disabled) {
+      background: #2a3a8c;
+      transform: translateY(-1px);
+    }
+    .bulk-paste-btn {
+      background: #20c997;
+      color: white;
+    }
+    .bulk-paste-btn:hover:not(:disabled) {
+      background: #17a2b8;
+      transform: translateY(-1px);
+    }
+    .bulk-clear-btn {
+      background: #6c757d;
+      color: white;
+    }
+    .bulk-clear-btn:hover:not(:disabled) {
+      background: #5a6268;
+      transform: translateY(-1px);
+    }
+    .bulk-copy-btn:disabled, .bulk-paste-btn:disabled, .bulk-clear-btn:disabled {
+      opacity: 0.5;
+      cursor: not-allowed;
+      transform: none;
+    }
+    .bulk-copy-btn i, .bulk-paste-btn i, .bulk-clear-btn i { font-size: 0.9rem; }
+
+    /* Content Selection Checkbox */
+    .content-selection-checkbox {
+      margin-right: 8px;
+      transform: scale(1.2);
+      cursor: pointer;
+    }
+    .activity-block.selected {
+      background: #fff3cd;
+      border-color: #ffc107;
+    }
+    .activity-block.selected .content-type {
+      background: linear-gradient(135deg, #ffc107, #fd7e14);
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+      background-clip: text;
+    }
 
     .modal { display:none; position:fixed; top:0; left:0; width:100%; height:100%; background:rgba(0,0,0,0.5); z-index:1000; justify-content:center; align-items:center; padding:16px; }
     .modal-content { background:white; padding:22px; border-radius:10px; width:92%; max-width:640px; box-shadow:0 5px 15px rgba(0,0,0,0.3); max-height:90vh; overflow-y:auto; }
@@ -875,6 +987,20 @@
       </div>
     </div>
 
+    <!-- Bulk Actions for Content Selection -->
+    <div class="bulk-actions hidden" id="bulk-actions" style="display: none;">
+      <div class="selection-count" id="selection-count">0 items selected</div>
+      <button class="bulk-copy-btn" id="bulk-copy-btn" disabled>
+        <i class="fas fa-copy"></i> Copy Selected
+      </button>
+      <button class="bulk-paste-btn" id="bulk-paste-btn" disabled>
+        <i class="fas fa-paste"></i> Paste to Selected Day
+      </button>
+      <button class="bulk-clear-btn" id="bulk-clear-btn" onclick="clearSelection()">
+        <i class="fas fa-times"></i> Clear Selection
+      </button>
+    </div>
+
     <div class="calendar-container" id="calendar-container">
       <div class="calendar-inner" id="calendar"></div>
     </div>
@@ -886,6 +1012,7 @@
     <div class="legend">
       <div class="legend-item"><div class="legend-color shortform"></div><span>Shortform</span></div>
       <div class="legend-item"><div class="legend-color ai-shortform"></div><span>AI Shortform</span></div>
+      <div class="legend-item"><div class="legend-color single-photo"></div><span>Single Photo</span></div>
       <div class="legend-item"><div class="legend-color ai-carousel"></div><span>AI Carousel</span></div>
       <div class="legend-item"><div class="legend-color real-carousel"></div><span>Real Carousel</span></div>
       <div class="legend-item"><div class="legend-color longform"></div><span>Longform (1×/month)</span></div>
@@ -912,6 +1039,7 @@
             <option value="">Select Content Type</option>
             <option value="shortform">Shortform</option>
             <option value="ai-shortform">AI Shortform</option>
+            <option value="single-photo">Single Photo</option>
             <option value="ai-carousel">AI Carousel</option>
             <option value="real-carousel">Real Carousel</option>
             <option value="longform">Longform</option>
@@ -1314,6 +1442,33 @@
     </div>
   </div>
 
+  <!-- Copy Content Selection Modal -->
+  <div class="modal" id="copy-selection-modal">
+    <div class="modal-content" style="max-width: 600px;">
+      <div class="modal-header">
+        <h2 class="modal-title">Select Content to Copy</h2>
+        <button class="close-modal" id="close-copy-modal">&times;</button>
+      </div>
+      
+      <div class="copy-selection-header">
+        <div id="content-count">Select content items to copy</div>
+        <div class="select-all-controls">
+          <button type="button" class="select-all-btn" id="select-all-btn">Select All</button>
+          <button type="button" class="deselect-all-btn" id="deselect-all-btn">Deselect All</button>
+        </div>
+      </div>
+      
+      <div id="copy-content-list" style="max-height: 400px; overflow-y: auto; margin-bottom: 20px;">
+        <!-- Content items will be populated here -->
+      </div>
+
+      <div class="form-actions">
+        <button type="button" class="btn btn-primary" id="confirm-copy-btn">Copy Selected</button>
+        <button type="button" class="btn btn-secondary" id="cancel-copy-btn">Cancel</button>
+      </div>
+    </div>
+  </div>
+
   <div class="save-notification" id="save-notification">Changes saved successfully!</div>
 </div>
 
@@ -1376,6 +1531,8 @@
   let currentView = 'global';
   let currentMarket = 'US';
   let currentlyEditingDay = null;
+  let contentClipboard = null; // Store copied content
+  let selectedContentItems = new Set(); // Store selected content item IDs
 
   let monthDataCache = {};
   let pollingInterval = null;
@@ -2565,6 +2722,12 @@
       if (isEditMode) {
         const activityBlock = e.target.closest('.activity-block');
         if (activityBlock) {
+          // Check if clicked on checkbox - don't open modal in that case
+          const checkbox = e.target.closest('.content-selection-checkbox');
+          if (checkbox) {
+            return; // Let the checkbox onchange handler handle this
+          }
+          
           const activityId = activityBlock.dataset.activityId;
           if (activityId) openEditModal(day, activityId);
           return;
@@ -2619,6 +2782,10 @@
       
       updateSelectAllButton();
     });
+
+    // Bulk action buttons
+    document.getElementById('bulk-copy-btn').addEventListener('click', bulkCopySelected);
+    document.getElementById('bulk-paste-btn').addEventListener('click', bulkPasteToDay);
 
     const mq = window.matchMedia('(max-width: 600px)');
     mq.addEventListener?.('change', () => renderCalendar(currentDate));
@@ -2700,7 +2867,10 @@ function updateOverallTranslationProgressStatus() {
     } else {
       editBtn.classList.remove('active'); editBtn.innerHTML = 'Edit Mode';
       document.getElementById('calendar').classList.remove('editable');
+      // Clear selection when exiting edit mode
+      clearSelection();
     }
+    updateBulkActionsVisibility();
     renderCalendar(currentDate);
   }
 
@@ -4419,6 +4589,7 @@ const googlePayload = {
     switch (type) {
       case 'shortform': return 'Shortform';
       case 'ai-shortform': return 'AI Shortform';
+      case 'single-photo': return 'Single Photo';
       case 'ai-carousel': return 'AI Carousel';
       case 'real-carousel': return 'Real Carousel';
       case 'longform': return 'Longform';
@@ -4498,6 +4669,331 @@ const googlePayload = {
     }
   }
 
+  // Toggle content selection
+  function toggleContentSelection(activityId) {
+    if (selectedContentItems.has(activityId)) {
+      selectedContentItems.delete(activityId);
+    } else {
+      selectedContentItems.add(activityId);
+    }
+    updateBulkActionsVisibility();
+    renderCalendar(currentDate); // Re-render to update visual selection
+  }
+
+  // Clear all content selections
+  function clearSelection() {
+    selectedContentItems.clear();
+    updateBulkActionsVisibility();
+    renderCalendar(currentDate); // Re-render to update visual selection
+  }
+
+  // Update bulk actions visibility and state
+  function updateBulkActionsVisibility() {
+    const bulkActions = document.getElementById('bulk-actions');
+    const selectionCount = document.getElementById('selection-count');
+    const bulkCopyBtn = document.getElementById('bulk-copy-btn');
+    const bulkPasteBtn = document.getElementById('bulk-paste-btn');
+    const bulkClearBtn = document.getElementById('bulk-clear-btn');
+
+    const count = selectedContentItems.size;
+    selectionCount.textContent = `${count} item${count !== 1 ? 's' : ''} selected`;
+
+    if (count > 0) {
+      bulkActions.classList.remove('hidden');
+      bulkCopyBtn.disabled = false;
+      bulkClearBtn.disabled = false;
+    } else {
+      bulkActions.classList.add('hidden');
+      bulkCopyBtn.disabled = true;
+      bulkClearBtn.disabled = true;
+    }
+
+    bulkPasteBtn.disabled = !contentClipboard || contentClipboard.length === 0;
+  }
+
+  // Bulk copy selected content
+  function bulkCopySelected() {
+    if (selectedContentItems.size === 0) {
+      showNotification('No content selected', 'warning');
+      return;
+    }
+
+    // Collect all selected content from all days
+    const selectedContent = [];
+    Object.values(monthDataCache).forEach(rawDayData => {
+      const dayDataArray = Array.isArray(rawDayData) ? rawDayData : (rawDayData ? [rawDayData] : []);
+      dayDataArray.forEach(content => {
+        const activityId = content.id || `legacy_${dayDataArray.indexOf(content)}`;
+        if (selectedContentItems.has(activityId)) {
+          selectedContent.push(content);
+        }
+      });
+    });
+
+    performCopy(selectedContent);
+    
+    // Clear selection after copying
+    clearSelection();
+  }
+
+  // Bulk paste to selected day
+  async function bulkPasteToDay() {
+    if (!contentClipboard || contentClipboard.length === 0) {
+      showNotification('No content in clipboard', 'warning');
+      return;
+    }
+
+    // Find which day has selected content (use the first selected item's day)
+    let targetDay = null;
+    for (const [day, rawDayData] of Object.entries(monthDataCache)) {
+      const dayDataArray = Array.isArray(rawDayData) ? rawDayData : (rawDayData ? [rawDayData] : []);
+      const hasSelected = dayDataArray.some(content => {
+        const activityId = content.id || `legacy_${dayDataArray.indexOf(content)}`;
+        return selectedContentItems.has(activityId);
+      });
+      if (hasSelected) {
+        targetDay = parseInt(day);
+        break;
+      }
+    }
+
+    if (!targetDay) {
+      showNotification('Please select content in the target day first', 'warning');
+      return;
+    }
+
+    await pasteDayContent(targetDay);
+  }
+
+  // Copy day content (copy all content in the day immediately)
+  function copyDayContent(day) {
+    const rawDayData = (monthDataCache && monthDataCache[day]) || null;
+    const dayDataArray = Array.isArray(rawDayData) ? rawDayData : (rawDayData ? [rawDayData] : []);
+
+    if (dayDataArray.length === 0) {
+      showNotification('No content to copy', 'warning');
+      return;
+    }
+
+    // Copy all activities but exclude file-related fields
+    contentClipboard = dayDataArray.map(activity => {
+      const copied = {
+        type: activity.type,
+        theme: activity.theme,
+        markets: activity.markets ? [...activity.markets] : [],
+        platform: activity.platform ? (Array.isArray(activity.platform) ? [...activity.platform] : activity.platform) : null,
+        postTime: activity.postTime || null
+      };
+
+      // Copy carousel-related fields but not files
+      if (activity.type === 'ai-carousel' || activity.type === 'real-carousel') {
+        if (activity.prompt) copied.prompt = activity.prompt;
+        if (activity.carouselVideo) copied.carouselVideo = activity.carouselVideo;
+        if (activity.carouselVideoUrl) copied.carouselVideoUrl = activity.carouselVideoUrl;
+        // Note: We intentionally skip carouselImages (file uploads)
+      }
+
+      // Copy video fields for shortform/longform but not the actual files
+      if (activity.type && (activity.type.includes('shortform') || activity.type === 'longform')) {
+        if (activity.fileName) copied.fileName = activity.fileName;
+        if (activity.videoUrl) copied.videoUrl = activity.videoUrl;
+        // Note: We skip the actual uploaded file data
+      }
+
+      return copied;
+    });
+
+    showNotification(`Content copied from day ${day}`, 'success');
+    updateBulkActionsVisibility(); // Update paste button state
+    
+    // Clear selection after copying
+    clearSelection();
+  }
+  
+  // Show modal for selecting content to copy
+  function showCopySelectionModal(contentArray) {
+    const modal = document.getElementById('copy-selection-modal');
+    const contentList = document.getElementById('copy-content-list');
+    const contentCount = document.getElementById('content-count');
+    
+    // Clear previous content
+    contentList.innerHTML = '';
+    
+    // Update content count
+    contentCount.textContent = `${contentArray.length} content item${contentArray.length > 1 ? 's' : ''} available`;
+    
+    // Create content selection items
+    contentArray.forEach((content, index) => {
+      const itemDiv = document.createElement('div');
+      itemDiv.className = 'copy-content-item';
+      itemDiv.style.cssText = `
+        display: flex;
+        align-items: center;
+        padding: 12px;
+        border: 1px solid #e9ecef;
+        border-radius: 8px;
+        margin-bottom: 8px;
+        background: white;
+      `;
+      
+      const checkbox = document.createElement('input');
+      checkbox.type = 'checkbox';
+      checkbox.className = 'content-checkbox';
+      checkbox.value = index;
+      checkbox.style.cssText = 'margin-right: 12px; transform: scale(1.2);';
+      
+      const contentInfo = document.createElement('div');
+      contentInfo.style.cssText = 'flex: 1;';
+      
+      const typeSpan = document.createElement('div');
+      typeSpan.style.cssText = 'font-weight: 600; color: var(--primary); margin-bottom: 4px;';
+      typeSpan.textContent = getContentTypeName(content.type);
+      
+      const themeSpan = document.createElement('div');
+      themeSpan.style.cssText = 'font-size: 0.9rem; color: #666;';
+      themeSpan.textContent = content.theme || 'No theme';
+      
+      const marketsSpan = document.createElement('div');
+      marketsSpan.style.cssText = 'font-size: 0.8rem; color: #999; margin-top: 2px;';
+      marketsSpan.textContent = content.markets ? content.markets.join(', ') : 'No markets';
+      
+      contentInfo.appendChild(typeSpan);
+      contentInfo.appendChild(themeSpan);
+      contentInfo.appendChild(marketsSpan);
+      
+      itemDiv.appendChild(checkbox);
+      itemDiv.appendChild(contentInfo);
+      
+      contentList.appendChild(itemDiv);
+    });
+    
+    // Show modal
+    modal.style.display = 'flex';
+    
+    // Select All button handler
+    document.getElementById('select-all-btn').onclick = () => {
+      document.querySelectorAll('.content-checkbox').forEach(cb => cb.checked = true);
+    };
+    
+    // Deselect All button handler
+    document.getElementById('deselect-all-btn').onclick = () => {
+      document.querySelectorAll('.content-checkbox').forEach(cb => cb.checked = false);
+    };
+    
+    // Close modal handlers
+    document.getElementById('close-copy-modal').onclick = () => modal.style.display = 'none';
+    document.getElementById('cancel-copy-btn').onclick = () => modal.style.display = 'none';
+    
+    // Close modal when clicking outside
+    modal.onclick = function(e) {
+      if (e.target === modal) modal.style.display = 'none';
+    };
+    
+    // Confirm copy handler
+    document.getElementById('confirm-copy-btn').onclick = () => {
+      const selectedIndexes = Array.from(document.querySelectorAll('.content-checkbox:checked'))
+        .map(cb => parseInt(cb.value));
+      
+      if (selectedIndexes.length === 0) {
+        showNotification('Please select at least one content item', 'warning');
+        return;
+      }
+      
+      // Copy selected content
+      const selectedContent = selectedIndexes.map(index => contentArray[index]);
+      performCopy(selectedContent);
+      
+      modal.style.display = 'none';
+    };
+  }
+  
+  // Perform the actual copy operation
+  function performCopy(selectedContent) {
+    // Copy all activities but exclude file-related fields
+    contentClipboard = selectedContent.map(activity => {
+      const copied = {
+        type: activity.type,
+        theme: activity.theme,
+        markets: activity.markets ? [...activity.markets] : [],
+        platform: activity.platform ? (Array.isArray(activity.platform) ? [...activity.platform] : activity.platform) : null,
+        postTime: activity.postTime || null
+      };
+      
+      // Copy carousel-related fields but not files
+      if (activity.type === 'ai-carousel' || activity.type === 'real-carousel') {
+        if (activity.prompt) copied.prompt = activity.prompt;
+        if (activity.carouselVideo) copied.carouselVideo = activity.carouselVideo;
+        if (activity.carouselVideoUrl) copied.carouselVideoUrl = activity.carouselVideoUrl;
+        // Note: We intentionally skip carouselImages (file uploads)
+      }
+      
+      // Copy video fields for shortform/longform but not the actual files
+      if (activity.type && (activity.type.includes('shortform') || activity.type === 'longform')) {
+        if (activity.fileName) copied.fileName = activity.fileName;
+        if (activity.videoUrl) copied.videoUrl = activity.videoUrl;
+        // Note: We skip the actual uploaded file data
+      }
+      
+      return copied;
+    });
+    
+    const count = selectedContent.length;
+    showNotification(`${count} content item${count > 1 ? 's' : ''} copied`, 'success');
+    renderCalendar(currentDate); // Re-render to enable paste buttons
+  }
+  
+  // Paste day content
+  async function pasteDayContent(day) {
+    if (!contentClipboard || contentClipboard.length === 0) {
+      showNotification('No content in clipboard', 'warning');
+      return;
+    }
+    
+    try {
+      // Get current day data
+      const rawDayData = (monthDataCache && monthDataCache[day]) || null;
+      const currentDayArray = (Array.isArray(rawDayData) ? rawDayData : (rawDayData ? [rawDayData] : [])).slice();
+      
+      // Add copied content to the day
+      const newActivities = contentClipboard.map(activity => ({
+        ...activity,
+        id: newActivityId() // Generate new IDs for pasted content
+      }));
+      
+      currentDayArray.push(...newActivities);
+      
+      // Save using the same method as normal calendar saves
+      await writeDay(currentDate, day, currentDayArray);
+      
+      showNotification(`Content pasted to day ${day}`, 'success');
+    } catch (err) {
+      console.error('Paste error:', err);
+      showNotification('Failed to paste content', 'error');
+    }
+  }
+
+  // Expose functions to global scope for onclick handlers
+  window.copyDayContent = copyDayContent;
+  window.pasteDayContent = pasteDayContent;
+  window.toggleContentSelection = toggleContentSelection;
+  window.bulkCopySelected = bulkCopySelected;
+  window.bulkPasteToDay = bulkPasteToDay;
+  window.clearSelection = clearSelection;
+
+  // Add event listeners for bulk actions
+  document.addEventListener('DOMContentLoaded', function() {
+    const bulkCopyBtn = document.getElementById('bulk-copy-btn');
+    const bulkPasteBtn = document.getElementById('bulk-paste-btn');
+    
+    if (bulkCopyBtn) {
+      bulkCopyBtn.addEventListener('click', bulkCopySelected);
+    }
+    
+    if (bulkPasteBtn) {
+      bulkPasteBtn.addEventListener('click', bulkPasteToDay);
+    }
+  });
+
   function renderCalendar(date) {
     const calendarEl = document.getElementById('calendar');
     const monthYearEl = document.getElementById('current-month');
@@ -4556,8 +5052,13 @@ const googlePayload = {
                     </span>`;
       }
 
+      // Selection checkbox (only in edit mode)
+      const isSelected = selectedContentItems.has(activityId);
+      const checkboxHtml = isEditMode ? `<input type="checkbox" class="content-selection-checkbox" data-activity-id="${activityId}" ${isSelected ? 'checked' : ''} onchange="toggleContentSelection('${activityId}')">` : '';
+
       return `
-        <div class="activity-block" data-activity-id="${activityId}">
+        <div class="activity-block ${isSelected ? 'selected' : ''}" data-activity-id="${activityId}">
+          ${checkboxHtml}
           <div class="content-type ${dayData.type}">
              ${getContentTypeName(dayData.type)}${platformIcons}${videoIndicator}
           </div>
@@ -4597,6 +5098,14 @@ const googlePayload = {
         html += postStatusHtml;
         if (isEditMode) html += `<span class="edit-indicator"><i class="fas fa-edit"></i></span>`;
         html += `</div>`;
+        
+        // Add copy/paste controls for mobile
+        if (isEditMode) {
+          html += `<div class="copy-paste-controls">
+            <button class="copy-btn" onclick="copyDayContent(${d}); event.stopPropagation();"><i class="fas fa-copy"></i> Copy</button>
+            <button class="paste-btn" onclick="pasteDayContent(${d}); event.stopPropagation();" ${!contentClipboard ? 'disabled' : ''}><i class="fas fa-paste"></i> Paste</button>
+          </div>`;
+        }
         
         html += activitiesHtml;
 
@@ -4663,6 +5172,14 @@ const googlePayload = {
             dayHTML += postStatusHtml;
             if (isEditMode) dayHTML += `<span class="edit-indicator"><i class="fas fa-edit"></i></span>`;
             dayHTML += `</div>`;
+            
+            // Add copy/paste controls for desktop
+            if (isEditMode) {
+              dayHTML += `<div class="copy-paste-controls">
+                <button class="copy-btn" onclick="copyDayContent(${dayCount}); event.stopPropagation();"><i class="fas fa-copy"></i> Copy</button>
+                <button class="paste-btn" onclick="pasteDayContent(${dayCount}); event.stopPropagation();" ${!contentClipboard ? 'disabled' : ''}><i class="fas fa-paste"></i> Paste</button>
+              </div>`;
+            }
             
             dayHTML += activitiesHtml;
 
