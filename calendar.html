@@ -1758,16 +1758,44 @@
       statusText.innerHTML = '<i class="fas fa-hourglass-start" style="color:#fdbb2d; margin-right:8px;"></i> Checking for existing video...';
 
       // Get the current activity data
-      const activityIdInput = document.getElementById('edit-activity-id').value;
+      const activityIdInput = activityId; // Use the passed parameter
       const day = currentlyEditingDay;
 
+      console.log('Debug - generateVideoFromImage:', {
+        activityId: activityIdInput,
+        day: day,
+        monthDataCache: monthDataCache
+      });
+
       // Find the activity in the current day's data
-      const rawDayData = monthDataCache[day] || null;
-      const dayDataArray = Array.isArray(rawDayData) ? rawDayData : (rawDayData ? [rawDayData] : []);
+      let rawDayData = monthDataCache[day] || null;
+      let dayDataArray = Array.isArray(rawDayData) ? rawDayData : (rawDayData ? [rawDayData] : []);
+      
+      // If no data in cache, try to reload from database
+      if (dayDataArray.length === 0) {
+        console.log('No data in cache, reloading from database...');
+        const id = monthId(currentDate);
+        const { data: sel } = await supabase.from('calendars').select('days').eq('id', id).maybeSingle();
+        if (sel && sel.days && sel.days[day]) {
+          monthDataCache = sel.days;
+          rawDayData = sel.days[day];
+          dayDataArray = Array.isArray(rawDayData) ? rawDayData : [rawDayData];
+          console.log('Reloaded data from database:', { dayDataArray });
+        }
+      }
+      
+      console.log('Debug - dayData:', {
+        rawDayData,
+        dayDataArray,
+        dayDataArrayLength: dayDataArray.length,
+        dayDataIds: dayDataArray.map(item => item.id)
+      });
+
       const activity = dayDataArray.find(item => item.id === activityIdInput);
 
       if (!activity) {
-        throw new Error('Activity not found');
+        console.error('Activity not found. Available activities:', dayDataArray.map(a => ({ id: a.id, platform: a.platform })));
+        throw new Error(`Activity not found. Looking for ID: ${activityIdInput}, Day: ${day}, Available IDs: ${dayDataArray.map(a => a.id).join(', ')}`);
       }
 
       // Get the date
@@ -3006,7 +3034,7 @@ function updateOverallTranslationProgressStatus() {
 
       // --- Carousel Images ---
       if ((content.type === 'ai-carousel' || content.type === 'real-carousel') && content.images && content.images.length > 0) {
-        renderCarouselImagesPreview(content.images);
+        renderCarouselImagesPreview(content.images, content.id);
         updateCarouselImagesCount(content.images.length);
         const imgSec = document.getElementById('carousel-images-section');
         if(imgSec) imgSec.style.display = 'block';
@@ -3652,7 +3680,7 @@ WITH CHECK (bucket_id = 'carousel-image');
                 monthDataCache = days;
                 
                 // Update preview without refreshing modal
-                renderCarouselImagesPreview(activity.images);
+                renderCarouselImagesPreview(activity.images, activity.id);
                 updateCarouselImagesCount(activity.images.length);
               } else {
                 showNotification('Activity not found. Please save the content first.', 'warning');
@@ -3663,8 +3691,9 @@ WITH CHECK (bucket_id = 'carousel-image');
               window.tempCarouselImages = window.tempCarouselImages || [];
               window.tempCarouselImages.push(...uploadedImages);
               
-              // Update preview
-              renderCarouselImagesPreview(window.tempCarouselImages);
+              // Update preview - get activityId from DOM if available
+              const currentActivityId = document.getElementById('edit-activity-id')?.value || null;
+              renderCarouselImagesPreview(window.tempCarouselImages, currentActivityId);
               updateCarouselImagesCount(window.tempCarouselImages.length);
             }
           }
@@ -3682,7 +3711,13 @@ WITH CHECK (bucket_id = 'carousel-image');
   }
 
   // Render carousel images preview
-  function renderCarouselImagesPreview(images) {
+  function renderCarouselImagesPreview(images, activityId = null) {
+    console.log('renderCarouselImagesPreview called with:', { 
+      imagesCount: images?.length, 
+      activityId: activityId,
+      activityIdType: typeof activityId
+    });
+    
     const imagesContainer = document.getElementById('carousel-images-preview');
     if (!imagesContainer || !images || images.length === 0) {
       if (imagesContainer) {
@@ -3697,18 +3732,21 @@ WITH CHECK (bucket_id = 'carousel-image');
     
     images.forEach((filename, index) => {
       const cleanName = filename.replace('carousel-image/', '').replace('carousel-image\\', '');
-      const url = `${STORAGE_BASE_URL}/${BUCKET_CAROUSEL}/${encodeURIComponent(cleanName)}`;
+      const baseUrl = `${STORAGE_BASE_URL}/${BUCKET_CAROUSEL}/${encodeURIComponent(cleanName)}`;
+      // Add cache-busting timestamp to prevent browser from showing cached old images
+      const url = `${baseUrl}?t=${Date.now()}`;
       const imageItem = document.createElement('div');
       imageItem.className = 'carousel-image-item';
       imageItem.innerHTML = `
         <img src="${url}" alt="Carousel image ${index + 1}" onerror="this.src='https://placehold.co/100x100?text=Error';">
-        <button class="generate-video-btn" data-image-url="${url}" data-image-index="${index}">
+        <button class="generate-video-btn" data-image-url="${baseUrl}" data-image-index="${index}" data-activity-id="${activityId || ''}">
           <i class="fas fa-video"></i> Generate Video
         </button>
         <button class="delete-image-btn" data-image-filename="${cleanName}" data-image-index="${index}" title="Delete this image">
           <i class="fas fa-times"></i>
         </button>
       `;
+      console.log(`Button created for image ${index} with activityId:`, activityId);
       imagesGrid.appendChild(imageItem);
     });
     
@@ -3723,7 +3761,22 @@ WITH CHECK (bucket_id = 'carousel-image');
           
           const imageUrl = btn.dataset.imageUrl;
           const imageIndex = btn.dataset.imageIndex;
-          const activityId = document.getElementById('edit-activity-id').value;
+          const activityId = btn.dataset.activityId || document.getElementById('edit-activity-id').value;
+          
+          // Check if activity is saved
+          if (!activityId) {
+            showNotification('Please save the content first before generating video', 'warning');
+            return;
+          }
+          
+          console.log('Generate video button clicked:', {
+            imageUrl,
+            imageIndex,
+            activityIdFromDataset: btn.dataset.activityId,
+            activityIdFromDOM: document.getElementById('edit-activity-id').value,
+            finalActivityId: activityId,
+            currentlyEditingDay
+          });
           
           const originalHTML = btn.innerHTML;
           btn.classList.add('loading');
@@ -3763,7 +3816,7 @@ WITH CHECK (bucket_id = 'carousel-image');
             if (!activityId && window.tempCarouselImages && window.tempCarouselImages[index]) {
               // Delete from temporary storage for new activities
               window.tempCarouselImages.splice(index, 1);
-              renderCarouselImagesPreview(window.tempCarouselImages);
+              renderCarouselImagesPreview(window.tempCarouselImages, activityId);
               updateCarouselImagesCount(window.tempCarouselImages.length);
               showNotification('Image deleted successfully', 'success');
             } else {
